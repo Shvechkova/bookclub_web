@@ -3,3 +3,5 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 public/
+bookclub_web.egg-info/
+*.egg-info/
