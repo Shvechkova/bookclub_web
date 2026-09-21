@@ -71,16 +71,12 @@ body {
   margin-right: auto;
 }
 
-.logo-mark { display: block; width: 56px; height: 56px; }
-.logo-words { display: flex; flex-direction: column; line-height: 1.05; }
-
-.logo-name {
-  font-weight: 900;
-  font-size: 20px;
-  letter-spacing: -0.02em;
-}
-
-.logo-descriptor { color: var(--cyan); font-size: 10px; }
+/* Логотип — две картинки: знак и начертание. Рукописную «Читальню»
+   шрифтом не набрать, поэтому текстом её не подменяем. */
+.logo-mark { display: block; width: 60px; height: auto; }
+.logo-words { display: flex; flex-direction: column; gap: 3px; }
+.logo-words img { display: block; width: 116px; height: auto; }
+.logo-descriptor { color: var(--cyan); font-size: 9px; }
 
 .sections { display: flex; flex-wrap: wrap; gap: 18px; }
 
@@ -243,6 +239,8 @@ section:first-of-type { border-top: 0; margin-top: 0; }
 
 @media (max-width: 520px) {
   .top { gap: 12px; }
+  .logo-mark { width: 50px; }
+  .logo-words img { width: 98px; }
   .sections { gap: 12px; width: 100%; }
   .sections .telegram { padding: 6px 10px; }
   main { padding-top: 24px; }

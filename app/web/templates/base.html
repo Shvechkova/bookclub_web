@@ -12,10 +12,11 @@
 </head>
 <body>
   <header class="top">
-    <a class="logo" href="{{ url('/') }}">
-      <img class="logo-mark" src="{{ url('/static/logo-mark.png') }}" alt="" width="56" height="56">
+    {# Логотип клуба — картинкой: рукописную «Читальню» шрифтом не набрать. #}
+    <a class="logo" href="{{ url('/') }}" aria-label="{{ club.name }}, {{ club.descriptor }}">
+      <img class="logo-mark" src="{{ url('/static/logo-mark.png') }}" alt="" width="504" height="473">
       <span class="logo-words">
-        <span class="logo-name">{{ club.name }}</span>
+        <img src="{{ url('/static/logo-words.png') }}" alt="" width="331" height="148">
         <span class="logo-descriptor">{{ club.descriptor }}</span>
       </span>
     </a>
