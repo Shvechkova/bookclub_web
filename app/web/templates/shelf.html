@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block title %}Полка · {{ club.name }}{% endblock %}
+{% block main %}
+<h1>Полка</h1>
+<p class="lead">Что клуб произвёл и чем пользуется.</p>
+
+<section class="book-notes">
+  <h2>Конспекты книг</h2>
+  {% set with_notes = view.books | selectattr("notes_url") | list %}
+  {% if with_notes %}
+  <ul>
+    {% for item in with_notes %}
+    <li><a href="{{ item.notes_url }}">{{ item.title }}</a> — {{ item.author }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  {{ empty("Здесь появятся конспекты прочитанных книг — по одному на книгу.") }}
+  {% endif %}
+</section>
+
+<section class="topics">
+  <h2>Понятия клуба</h2>
+  {% if recent %}
+  <ul>
+    {% for item in recent %}
+    <li>{% if item.notes_url %}<a href="{{ item.notes_url }}">{{ item.name }}</a>{% else %}{{ item.name }}{% endif %}</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{{ url('/shelf/topics') }}">Все понятия клуба</a></p>
+  {% else %}
+  {{ empty("Каталог понятий собирается из тем встреч — пока их нет.") }}
+  <p><a href="{{ url('/shelf/topics') }}">Каталог понятий</a></p>
+  {% endif %}
+</section>
+
+<section class="game">
+  <h2>Разминка</h2>
+  <p>
+    <a href="{{ url(game_url) }}">Тыжархитектор</a> — карточный тренажёр по архитектуре:
+    тянешь симптом, подбираешь лекарство. Двадцать минут перед встречей.
+  </p>
+</section>
+{% endblock %}

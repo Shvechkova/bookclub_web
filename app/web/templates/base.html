@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ club.name }}{% endblock %}</title>
+  <link rel="icon" href="{{ url('/static/logo-mark.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url('/static/style.css') }}">
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="{{ url('/') }}">
+      <img class="logo-mark" src="{{ url('/static/logo-mark.png') }}" alt="" width="56" height="56">
+      <span class="logo-words">
+        <span class="logo-name">{{ club.name }}</span>
+        <span class="logo-descriptor">{{ club.descriptor }}</span>
+      </span>
+    </a>
+    <nav class="sections">
+      <a href="{{ url('/') }}"{% if section == "now" %} aria-current="page"{% endif %}>Сейчас</a>
+      <a href="{{ url('/history') }}"{% if section == "history" %} aria-current="page"{% endif %}>История</a>
+      <a href="{{ url('/shelf') }}"{% if section == "shelf" %} aria-current="page"{% endif %}>Полка</a>
+      <a href="{{ url('/about') }}"{% if section == "about" %} aria-current="page"{% endif %}>О клубе</a>
+      {% if club.telegram %}<a class="telegram" href="{{ club.telegram }}">В телеграм</a>{% endif %}
+    </nav>
+  </header>
+
+  {% if club.marquee %}
+  <div class="marquee marquee--top" aria-hidden="true"><div class="marquee-track">{% for _ in range(8) %}<span>{{ club.marquee[0] }}</span>{% endfor %}</div></div>
+  {% endif %}
+
+  <main>{% block main %}{% endblock %}</main>
+
+  {% if club.marquee | length > 1 %}
+  <div class="marquee marquee--bottom" aria-hidden="true"><div class="marquee-track">{% for _ in range(8) %}<span>{{ club.marquee[1] }}</span>{% endfor %}</div></div>
+  {% endif %}
+</body>
+</html>

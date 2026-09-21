@@ -1,0 +1,234 @@
+# Рабочие данные клуба. Формат — в data/README.md, образец — в club.example.yaml.
+# Книги и встречи заполняются отдельно: пока их нет, разделы сайта показывают,
+# чем они наполняются.
+
+club:
+  name: Кабанья Читальня
+  descriptor: IT книжный клуб
+  about: >
+    Читаем техническую литературу и спорим о ней вслух. Первый час — разбор
+    глав, второй — практика: лайтнинги, каты, разборы паттернов.
+  place: дом77, комната 413
+  slot: среда, раз в две недели
+  time: "19:30"
+  duration: 90 минут
+  marquee:
+    - КНИЖНАЯ СРЕДА
+    - КОД · КНИГИ · СПОРЫ · КОФЕ · ГЛАВЫ
+  marquee:
+    - КНИЖНАЯ СРЕДА
+    - КОД · КНИГИ · СПОРЫ · КОФЕ · ГЛАВЫ
+  rules: []
+
+books:
+  - id: fundamental-software-architecture
+    number: 1
+    title: Фундаментальный подход к программной архитектуре
+    author: Марк Ричардс, Нил Форд
+    status: closed
+    notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/README.md
+    chapters:
+      - title: Введение
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%201.%20%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5.md
+      - title: Архитектурное мышление
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%202.%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D0%BE%D0%B5%20%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5.md
+      - title: Модульность
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%203.%20%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C.md
+      - title: Основные свойства архитектуры
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%204.%20%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5%20%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D1%8B.md
+      - title: Выбор архитектурных свойств
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%205.%20%D0%92%D1%8B%D0%B1%D0%BE%D1%80%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D1%85%20%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2.md
+      - title: Измерение параметров архитектурных свойств
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%206.%20%D0%98%D0%B7%D0%BC%D0%B5%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D0%BE%D0%B2%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D1%85%20%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2.md
+      - title: Область действия архитектурных свойств
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%207.%20%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C%20%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D1%85%20%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2.md
+      - title: Фундаментальный подход к программной архитектуре
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%208%20%D0%A4%D1%83%D0%BD%D0%B4%D0%B0%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%20%D0%BA%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%BD%D0%BE%D0%B9%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B5.md
+      - title: Архитектурные стили. Основы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%209.%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D0%B5%20%D1%81%D1%82%D0%B8%D0%BB%D0%B8.%20%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D1%8B.md
+      - title: Многоуровневая архитектура
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%BB%D0%B0%D0%B2%D0%B0%2010.%20%D0%9C%D0%BD%D0%BE%D0%B3%D0%BE%D1%83%D1%80%D0%BE%D0%B2%D0%BD%D0%B5%D0%B2%D0%B0%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0.md
+      - title: Конвейерная архитектура, каналов и фильтров (pipes and filters)
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2011%20%D0%9A%D0%BE%D0%BD%D0%B2%D0%B5%D0%B9%D0%B5%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0%2C%20%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%BE%D0%B2%20%D0%B8%20%D1%84%D0%B8%D0%BB%D1%8C%D1%82%D1%80%D0%BE%D0%B2%20%28pipes%20and%20filters%29.md
+      - title: Микроядерная архитектура
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2012%20%D0%9C%D0%B8%D0%BA%D1%80%D0%BE%D1%8F%D0%B4%D0%B5%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0.md
+      - title: Архитектура на основе сервисов
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2013%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%BD%D0%B0%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B5%20%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%BE%D0%B2.md
+      - title: Архитектура, управляемая событиями
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2014%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0%2C%20%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8F%D0%B5%D0%BC%D0%B0%D1%8F%20%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D1%8F%D0%BC%D0%B8.md
+      - title: Архитектура на основе пространства
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2015%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%BD%D0%B0%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B0.md
+      - title: Оркестрированная сервис- ориентированная архитектура
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2016%20%D0%9E%D1%80%D0%BA%D0%B5%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%B0%D1%8F%20%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81-%20%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0.md
+      - title: Архитектура микросервисов
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2017%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%BE%D0%B2.md
+      - title: Выбор подходящего архитектурного стиля
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2018%20%D0%92%D1%8B%D0%B1%D0%BE%D1%80%20%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%D1%8F%D1%89%D0%B5%D0%B3%D0%BE%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D0%BE%D0%B3%D0%BE%20%D1%81%D1%82%D0%B8%D0%BB%D1%8F.md
+      - title: Архитектурные решения
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2019%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D0%B5%20%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D1%8F.md
+      - title: Анализ архитектурных рисков
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2020%20%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D1%85%20%D1%80%D0%B8%D1%81%D0%BA%D0%BE%D0%B2.md
+      - title: Составление диаграмм и проведение презентаций архитектуры
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2021%20%D0%A1%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B4%D0%B8%D0%B0%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%20%D0%B8%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%B5%D0%B7%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B9%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D1%8B.md
+      - title: Эффективная команда
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2022%20%D0%AD%D1%84%D1%84%D0%B5%D0%BA%D1%82%D0%B8%D0%B2%D0%BD%D0%B0%D1%8F%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0.md
+      - title: Навыки лидерства и ведения переговоров
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2023%20%D0%9D%D0%B0%D0%B2%D1%8B%D0%BA%D0%B8%20%D0%BB%D0%B8%D0%B4%D0%B5%D1%80%D1%81%D1%82%D0%B2%D0%B0%20%D0%B8%20%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%BE%D0%B2.md
+      - title: Карьерный путь
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/fundamental-software-architecture/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2024%20%D0%9A%D0%B0%D1%80%D1%8C%D0%B5%D1%80%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%83%D1%82%D1%8C.md
+
+  - id: learning-domain-driver-design
+    number: 2
+    title: Изучаем DDD — предметно-ориентированное проектирование
+    author: Влад Хононов
+    status: closed
+    notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/README.md
+    chapters:
+      - title: Анализ предметной области
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%201%20%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%20%D0%BF%D1%80%D0%B5%D0%B4%D0%BC%D0%B5%D1%82%D0%BD%D0%BE%D0%B9%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%B8.md
+      - title: Экспертные знания о предметной области
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%202.%20%D0%AD%D0%BA%D1%81%D0%BF%D0%B5%D1%80%D1%82%D0%BD%D1%8B%D0%B5%20%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%BE%20%D0%BF%D1%80%D0%B5%D0%B4%D0%BC%D0%B5%D1%82%D0%BD%D0%BE%D0%B9%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%B8.md
+      - title: Как осмыслить сложность предметной области
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%203%20%D0%9A%D0%B0%D0%BA%20%D0%BE%D1%81%D0%BC%D1%8B%D1%81%D0%BB%D0%B8%D1%82%D1%8C%20%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%BF%D1%80%D0%B5%D0%B4%D0%BC%D0%B5%D1%82%D0%BD%D0%BE%D0%B9%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%B8.md
+      - title: Интеграция ограниченных контекстов
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%204%20%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%87%D0%B5%D0%BD%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%BE%D0%B2.md
+      - title: Реализация простой бизнес-логики
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%205%20%D0%A0%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%BE%D0%B9%20%D0%B1%D0%B8%D0%B7%D0%BD%D0%B5%D1%81-%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.md
+      - title: Проработка сложной бизнес-логики
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%206%20%D0%9F%D1%80%D0%BE%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0%20%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D0%B9%20%D0%B1%D0%B8%D0%B7%D0%BD%D0%B5%D1%81-%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.md
+      - title: Моделирование   фактора времени
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%207%20%20%D0%9C%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%20%20%D1%84%D0%B0%D0%BA%D1%82%D0%BE%D1%80%D0%B0%20%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8.md
+      - title: Архитектурные паттерны
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%208%20%20%D0%90%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D1%8B%D0%B5%20%D0%BF%D0%B0%D1%82%D1%82%D0%B5%D1%80%D0%BD%D1%8B.md
+      - title: Паттерны взаимодействия
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%209%20%D0%9F%D0%B0%D1%82%D1%82%D0%B5%D1%80%D0%BD%D1%8B%20%D0%B2%D0%B7%D0%B0%D0%B8%D0%BC%D0%BE%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F.md
+      - title: Эвристика проектирования
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2010%20%D0%AD%D0%B2%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.md
+      - title: Эволюция проектных решений
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2011%20%D0%AD%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%BD%D1%8B%D1%85%20%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B9.md
+      - title: EventStorming
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2012%20EventStorming.md
+      - title: Предметно-ориентированное проектирование на практике
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2013%20%D0%9F%D1%80%D0%B5%D0%B4%D0%BC%D0%B5%D1%82%D0%BD%D0%BE-%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B5%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%B0%20%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B5.md
+      - title: Микросервисы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2014%20%D0%9C%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B.md
+      - title: Событийно-ориентированная архитектура
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2015%20%D0%A1%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9%D0%BD%D0%BE-%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0.md
+      - title: Сеть данных (Data Mesh)
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/learning-domain-driver-design/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2016%20%D0%A1%D0%B5%D1%82%D1%8C%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85%20%28Data%20Mesh%29.md
+
+  - id: building-microservices
+    number: 3
+    title: Создание микросервисов
+    author: Сэм Ньюмен
+    status: closed
+    notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/README.md
+    chapters:
+      - title: Что такое микросервисы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%201%20%D0%A7%D1%82%D0%BE%20%D1%82%D0%B0%D0%BA%D0%BE%D0%B5%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B.md
+      - title: Как моделировать микросервисы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%202%20%D0%9A%D0%B0%D0%BA%20%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B.md
+      - title: Разделение монолита на части
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%203%20%D0%A0%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BC%D0%BE%D0%BD%D0%BE%D0%BB%D0%B8%D1%82%D0%B0%20%D0%BD%D0%B0%20%D1%87%D0%B0%D1%81%D1%82%D0%B8.md
+      - title: Стили взаимодействия микросервисов
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%204%20%D0%A1%D1%82%D0%B8%D0%BB%D0%B8%20%D0%B2%D0%B7%D0%B0%D0%B8%D0%BC%D0%BE%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%BE%D0%B2.md
+      - title: Реализация коммуникации микросервисов
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%205%20%D0%A0%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BA%D0%BE%D0%BC%D0%BC%D1%83%D0%BD%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D0%B8%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%BE%D0%B2.md
+      - title: Рабочий поток
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%206%20%D0%A0%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%B9%20%D0%BF%D0%BE%D1%82%D0%BE%D0%BA.md
+      - title: Сборка
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%207%20%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0.md
+      - title: Развертывание
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%208%20%D0%A0%D0%B0%D0%B7%D0%B2%D0%B5%D1%80%D1%82%D1%8B%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.md
+      - title: Тестирование
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%209%20%D0%A2%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.md
+      - title: От мониторинга к наблюдаемости
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2010%20%D0%9E%D1%82%20%D0%BC%D0%BE%D0%BD%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%BD%D0%B3%D0%B0%20%D0%BA%20%D0%BD%D0%B0%D0%B1%D0%BB%D1%8E%D0%B4%D0%B0%D0%B5%D0%BC%D0%BE%D1%81%D1%82%D0%B8.md
+      - title: Безопасность
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2011%20%D0%91%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D1%8C.md
+      - title: Отказоустойчивость
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2012%20%D0%9E%D1%82%D0%BA%D0%B0%D0%B7%D0%BE%D1%83%D1%81%D1%82%D0%BE%D0%B9%D1%87%D0%B8%D0%B2%D0%BE%D1%81%D1%82%D1%8C.md
+      - title: Масштабирование
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2013%20%D0%9C%D0%B0%D1%81%D1%88%D1%82%D0%B0%D0%B1%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.md
+      - title: Пользовательские интерфейсы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2014%20%D0%9F%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81%D1%8B.md
+      - title: Организационные структуры
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2015%20%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D1%8B.md
+      - title: Эволюционный архитектор
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2016%20%D0%AD%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80.md
+      - title: Послесловие
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/building-microservices/chapters/%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5.md
+
+  - id: brooks-mythical-man-month
+    number: 4
+    title: Мифический человеко-месяц
+    author: Фредерик Брукс
+    status: reading
+    chapters:
+      - title: Смоляная яма
+      - title: Закон Брукса
+      - title: Хирургическая бригада
+      - title: Концептуальная целостность
+      - title: Эффект второй системы
+      - title: Донести слово
+      - title: Вавилонская башня
+      - title: Оценка сроков
+      - title: Десять фунтов в пятифунтовом мешке
+      - title: Документарная гипотеза
+      - title: Планируйте на выброс
+      - title: Острый инструмент
+      - title: Целое и части
+      - title: Назревание катастрофы
+      - title: Другое лицо
+      - title: Серебряной пули нет
+      - title: Вновь о серебряной пуле
+      - title: "Положения: правда или ложь"
+      - title: 20 лет спустя
+
+  - id: kleppmann-ddia-2
+    number: 5
+    title: Высоконагруженные приложения, 2-е издание
+    author: Мартин Клеппманн, Крис Рикомини
+    status: queued
+    chapters: []
+
+meetings:
+  - id: m-2026-09-23
+    date: 2026-09-23
+    book: brooks-mythical-man-month
+    chapters:
+      - { number: 1 }
+      - { number: 2 }
+      - { number: 3 }
+      - { number: 4 }
+      - { number: 5 }
+      - { number: 6 }
+      - { number: 7 }
+    announce:
+      - Кто видел, как на горящий проект кидали людей? Чем кончилось?
+
+  - id: m-2026-10-07
+    date: 2026-10-07
+    book: brooks-mythical-man-month
+    chapters:
+      - { number: 8 }
+      - { number: 9 }
+      - { number: 10 }
+      - { number: 11 }
+      - { number: 12 }
+      - { number: 13 }
+      - { number: 14 }
+      - { number: 15 }
+    announce:
+      - «Расписание срывается по одному дню за раз» — как у нас срывается?
+
+  - id: m-2026-10-21
+    date: 2026-10-21
+    book: brooks-mythical-man-month
+    chapters:
+      - { number: 16 }
+      - { number: 17 }
+      - { number: 18 }
+      - { number: 19 }
+    announce:
+      - Нейронки — это серебряная пуля? Что бы Брукс написал в 2026?

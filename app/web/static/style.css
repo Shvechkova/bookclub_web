@@ -1,0 +1,252 @@
+/* Визуальная система «Кабаньей Читальни», голубой пак.
+   Панк-зин, а не корпоративный лендинг: ирония живёт в служебном слое —
+   бегущих строках, плашках, подписях. В анонсах и итогах её нет. */
+
+:root {
+  --ink: #0a0a0a;
+  --ink-soft: #141414;
+  --ink-line: #1f1f1f;
+  --paper: #ffffff;
+  --cyan: #29c5f6;
+  --magenta: #f5117f;
+  --muted: rgba(255, 255, 255, 0.62);
+
+  --sans: "Golos Text", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --gutter: 16px;
+  --measure: 70ch;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* --- служебный слой: моноширинный капс с большим трекингом --------------- */
+
+.label,
+.where,
+.num,
+.date,
+.status,
+.not-taken,
+.started,
+.format,
+.source,
+.marquee,
+.sections,
+.logo-descriptor {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+}
+
+/* --- шапка --------------------------------------------------------------- */
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 18px var(--gutter);
+  border-bottom: 2px solid var(--cyan);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.logo-mark { display: block; width: 56px; height: 56px; }
+.logo-words { display: flex; flex-direction: column; line-height: 1.05; }
+
+.logo-name {
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.logo-descriptor { color: var(--cyan); font-size: 10px; }
+
+.sections { display: flex; flex-wrap: wrap; gap: 18px; }
+
+.sections a {
+  color: var(--paper);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.sections a:hover { border-bottom-color: var(--cyan); }
+.sections a[aria-current="page"] { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+.sections .telegram {
+  background: var(--magenta);
+  color: var(--paper);
+  padding: 8px 14px;
+  border-bottom: 0;
+}
+
+/* --- бегущие строки ------------------------------------------------------
+   Текст повторяется так, чтобы обрезаться с обеих сторон: обрезка — приём. */
+
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  letter-spacing: 0.22em;
+  padding: 8px 0;
+  font-weight: 700;
+}
+
+.marquee--top { background: var(--cyan); color: var(--ink); }
+.marquee--bottom { background: var(--magenta); color: var(--paper); }
+
+.marquee-track {
+  display: inline-block;
+  animation: marquee-run 28s linear infinite;
+}
+
+.marquee-track span::after { content: " · "; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+@keyframes marquee-run {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* --- основной поток ------------------------------------------------------ */
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px var(--gutter) 56px;
+}
+
+h1 {
+  font-size: clamp(32px, 8vw, 56px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin: 8px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+h2 {
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 36px 0 12px;
+}
+
+p, li { max-width: var(--measure); }
+
+a { color: var(--cyan); }
+a:hover { color: var(--magenta); }
+
+.label { color: var(--magenta); margin-bottom: 0; }
+.where, .meta { color: var(--muted); }
+.lead { color: var(--muted); }
+
+section { border-top: 1px solid var(--ink-line); padding-top: 8px; margin-top: 28px; }
+section:first-of-type { border-top: 0; margin-top: 0; }
+
+/* --- плашки состояний: без скруглений, свой цвет на состояние ------------ */
+
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  font-weight: 700;
+}
+
+.status--reading { background: var(--magenta); color: var(--paper); }
+.status--queued { background: var(--cyan); color: var(--ink); }
+.status--closed { background: var(--ink-soft); color: var(--paper); border-color: var(--paper); }
+.status--dropped { background: transparent; color: var(--muted); border-color: var(--muted); }
+.status--voting { background: transparent; color: var(--magenta); border-color: var(--magenta); }
+
+/* --- лента истории и оглавление ------------------------------------------ */
+
+.meetings, .chapters, .topic-list, .takeaways, .announce, .rules, .links {
+  padding-left: 0;
+  list-style: none;
+}
+
+.chapters { counter-reset: chapter; }
+
+.meetings li, .chapters li, .topic-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ink-line);
+  max-width: none;
+}
+
+.chapters li::before {
+  counter-increment: chapter;
+  content: counter(chapter) ". ";
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.num { color: var(--cyan); font-weight: 700; }
+.date { color: var(--muted); }
+.format { color: var(--magenta); }
+
+.not-taken, .started {
+  color: var(--muted);
+  border: 1px solid var(--ink-line);
+  padding: 2px 6px;
+  margin-left: 6px;
+}
+
+.announce li, .rules li, .takeaways li { padding: 4px 0; }
+.rules { counter-reset: rule; }
+
+.quote {
+  margin: 20px 0 0;
+  padding: 18px;
+  background: var(--ink-soft);
+  border-left: 4px solid var(--magenta);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.quote .source { display: block; margin-top: 8px; color: var(--cyan); }
+
+.empty {
+  color: var(--muted);
+  border: 1px dashed var(--ink-line);
+  padding: 14px;
+}
+
+.conditions { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; }
+.conditions dt { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; color: var(--muted); }
+.conditions dd { margin: 0; }
+
+/* --- узкий экран --------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .top { gap: 12px; }
+  .sections { gap: 12px; width: 100%; }
+  .sections .telegram { padding: 6px 10px; }
+  main { padding-top: 24px; }
+  .conditions { grid-template-columns: 1fr; }
+}
+
+img { max-width: 100%; height: auto; }

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block title %}Понятия · {{ club.name }}{% endblock %}
+{% block main %}
+<h1>Понятия клуба</h1>
+{% if topics %}
+<ul class="topic-list">
+  {% for item in topics %}
+  <li class="topic">
+    <span class="name">{{ item.name }}</span>
+    {% if item.notes_url %}<a class="notes" href="{{ item.notes_url }}">конспект</a>{% endif %}
+    <span class="meetings">
+      {% for meeting in item.meetings %}<a href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% endfor %}
+    </span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+{{ empty("Каталог понятий собирается из тем встреч — пока их нет ни на одной.") }}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{# Пустое состояние — одно на весь сайт. Раздел без данных объясняет,
+   чем он наполняется, а не выглядит сломанным. #}
+{% macro empty(explains) %}
+<p class="empty">{{ explains }}</p>
+{% endmacro %}
+
+{% macro meeting_line(numbered, view) %}
+<span class="num">#{{ numbered.number }}</span>
+<span class="date">{{ numbered.meeting.date | day_month }}</span>
+<a href="{{ url('/meetings/' ~ numbered.meeting.id) }}">{{ view.title_of(numbered.meeting) }}</a>
+{% if numbered.meeting.format %}<span class="format">{{ numbered.meeting.format.name }}</span>{% endif %}
+{% endmacro %}

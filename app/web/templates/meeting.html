@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Встреча #{{ number }} · {{ club.name }}{% endblock %}
+{% block main %}
+<p class="label">Встреча #{{ number }} · {{ meeting.date | full_date }}</p>
+<h1>{{ view.title_of(meeting) }}</h1>
+{% if meeting.format %}
+<p class="format">Второй час: {{ meeting.format.name }}{% if meeting.format.note %} — {{ meeting.format.note }}{% endif %}</p>
+{% endif %}
+<p class="where">{{ meeting.time }} · {{ meeting.place }}{% if meeting.host %} · ведёт {{ meeting.host }}{% endif %}</p>
+{% if book %}<p class="book"><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a> — {{ book.author }}</p>{% endif %}
+{% if meeting.announce %}
+<ul class="announce">{% for item in meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+{% if is_past %}
+  {% if meeting.outcome %}
+  <section class="outcome">
+    <h2>Итоги</h2>
+    <ol>
+      {% if meeting.outcome.agreed %}<li>{{ meeting.outcome.agreed }}</li>{% endif %}
+      {% if meeting.outcome.argued %}<li>{{ meeting.outcome.argued }}</li>{% endif %}
+      {% if meeting.outcome.taken %}<li>{{ meeting.outcome.taken }}</li>{% endif %}
+    </ol>
+    {% if meeting.outcome.quote %}
+    <blockquote class="quote">
+      {{ meeting.outcome.quote.text }}
+      {% if meeting.outcome.quote.chapter %}<span class="source">{{ chapter_phrase([meeting.outcome.quote.chapter]) }}</span>{% endif %}
+    </blockquote>
+    {% endif %}
+  </section>
+  {% else %}
+  <p class="empty">Итоги этой встречи ещё не записаны.</p>
+  {% endif %}
+{% endif %}
+{% if meeting.topics %}
+<p class="topics">Темы: {% for topic in meeting.topics %}<a href="{{ url('/shelf/topics') }}">{{ topic }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+{% endif %}
+{% if meeting.links %}
+<ul class="links">{% for link in meeting.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

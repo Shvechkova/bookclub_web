@@ -1,0 +1,161 @@
+# Образец файла данных клуба. Показывает все возможности формата.
+# Содержимое выдуманное: рабочие данные лежат в club.yaml.
+# Описание полей — в data/README.md.
+
+club:
+  name: Кабанья Читальня
+  descriptor: IT книжный клуб
+  about: >
+    Читаем техническую литературу и спорим о ней вслух. Первый час — разбор
+    глав, второй — практика: лайтнинги, каты, разборы паттернов.
+  place: дом77, комната 413
+  slot: среда, раз в две недели
+  time: "19:30"
+  duration: 90 минут
+  telegram: https://t.me/example
+  marquee:
+    - КНИЖНАЯ СРЕДА
+    - КОД · КНИГИ · СПОРЫ · КОФЕ · ГЛАВЫ
+  rules:
+    - "Читаем главу до встречи: без этого разговор превращается в пересказ."
+    - Если главу не дожали — переносим хвост, а не ускоряемся.
+    - "Ведущий не лектор: его дело — держать канву и следить, чтобы высказались все."
+  topic_notes:
+    Закон Конвея: https://example.org/notes/conway
+
+books:
+  # Книга без записанных встреч: прочитана до того, как клуб начал вести хронику.
+  - id: archive-example
+    number: 1
+    title: Книга из архива
+    author: Автор Архивный
+    status: closed
+    period: весна 2025
+    notes_url: https://example.org/notes/archive
+    close_note: Прочитали до того, как начали записывать встречи.
+    chapters:
+      - title: Первая глава
+        notes_url: https://example.org/notes/archive/1
+      - title: Вторая глава
+
+  # Книга, прочитанная целиком и по порядку.
+  - id: closed-example
+    number: 2
+    title: Закрытая книга
+    author: Автор Закрытый
+    status: closed
+    close_note: Дочитали до конца, спорили больше всего про третью главу.
+    takeaways:
+      - Первый вывод клуба.
+      - Второй вывод клуба.
+    chapters:
+      - title: Начало
+      - title: Середина
+      - title: Конец
+
+  # Книга, которую читают сейчас, и не целиком: взяты только главы 1, 3 и 5.
+  - id: reading-example
+    number: 3
+    title: Читаемая книга
+    author: Автор Читаемый
+    status: reading
+    taken_chapters: [1, 3, 5]
+    notes_url: https://example.org/notes/reading
+    chapters:
+      - title: Глава первая
+      - title: Глава вторая
+      - title: Глава третья
+      - title: Глава четвёртая
+      - title: Глава пятая
+
+  - id: dropped-example
+    number: 4
+    title: Брошенная книга
+    author: Автор Брошенный
+    status: dropped
+    close_note: "Бросили на второй главе: язык оказался неподъёмным."
+    chapters:
+      - title: Одна
+      - title: Две
+      - title: Три
+
+  - id: queued-example
+    number: 5
+    title: Книга в списке
+    author: Автор Будущий
+    status: queued
+    chapters:
+      - title: Пока не читали
+
+meetings:
+  # Обычная встреча: книга плюс формат во втором часу.
+  - id: m-2026-06-03
+    date: 2026-06-03
+    host: Настя
+    book: closed-example
+    chapters:
+      - { number: 1, outcome: closed }
+      - { number: 2, outcome: closed }
+    format:
+      name: Лайтнинги
+      note: пять минут на человека, без слайдов
+    announce:
+      - Как устроено начало книги
+      - Зачем автор начал именно с этого
+    outcome:
+      agreed: С тем, что первая глава лишняя, согласились все.
+      argued: Дольше всего спорили про вторую.
+      taken: Забираем приём с разделением ответственности.
+      quote:
+        text: Архитектор — градостроитель, а не строитель.
+        chapter: 2
+    topics:
+      - Закон Конвея
+    links:
+      - { title: Разбор в блоге автора, url: https://example.org/post }
+
+  # Главу не дожали: третью перенесли на следующую встречу.
+  - id: m-2026-06-17
+    date: 2026-06-17
+    host: Артём
+    book: closed-example
+    chapters:
+      - { number: 3, outcome: carried }
+
+  - id: m-2026-07-01
+    date: 2026-07-01
+    host: Лена
+    book: closed-example
+    chapters:
+      - { number: 3, outcome: closed }
+    outcome:
+      agreed: Дожали третью главу и на этом книгу закрыли.
+      argued: Спорили, стоило ли вообще её дочитывать.
+      taken: Забираем правило не ускоряться на хвостах.
+
+  # Встреча без книжной части: день открытых дверей.
+  - id: m-2026-07-15
+    date: 2026-07-15
+    host: Игорь
+    title: "ADR-дуэль: выбираем хранилище"
+    format:
+      name: ADR-дуэль
+      note: две команды защищают противоположные решения
+    topics:
+      - Закон Конвея
+
+  # Служебная встреча: ни книги, ни формата.
+  - id: m-2026-07-29
+    date: 2026-07-29
+    title: Голосование за следующую книгу
+
+  # Выборочное чтение: взяты главы 1, 3 и 5, разбираем их не подряд.
+  - id: m-2026-08-12
+    date: 2026-08-12
+    host: Настя
+    book: reading-example
+    chapters:
+      - { number: 1, outcome: closed }
+      - { number: 3, outcome: closed }
+    format:
+      name: Петпроект-практика

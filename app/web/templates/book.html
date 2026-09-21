@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block title %}{{ book.title }} · {{ club.name }}{% endblock %}
+{% block main %}
+<h1>{{ book.title }}</h1>
+<p class="meta">{{ book.author }} · <span class="status status--{{ book.status.value }}">{{ book.status | status_label }}</span>{% if book.period %} · {{ book.period }}{% endif %}</p>
+
+{% if meeting_count %}<p class="count">Книга закрыта за {{ meeting_count | meetings_count }}</p>{% endif %}
+
+{% if book.status.value == "dropped" %}
+  <p class="progress">Закрыто {{ passed | length | chapters_count }}</p>
+{% elif progress %}
+  {% if progress.done %}
+  <p class="progress">Пройдено {{ progress.done }} из {{ progress.taken | chapters_of }}</p>
+  {% elif book.status.value == "reading" %}
+  <p class="progress">Чтение ещё не начиналось</p>
+  {% endif %}
+{% endif %}
+
+{% if book.notes_url %}<p class="notes"><a href="{{ book.notes_url }}">Конспект книги</a></p>{% endif %}
+{% if book.close_note %}<p class="close-note">{{ book.close_note }}</p>{% endif %}
+{% if book.takeaways %}
+<ul class="takeaways">{% for item in book.takeaways %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>Оглавление</h2>
+{% if chapters %}
+<ol class="chapters">
+  {% for item in chapters %}
+  <li class="chapter" data-chapter="{{ item.chapter.number }}">
+    <span class="chapter-title">{{ item.chapter.title }}</span>
+    {% if not item.is_taken %}<span class="not-taken">не взята</span>{% endif %}
+    {% if item.is_started %}<span class="started">перенесена</span>{% endif %}
+    {% for meeting in item.meetings %}<a class="meeting" href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% endfor %}
+    {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}">конспект</a>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+{{ empty("Оглавление появится здесь, когда будет заведено.") }}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+name: Сайт клуба на GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Одна выкатка за раз; начатую не обрываем, чтобы не получить полусайт.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Игра-разминка подключена подмодулем: без неё раздел «Полка» ведёт в никуда.
+          submodules: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Поставить зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          python -m playwright install --with-deps chromium
+
+      - name: Прогнать тесты
+        run: pytest
+
+      - name: Выгрузить сайт
+        # Сайт живёт в папке проекта, а не в корне домена: без префикса
+        # абсолютные ссылки уехали бы на shvechkova.github.io/history.
+        env:
+          SITE_BASE: /${{ github.event.repository.name }}
+        run: python -m app.web.export public
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

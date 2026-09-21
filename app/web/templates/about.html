@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block title %}О клубе · {{ club.name }}{% endblock %}
+{% block main %}
+<h1>О клубе</h1>
+<p class="about">{{ club.about }}</p>
+
+<dl class="conditions">
+  <dt>Где</dt><dd>{{ club.place }}</dd>
+  <dt>Когда</dt><dd>{{ club.slot }}, в {{ club.time }}</dd>
+  <dt>Сколько идёт</dt><dd>{{ club.duration }}</dd>
+</dl>
+
+<h2>Договор клуба</h2>
+{% if club.rules %}
+<ol class="rules">{% for rule in club.rules %}<li>{{ rule }}</li>{% endfor %}</ol>
+{% else %}
+{{ empty("Договор клуба появится здесь: это правила, на которые все согласились.") }}
+{% endif %}
+
+{% if club.telegram %}
+<p class="chat"><a href="{{ club.telegram }}">Чат клуба в телеграме</a></p>
+{% endif %}
+{% endblock %}

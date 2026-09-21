@@ -1,0 +1,3 @@
+[submodule "vendor/tyzharchitector"]
+	path = vendor/tyzharchitector
+	url = https://github.com/Shvechkova/tyzharchitector.git

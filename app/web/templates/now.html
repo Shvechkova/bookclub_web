@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block main %}
+{% if upcoming %}
+<section class="next">
+  <p class="label">Ближайшая встреча · {{ upcoming.meeting.date | day_month }}</p>
+  <h1>{{ view.title_of(upcoming.meeting) }}</h1>
+  {% if upcoming.meeting.announce %}
+  <ul class="announce">{% for item in upcoming.meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if upcoming.meeting.format %}
+  <p class="format">Второй час: {{ upcoming.meeting.format.name }}{% if upcoming.meeting.format.note %} — {{ upcoming.meeting.format.note }}{% endif %}</p>
+  {% endif %}
+  <p class="where">{{ upcoming.meeting.time }} · {{ upcoming.meeting.place }}{% if upcoming.meeting.host %} · ведёт {{ upcoming.meeting.host }}{% endif %}</p>
+  <p><a href="{{ url('/meetings/' ~ upcoming.meeting.id) }}">Подробности встречи</a></p>
+</section>
+{% else %}
+<section class="next">
+  <h1>Следующая встреча не назначена</h1>
+  {% if latest %}
+  <p>Последняя была {{ latest.meeting.date | day_month }}:
+    <a href="{{ url('/meetings/' ~ latest.meeting.id) }}">{{ view.title_of(latest.meeting) }}</a></p>
+  {% else %}
+  {{ empty("Здесь будет ближайшая встреча — дата, место и что к ней читать.") }}
+  {% endif %}
+</section>
+{% endif %}
+
+{% if book %}
+<section class="reading">
+  <h2>Читаем</h2>
+  <p><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a> — {{ book.author }}</p>
+  {% if progress and progress.done %}
+  <p class="progress">Пройдено {{ progress.done }} из {{ progress.taken | chapters_of }}</p>
+  {% else %}
+  <p class="progress">Чтение ещё не начиналось</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if latest and latest.meeting.outcome %}
+<section class="outcome">
+  <h2>Итоги прошлой встречи</h2>
+  <ol>
+    {% if latest.meeting.outcome.agreed %}<li>{{ latest.meeting.outcome.agreed }}</li>{% endif %}
+    {% if latest.meeting.outcome.argued %}<li>{{ latest.meeting.outcome.argued }}</li>{% endif %}
+    {% if latest.meeting.outcome.taken %}<li>{{ latest.meeting.outcome.taken }}</li>{% endif %}
+  </ol>
+  <p><a href="{{ url('/meetings/' ~ latest.meeting.id) }}">Встреча целиком</a></p>
+</section>
+{% endif %}
+{% endblock %}
