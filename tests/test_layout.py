@@ -786,3 +786,15 @@ def test_gallery_tabs_fill_the_rest_of_the_block(site):
             assert gap <= 32, f"между картинкой и вкладками пустота {gap}px"
         finally:
             browser.close()
+
+
+def test_the_column_grows_on_a_wide_monitor(site):
+    with playwright_api.sync_playwright() as playwright:
+        for width, low, high in ((2300, 1100, 1200), (1280, 760, 860)):
+            browser, page = _open_home(playwright, {"width": width, "height": 900})
+            try:
+                page.goto(site + "/", wait_until="load")
+                column = page.locator("main").bounding_box()["width"]
+                assert low <= column <= high, f"колонка {column} при окне {width}"
+            finally:
+                browser.close()

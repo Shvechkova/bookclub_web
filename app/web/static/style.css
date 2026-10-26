@@ -21,6 +21,10 @@
 
   --gutter: 16px;
   --measure: 70ch;
+  /* Колонка страниц растёт с окном: на 27" 2K фиксированные 860 точек
+     занимали треть экрана. Абзацы держит --measure, так что строки текста
+     длиннее не становятся. */
+  --column: clamp(860px, 60vw, 1200px);
   /* Высота закреплённой шапки: картинка «Как это было» не должна уходить
      под неё. Число с запасом — шапка не меняет высоту от содержимого. */
   --header: 100px;
@@ -162,7 +166,7 @@ main { flex: 1 0 auto; }
 /* --- основной поток ------------------------------------------------------ */
 
 main {
-  max-width: 860px;
+  max-width: var(--column);
   margin: 0 auto;
   padding: 32px var(--gutter) 56px;
 }
@@ -730,7 +734,7 @@ a.plate--magenta:hover { background: var(--magenta); color: var(--paper); }
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 18px;
-  max-width: 860px;
+  max-width: var(--column);
   margin: 0 auto;
   padding: 18px var(--gutter) 32px;
   border-top: 1px solid var(--ink-line);
@@ -852,7 +856,7 @@ img { max-width: 100%; height: auto; }
 .about-boar {
   position: absolute;
   top: 0;
-  right: max(-120px, calc(-1 * (max(0px, (100vw - 860px) / 2) + var(--gutter))));
+  right: max(-120px, calc(-1 * (max(0px, (100vw - var(--column)) / 2) + var(--gutter))));
   width: 400px;
   height: auto;
   transform: scaleX(-1);
