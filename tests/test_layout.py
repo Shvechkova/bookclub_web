@@ -757,3 +757,32 @@ def test_the_glossary_search_fits_the_screen_with_a_query(site, viewport):
             assert scroll_width <= client_width, "поле поиска раздвинуло страницу"
         finally:
             browser.close()
+
+
+def test_the_finished_books_grid_is_centred(site):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, WIDE)
+        try:
+            page.goto(site + "/", wait_until="load")
+            block = page.locator(".finished").bounding_box()
+            items = [item.bounding_box() for item in page.locator(".finished-list > li").all()]
+            left = min(item["x"] for item in items) - block["x"]
+            right = block["x"] + block["width"] - max(item["x"] + item["width"] for item in items)
+            assert abs(left - right) <= 2, f"сетка прижата: слева {left}, справа {right}"
+        finally:
+            browser.close()
+
+
+def test_gallery_tabs_fill_the_rest_of_the_block(site):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, WIDE)
+        try:
+            page.goto(site + "/", wait_until="load")
+            body = page.locator(".gallery-body").bounding_box()
+            image = page.locator(".gallery-panel:not([hidden]) img").bounding_box()
+            tabs = page.locator(".gallery-tabs").bounding_box()
+            assert abs(tabs["x"] + tabs["width"] - (body["x"] + body["width"])) <= 1, "вкладки не до правого края"
+            gap = tabs["x"] - (image["x"] + image["width"])
+            assert gap <= 32, f"между картинкой и вкладками пустота {gap}px"
+        finally:
+            browser.close()

@@ -145,7 +145,7 @@ main { flex: 1 0 auto; }
 
 .marquee-track {
   display: inline-block;
-  animation: marquee-run 56s linear infinite;
+  animation: marquee-run 90s linear infinite;
 }
 
 .marquee-track span::after { content: " · "; }
@@ -400,7 +400,10 @@ a.cover, a.cover:hover { color: var(--paper); text-decoration: none; }
   padding: 0;
   margin: 16px 0 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  /* Колонки не шире 190 точек, а сетка — по центру блока: при четырёх книгах
+     auto-fill оставлял справа пустые колонки, и ряд выглядел прижатым. */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 190px));
+  justify-content: center;
   gap: 24px 18px;
 }
 
@@ -621,7 +624,9 @@ a.plate--magenta:hover { background: var(--magenta); color: var(--paper); }
    ещё до загрузки файла. */
 .gallery-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px);
+  /* Колонка картинки — по ширине самой картинки, вкладки забирают остаток:
+     иначе между ними оставалась пустая полоса, а вкладки были узкими. */
+  grid-template-columns: max-content minmax(200px, 1fr);
   gap: 24px;
   align-items: start;
   margin-top: 16px;
@@ -658,9 +663,9 @@ a.plate--magenta:hover { background: var(--magenta); color: var(--paper); }
 .gallery-image { display: block; }
 .gallery-image img {
   display: block;
-  width: 100%;
-  max-width: calc((100vh - var(--header) - 96px) * 1080 / 1350);
-  max-width: calc((100dvh - var(--header) - 96px) * 1080 / 1350);
+  width: calc((100vh - var(--header) - 96px) * 1080 / 1350);
+  width: calc((100dvh - var(--header) - 96px) * 1080 / 1350);
+  max-width: 100%;
   height: auto;
   aspect-ratio: 1080 / 1350;
   object-fit: contain;
