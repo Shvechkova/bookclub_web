@@ -1,9 +1,14 @@
 {% extends "base.html" %}
-{% from "_macros.html" import empty %}
+{% from "_macros.html" import cover, empty, book_status %}
 {% block title %}{{ book.title }} · {{ club.name }}{% endblock %}
 {% block main %}
-<h1>{{ book.title }}</h1>
-<p class="meta">{{ book.author }} · <span class="status status--{{ book.status.value }}">{{ book.status | status_label }}</span>{% if book.period %} · {{ book.period }}{% endif %}</p>
+<div class="book-head">
+  <div class="book-cover">{{ cover(book, link=false, lazy=false) }}</div>
+  <div class="book-meta">
+    <h1>{{ book.title }}</h1>
+    <p class="meta"><span class="author-hand">{{ book.author }}</span> · {{ book_status(book, view) }}{% if book.period %} · {{ book.period }}{% endif %}</p>
+  </div>
+</div>
 
 {% if meeting_count %}<p class="count">Книга закрыта за {{ meeting_count | meetings_count }}</p>{% endif %}
 
@@ -17,7 +22,7 @@
   {% endif %}
 {% endif %}
 
-{% if book.notes_url %}<p class="notes"><a href="{{ book.notes_url }}">Конспект книги</a></p>{% endif %}
+{% if book.notes_url %}<p class="notes"><a href="{{ book.notes_url }}"{{ book.notes_url | new_tab }}>Конспект книги</a></p>{% endif %}
 {% if book.close_note %}<p class="close-note">{{ book.close_note }}</p>{% endif %}
 {% if book.takeaways %}
 <ul class="takeaways">{% for item in book.takeaways %}<li>{{ item }}</li>{% endfor %}</ul>
@@ -32,7 +37,7 @@
     {% if not item.is_taken %}<span class="not-taken">не взята</span>{% endif %}
     {% if item.is_started %}<span class="started">перенесена</span>{% endif %}
     {% for meeting in item.meetings %}<a class="meeting" href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% endfor %}
-    {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}">конспект</a>{% endif %}
+    {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}"{{ item.chapter.notes_url | new_tab }}>конспект</a>{% endif %}
   </li>
   {% endfor %}
 </ol>

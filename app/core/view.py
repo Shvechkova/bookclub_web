@@ -12,8 +12,25 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date as Day
+from datetime import datetime, timedelta
+from urllib.parse import quote
 
-from app.core.models import Book, BookStatus, Chapter, Club, ClubData, Meeting
+from app.core.models import (
+    Book,
+    BookStatus,
+    Chapter,
+    Club,
+    ClubData,
+    Meeting,
+    MeetingImage,
+    OutcomeItem,
+)
+
+# Сколько чего показывает главная. Границы — часть выборки, а не вёрстки:
+# «восемь свежих понятий» должно совпадать у сайта и у анонса.
+RECENT_TOPICS = 8
+RECENT_DEBATES = 3
+GALLERY_SIZE = 6
 
 
 @dataclass(frozen=True)
@@ -42,6 +59,14 @@ class TopicEntry:
 
 
 @dataclass(frozen=True)
+class FormatEntry:
+    """Формат встречи и встречи, на которых его проводили."""
+
+    name: str
+    meetings: tuple[Meeting, ...]
+
+
+@dataclass(frozen=True)
 class BookSegment:
     """Отрезок ленты истории: книга и её встречи, свежие сверху."""
 
@@ -54,6 +79,46 @@ class LoneMeeting:
     """Запись ленты истории: встреча без книжной части."""
 
     meeting: NumberedMeeting
+
+
+@dataclass(frozen=True)
+class CalendarEvent:
+    """Встреча как событие календаря.
+
+    Собрана здесь, а не в шаблоне: то же событие нужно и сайту, и анонсу в
+    канале, и боту — расходиться им незачем.
+    """
+
+    title: str
+    start: datetime
+    end: datetime
+    location: str
+    timezone: str
+
+
+@dataclass(frozen=True)
+class DebateCard:
+    """Спор из итогов вместе со встречей, на которой о нём спорили."""
+
+    meeting: Meeting
+    debate: OutcomeItem
+
+
+@dataclass(frozen=True)
+class GalleryItem:
+    """Встреча с картинкой для блока «Как это было».
+
+    Картинку выбирает `meeting_image`: витрина показывает то же, что страница
+    встречи, и разойтись им не в чем.
+    """
+
+    meeting: Meeting
+    image: MeetingImage
+    is_upcoming: bool
+
+    @property
+    def is_recap(self) -> bool:
+        return self.image == self.meeting.recap_card and not self.is_upcoming
 
 
 @dataclass(frozen=True)
@@ -88,12 +153,19 @@ class ClubView:
     # --- встречи -------------------------------------------------------------
 
     def numbered_meetings(self) -> tuple[NumberedMeeting, ...]:
-        """Все встречи по датам, со сквозной нумерацией с единицы."""
+        """Все встречи по датам; номер — порядковый внутри своей книги.
+
+        Сквозной номер через все книги ничего не говорит читателю: «#4» у
+        первой встречи по новой книге выглядит как пропуск трёх. Встречи без
+        книжной части считаются отдельным рядом, между собой.
+        """
         ordered = sorted(self._data.meetings, key=lambda meeting: (meeting.date, meeting.id))
-        return tuple(
-            NumberedMeeting(number=position, meeting=meeting)
-            for position, meeting in enumerate(ordered, start=1)
-        )
+        counters: dict[str | None, int] = {}
+        numbered = []
+        for meeting in ordered:
+            counters[meeting.book_id] = counters.get(meeting.book_id, 0) + 1
+            numbered.append(NumberedMeeting(number=counters[meeting.book_id], meeting=meeting))
+        return tuple(numbered)
 
     def number_of(self, meeting_id: str) -> int | None:
         for numbered in self.numbered_meetings():
@@ -125,12 +197,36 @@ class ClubView:
         past = [item for item in self.numbered_meetings() if item.meeting.date < today]
         return past[-1] if past else None
 
+    def is_first_of_book(self, meeting: Meeting) -> bool:
+        """Первая ли это встреча по своей книге.
+
+        Считается по датам, а не по признаку в данных: встречу могут добавить
+        задним числом, и тогда первой становится она — без правки прежней.
+        """
+        if meeting.book_id is None:
+            return False
+        book = self._data.book(meeting.book_id)
+        if book is None:
+            return False
+        of_book = self.meetings_of(book)
+        return bool(of_book) and of_book[0].id == meeting.id
+
     def reading_book(self) -> Book | None:
         """Книга, которую читают сейчас. Такая может быть только одна."""
         for book in self._data.books:
             if book.status is BookStatus.READING:
                 return book
         return None
+
+    def finished_books(self) -> tuple[Book, ...]:
+        """Прочитанные клубом книги, последняя закрытая первой.
+
+        Порядок — по номеру книги: книги берут и закрывают по очереди, так что
+        больший номер закрыт позже. Брошенная книга сюда не попадает —
+        «прочитали» про неё неправда.
+        """
+        closed = (book for book in self._data.books if book.status is BookStatus.CLOSED)
+        return tuple(sorted(closed, key=lambda book: book.number, reverse=True))
 
     # --- главы ---------------------------------------------------------------
 
@@ -225,10 +321,64 @@ class ClubView:
             for name in order
         )
 
+    # --- форматы ------------------------------------------------------------
+
+    def formats(self, today: Day) -> tuple[FormatEntry, ...]:
+        """Форматы, которые клуб уже проводил. Отдельного списка форматов нет.
+
+        Формат, назначенный будущей встрече, сюда не попадает: перечень отвечает
+        на вопрос «что клуб делал», а не «что собирается».
+        """
+        order: list[str] = []
+        by_name: dict[str, list[Meeting]] = {}
+        for numbered in self.numbered_meetings():
+            meeting = numbered.meeting
+            if meeting.date >= today or meeting.format is None:
+                continue
+            if meeting.format.name not in by_name:
+                order.append(meeting.format.name)
+                by_name[meeting.format.name] = []
+            by_name[meeting.format.name].append(meeting)
+        return tuple(
+            FormatEntry(name=name, meetings=tuple(by_name[name])) for name in order
+        )
+
+    # --- календарь -----------------------------------------------------------
+
+    def chapters_of_meeting(self, meeting: Meeting) -> tuple[Chapter, ...]:
+        """Главы встречи с названиями, по порядку номеров."""
+        book = self._data.book(meeting.book_id) if meeting.book_id else None
+        if book is None:
+            return ()
+        numbers = sorted({item.number for item in meeting.chapters})
+        found = (book.chapter(number) for number in numbers)
+        return tuple(chapter for chapter in found if chapter is not None)
+
+    def calendar_event(self, meeting: Meeting) -> CalendarEvent:
+        """Данные события: название, начало, конец по длительности клуба, адрес."""
+        hour, minute = (int(part) for part in meeting.time.split(":", 1))
+        start = datetime.combine(meeting.date, datetime.min.time()).replace(
+            hour=hour, minute=minute
+        )
+        return CalendarEvent(
+            title=self.title_of(meeting),
+            start=start,
+            end=start + timedelta(minutes=self.club.duration_minutes),
+            location=meeting.place.full,
+            timezone=self.club.timezone,
+        )
+
     # --- заголовок встречи --------------------------------------------------
 
     def planned_numbers(self, meeting: Meeting) -> tuple[int, ...]:
         return tuple(sorted(meeting.planned_numbers()))
+
+    def short_title_of(self, meeting: Meeting) -> str:
+        """Подпись встречи в одну строку: короткое название книги или своё."""
+        book = self._data.book(meeting.book_id) if meeting.book_id else None
+        if book is None:
+            return meeting.title or ""
+        return book.short_title or book.title
 
     def title_of(self, meeting: Meeting) -> str:
         """Заголовок встречи: из книжной части, если она есть, иначе собственный."""
@@ -239,12 +389,77 @@ class ClubView:
         phrase = chapter_phrase(numbers)
         return f"{book.title} · {phrase}" if phrase else book.title
 
+    # --- витрина главной ---------------------------------------------------
+
+    def _past_newest_first(self, today: Day) -> list[Meeting]:
+        return [
+            numbered.meeting
+            for numbered in reversed(self.numbered_meetings())
+            if is_past(numbered.meeting, today)
+        ]
+
+    def recent_topics(self, today: Day, limit: int = RECENT_TOPICS) -> tuple[TopicEntry, ...]:
+        """Понятия прошедших встреч, свежие первыми, без повторов.
+
+        Тема будущей встречи сюда не идёт: заставка говорит «о чём говорили»,
+        а не «о чём собираемся». Запись берётся из каталога — с адресом
+        конспекта и всеми встречами понятия.
+        """
+        catalogue = {entry.name: entry for entry in self.topics()}
+        seen: list[str] = []
+        for meeting in self._past_newest_first(today):
+            for topic in meeting.topics:
+                if topic not in seen:
+                    seen.append(topic)
+        return tuple(catalogue[name] for name in seen[:limit])
+
+    def recent_debates(self, today: Day, limit: int = RECENT_DEBATES) -> tuple[DebateCard, ...]:
+        """Свежие споры: от последней прошедшей встречи, внутри — по порядку записи."""
+        cards = [
+            DebateCard(meeting=meeting, debate=debate)
+            for meeting in self._past_newest_first(today)
+            if meeting.outcome is not None
+            for debate in meeting.outcome.debates
+        ]
+        return tuple(cards[:limit])
+
+    def gallery(self, today: Day, limit: int = GALLERY_SIZE) -> tuple[GalleryItem, ...]:
+        """Встречи с картинкой, свежие первыми: ближайшая и прошедшие.
+
+        Из будущих — только ближайшая: афиша дальних встреч ещё может
+        поменяться, и витрина не должна обещать того, что не назначено.
+        """
+        upcoming = self.upcoming_meeting(today)
+        candidates = ([upcoming.meeting] if upcoming else []) + self._past_newest_first(today)
+        items = []
+        for meeting in candidates:
+            image = meeting_image(meeting, today)
+            if image is not None:
+                items.append(
+                    GalleryItem(meeting=meeting, image=image, is_upcoming=not is_past(meeting, today))
+                )
+        return tuple(items[:limit])
+
+    def gallery_default(self, today: Day) -> GalleryItem | None:
+        """Что показано сразу: последняя прошедшая встреча с картинкой.
+
+        Прошедшая, а не ближайшая: афиша ближайшей и так стоит выше, а блок
+        отвечает на вопрос «как это было». Прошедших с картинкой нет — тогда
+        ближайшая, лишь бы блок не стоял пустым.
+        """
+        items = self.gallery(today)
+        for item in items:
+            if not item.is_upcoming:
+                return item
+        return items[0] if items else None
+
     # --- лента истории ------------------------------------------------------
 
     def history(self) -> tuple[BookSegment | LoneMeeting, ...]:
         """Вся жизнь клуба одной лентой, свежее сверху.
 
-        Книга — заголовок отрезка, её встречи — записи внутри. Встречи без
+        Книга — заголовок отрезка, её встречи — записи внутри, по порядку
+        чтения: отрезок читается как оглавление, с первой встречи. Встречи без
         книжной части идут той же лентой по своей дате. Книга, к которой встреч
         не отнесено, держится своего номера: датами её разместить не по чему.
         """
@@ -264,9 +479,25 @@ class ClubView:
             ):
                 entries.append(LoneMeeting(meeting=lone[position]))
                 position += 1
-            entries.append(BookSegment(book=book, meetings=tuple(reversed(inside))))
+            entries.append(BookSegment(book=book, meetings=inside))
         entries.extend(LoneMeeting(meeting=item) for item in lone[position:])
         return tuple(reversed(entries))
+
+
+def is_past(meeting: Meeting, today: Day) -> bool:
+    """Прошла ли встреча. В свой день она ещё предстоящая."""
+    return meeting.date < today
+
+
+def meeting_image(meeting: Meeting, today: Day) -> MeetingImage | None:
+    """Картинка встречи: до встречи — афиша, после — карточка итогов.
+
+    Если карточки итогов нет, прошедшая встреча остаётся при афише: картинка с
+    анонсом лучше пустого места, а неверной она не станет.
+    """
+    if is_past(meeting, today) and meeting.recap_card is not None:
+        return meeting.recap_card
+    return meeting.poster
 
 
 def chapter_phrase(numbers: list[int] | tuple[int, ...]) -> str:
@@ -279,3 +510,23 @@ def chapter_phrase(numbers: list[int] | tuple[int, ...]) -> str:
     if numbers[-1] - numbers[0] + 1 == len(numbers):
         return f"главы {numbers[0]}–{numbers[-1]}"
     return "главы " + ", ".join(str(number) for number in numbers)
+
+
+def google_calendar_url(event: CalendarEvent, details: str = "") -> str:
+    """Ссылка «в календарь» для Google.
+
+    Время идёт локальным, а пояс — отдельным параметром `ctz`: так событие
+    встаёт на правильный час и у того, кто живёт в другом поясе.
+    """
+    stamp = "%Y%m%dT%H%M%S"
+    dates = f"{event.start.strftime(stamp)}/{event.end.strftime(stamp)}"
+    parts = [
+        "action=TEMPLATE",
+        f"text={quote(event.title)}",
+        f"dates={dates}",
+        f"ctz={quote(event.timezone)}",
+        f"location={quote(event.location)}",
+    ]
+    if details:
+        parts.append(f"details={quote(details)}")
+    return "https://calendar.google.com/calendar/render?" + "&".join(parts)

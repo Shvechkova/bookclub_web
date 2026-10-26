@@ -1,0 +1,25 @@
+# Окружение и служебное
+.venv/
+.git/
+.github/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+public/
+
+# Не нужно работающему сайту
+tests/
+openspec/
+img/
+logo/
+*.md
+!data/README.md
+vendor/tyzharchitector/.git
+vendor/tyzharchitector/test/
+vendor/tyzharchitector/node_modules/
+
+Dockerfile
+docker-compose.yml
+.dockerignore

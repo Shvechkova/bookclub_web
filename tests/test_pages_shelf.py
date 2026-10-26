@@ -1,4 +1,4 @@
-"""Полка, каталог понятий, «О клубе», пустые состояния и отсутствие входа."""
+"""«О клубе», пустые состояния и отсутствие входа."""
 
 from datetime import date
 
@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from app.core.models import BookStatus
 from app.core.view import ClubView
 from app.web.app import create_app
-from tests.factories import a_book, a_club, a_meeting, some_data
+from tests.factories import a_book, a_club, a_meeting, a_space, some_data
 
 TODAY = date(2026, 9, 21)
 
@@ -23,86 +23,42 @@ def page(path, **kwargs) -> str:
     return response.text
 
 
-# --- 4.6 полка ---------------------------------------------------------------
-
-
-def test_the_shelf_has_three_blocks():
-    html = page(
-        "/shelf",
-        books=[
-            a_book("b1", status=BookStatus.CLOSED, title="С конспектом", notes_url="https://notes/b1"),
-            a_book("b2", number=2, status=BookStatus.CLOSED, title="Без конспекта"),
-        ],
-        meetings=[a_meeting("m1", "2026-01-07", title="Встреча", topics=("Саги",))],
-    )
-
-    assert "https://notes/b1" in html
-    assert "Без конспекта" not in html
-    assert "Саги" in html
-    assert 'href="/shelf/topics"' in html
-    assert 'href="/game/' in html
-
-
-def test_the_shelf_does_not_repeat_the_whole_catalogue():
-    topics = tuple(f"Понятие {number}" for number in range(1, 13))
-    html = page(
-        "/shelf",
-        meetings=[a_meeting("m1", "2026-01-07", title="Встреча", topics=topics)],
-    )
-
-    shown = sum(1 for topic in topics if topic in html)
-    assert shown < len(topics)
-    assert 'href="/shelf/topics"' in html
-
-
-# --- 4.7 каталог понятий -----------------------------------------------------
-
-
-def test_a_topic_leads_to_its_meetings_and_notes():
-    html = page(
-        "/shelf/topics",
-        club=a_club(topic_notes={"Саги": "https://notes/saga"}),
-        meetings=[
-            a_meeting("m1", "2026-01-07", title="Раз", topics=("Саги", "Кворум")),
-            a_meeting("m2", "2026-01-21", title="Два", topics=("Саги",)),
-        ],
-    )
-
-    assert "https://notes/saga" in html
-    assert 'href="/meetings/m1"' in html
-    assert 'href="/meetings/m2"' in html
-    assert "Кворум" in html
-
-
 # --- 4.8 о клубе -------------------------------------------------------------
 
 
-def test_about_explains_the_club_and_lists_its_agreement():
+def test_about_explains_the_club_and_how_a_meeting_goes():
     html = page(
         "/about",
         club=a_club(
-            about="Читаем техническую литературу и спорим о ней вслух.",
-            rules=("Читаем главу до встречи.", "Ведущий не лектор."),
+            about=(
+                "Читаем техническую литературу и спорим о ней вслух.",
+                "Собираемся только очно, в Самаре.",
+            ),
+            routine=("Разбираем главы вслух.", "Ведущий у каждой встречи свой."),
             telegram="https://t.me/kabanya",
         ),
     )
 
     assert "Читаем техническую литературу и спорим о ней вслух." in html
-    assert "дом77, комната 413" in html
+    assert "Собираемся только очно, в Самаре." in html
+    assert "Разбираем главы вслух." in html
+    assert "Ведущий у каждой встречи свой." in html
+    assert "Дом77, Ленинградская 77, 4 этаж, комната 413, Самара" in html
     assert "среда, раз в две недели" in html
     assert "90 минут" in html
-    assert "Читаем главу до встречи." in html
     assert "https://t.me/kabanya" in html
 
 
+def test_about_links_to_the_space_and_to_the_club_thread_in_it():
+    html = page("/about", club=a_club(space=a_space()))
+
+    assert "https://s4m.space/" in html
+    assert "https://t.me/s4m_space" in html
+    assert "https://t.me/+chat" in html
+    assert "https://t.me/c/1/2" in html
+
+
 # --- 4.9 пустые состояния ----------------------------------------------------
-
-
-def test_an_empty_topic_catalogue_explains_what_fills_it():
-    html = page("/shelf/topics")
-
-    assert "из тем встреч" in html
-    assert 'class="empty"' in html
 
 
 def test_an_empty_history_explains_what_fills_it():
@@ -112,17 +68,10 @@ def test_an_empty_history_explains_what_fills_it():
     assert "встречами" in html
 
 
-def test_an_empty_agreement_explains_what_fills_it():
-    html = page("/about", club=a_club(rules=()))
-
-    assert 'class="empty"' in html
-
-
 def test_every_empty_state_uses_the_same_markup():
-    pages = [page("/history"), page("/shelf/topics"), page("/about", club=a_club(rules=()))]
-
-    for html in pages:
-        assert html.count('class="empty"') >= 1
+    # «Форматы» с пустым состоянием ушли со страницы «О клубе»; пустая
+    # лента остаётся единственной.
+    assert page("/history").count('class="empty"') >= 1
 
 
 # --- 4.10 сайт только для чтения ---------------------------------------------
@@ -134,12 +83,13 @@ def test_no_page_offers_a_login_or_changes_anything():
         books=[a_book("b1", status=BookStatus.CLOSED)],
         meetings=[a_meeting("m1", "2026-01-07", book="b1", closed=(1,), topics=("Саги",))],
     )
-    paths = ("/", "/history", "/shelf", "/shelf/topics", "/about", "/meetings/m1", "/books/b1")
+    paths = ("/", "/history", "/about", "/meetings/m1", "/books/b1")
 
     for path in paths:
         html = page(path, **setup)
         assert "<form" not in html
         assert "<input" not in html
-        assert "<button" not in html
+        # Единственная кнопка — бургер меню: она раскрывает разделы и ничего не меняет.
+        assert html.count("<button") == html.count('<button class="menu-toggle"')
         assert "Войти" not in html
         assert "Записаться" not in html

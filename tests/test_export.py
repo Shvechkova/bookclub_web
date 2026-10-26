@@ -56,8 +56,6 @@ def test_export_writes_a_file_for_every_address(tmp_path):
     expected = [
         "index.html",
         "history/index.html",
-        "shelf/index.html",
-        "shelf/topics/index.html",
         "about/index.html",
         "meetings/m1/index.html",
         "meetings/m2/index.html",
@@ -111,6 +109,31 @@ def test_links_under_a_subpath_still_lead_to_files(tmp_path):
     export_site(a_site(), tmp_path, today=TODAY, base="/bookclub_web")
 
     assert broken_links(tmp_path, base="/bookclub_web") == []
+
+
+# --- карта сайта -------------------------------------------------------------
+
+
+def test_export_writes_a_sitemap_and_robots(tmp_path):
+    export_site(
+        a_site(), tmp_path, today=TODAY, base="/bookclub_web", origin="https://example.org"
+    )
+
+    sitemap = (tmp_path / "sitemap.xml").read_text(encoding="utf-8")
+    robots = (tmp_path / "robots.txt").read_text(encoding="utf-8")
+
+    assert "<loc>https://example.org/bookclub_web/</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/about</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/meetings/m1</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/books/closed-one</loc>" in sitemap
+    assert "Sitemap: https://example.org/bookclub_web/sitemap.xml" in robots
+
+
+def test_export_without_a_site_address_writes_no_sitemap(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY)
+
+    assert not (tmp_path / "sitemap.xml").exists()
+    assert not (tmp_path / "robots.txt").exists()
 
 
 def test_a_trailing_slash_in_the_base_is_ignored(tmp_path):

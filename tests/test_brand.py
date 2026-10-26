@@ -10,7 +10,7 @@ from app.web.app import create_app
 from tests.factories import a_book, a_club, a_meeting, some_data
 
 TODAY = date(2026, 9, 21)
-PATHS = ("/", "/history", "/shelf", "/shelf/topics", "/about")
+PATHS = ("/", "/history", "/about")
 
 
 def page(path, books=(), meetings=(), club=None) -> str:
@@ -91,3 +91,53 @@ def test_without_marquee_texts_there_are_no_running_lines():
     html = page("/", club=a_club(marquee=()))
 
     assert "marquee" not in html
+
+
+# --- 5.5 приёмы анонса: рукописная подпись и наклейка ------------------------
+
+
+def test_the_author_is_signed_by_hand_on_the_book_page():
+    book = a_book("b1", status=BookStatus.READING, author="Фредерик Брукс")
+    html = page("/books/b1", books=[book])
+
+    assert '<span class="author-hand">Фредерик Брукс</span>' in html
+    assert "family=Caveat" in html
+
+
+def test_the_author_is_signed_by_hand_in_the_reading_block():
+    book = a_book("b1", status=BookStatus.READING, author="Фредерик Брукс")
+    meeting = a_meeting("m1", "2026-09-23", book="b1", planned=(1,))
+    html = page("/", books=[book], meetings=[meeting])
+
+    assert '<span class="author-hand">Фредерик Брукс</span>' in html
+
+
+def test_the_first_meeting_of_a_book_wears_a_sticker():
+    book = a_book("b1", chapters=6, status=BookStatus.READING)
+    meetings = [
+        a_meeting("m1", "2026-09-23", book="b1", planned=(1, 2)),
+        a_meeting("m2", "2026-10-07", book="b1", planned=(3, 4)),
+    ]
+
+    for path in ("/", "/meetings/m1"):
+        html = page(path, books=[book], meetings=meetings)
+        assert "Начинаем новую книгу" in html, path
+        assert "встреча #1" in html, path
+
+
+def test_a_meeting_in_the_middle_of_a_book_has_no_sticker():
+    book = a_book("b1", chapters=6, status=BookStatus.READING)
+    meetings = [
+        a_meeting("m1", "2026-09-09", book="b1", closed=(1, 2)),
+        a_meeting("m2", "2026-10-07", book="b1", planned=(3, 4)),
+    ]
+
+    html = page("/meetings/m2", books=[book], meetings=meetings)
+
+    assert "Начинаем новую книгу" not in html
+
+
+def test_a_meeting_without_a_book_has_no_sticker():
+    html = page("/meetings/lone", meetings=[a_meeting("lone", "2026-09-23", title="ADR-дуэль")])
+
+    assert "Начинаем новую книгу" not in html

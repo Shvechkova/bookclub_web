@@ -1,30 +1,75 @@
 {% extends "base.html" %}
+{% from "_macros.html" import meeting_image %}
 {% block title %}Встреча #{{ number }} · {{ club.name }}{% endblock %}
+{% block og_image %}{% if image %}{{ absolute('/static/' ~ image.src) }}{% else %}{{ super() }}{% endif %}{% endblock %}
 {% block main %}
-<p class="label">Встреча #{{ number }} · {{ meeting.date | full_date }}</p>
-<h1>{{ view.title_of(meeting) }}</h1>
-{% if meeting.format %}
-<p class="format">Второй час: {{ meeting.format.name }}{% if meeting.format.note %} — {{ meeting.format.note }}{% endif %}</p>
+{# Картинка встречи — сразу под заголовком, до глав и итогов: на широком
+   экране рядом с ним, как обложка на странице книги. #}
+<div class="headline">
+<div class="headline-text">
+  <p class="label">Встреча #{{ number }} · {{ meeting.date | full_date }}</p>
+  {% if view.is_first_of_book(meeting) %}
+  <p class="sticker"><span class="sticker-lead">Начинаем новую книгу</span><span class="sticker-number">встреча #{{ number }}</span></p>
+  {% endif %}
+  <h1>{{ view.title_of(meeting) }}</h1>
+  {% if meeting.format %}
+  <p class="format">Второй час: {{ meeting.format.name }}{% if meeting.format.note %} — {{ meeting.format.note }}{% endif %}</p>
+  {% endif %}
+  <p class="where">{{ meeting.time }} · {{ meeting.place.venue }}{% if meeting.host %} · ведёт {{ meeting.host }}{% endif %}</p>
+  <p class="address">{{ meeting.place.full }}</p>
+  {% if book %}<p class="book"><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a> — {{ book.author }}</p>{% endif %}
+</div>
+{% if image %}{{ meeting_image(image) }}{% endif %}
+</div>
+{% if chapters %}
+<section class="chapters-of-meeting">
+  <h2>{% if is_past %}Разобрали{% else %}Разбираем{% endif %}</h2>
+  <ol class="meeting-chapters">
+    {% for chapter in chapters %}
+    <li><span class="num">{{ "%02d" | format(chapter.number) }}</span> {{ chapter.title }}</li>
+    {% endfor %}
+  </ol>
+</section>
 {% endif %}
-<p class="where">{{ meeting.time }} · {{ meeting.place }}{% if meeting.host %} · ведёт {{ meeting.host }}{% endif %}</p>
-{% if book %}<p class="book"><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a> — {{ book.author }}</p>{% endif %}
 {% if meeting.announce %}
 <ul class="announce">{% for item in meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
 {% endif %}
 {% if is_past %}
   {% if meeting.outcome %}
+  {% set outcome = meeting.outcome %}
   <section class="outcome">
     <h2>Итоги</h2>
+    {% if outcome.agreed or outcome.argued or outcome.taken %}
     <ol>
-      {% if meeting.outcome.agreed %}<li>{{ meeting.outcome.agreed }}</li>{% endif %}
-      {% if meeting.outcome.argued %}<li>{{ meeting.outcome.argued }}</li>{% endif %}
-      {% if meeting.outcome.taken %}<li>{{ meeting.outcome.taken }}</li>{% endif %}
+      {% if outcome.agreed %}<li>{{ outcome.agreed }}</li>{% endif %}
+      {% if outcome.argued %}<li>{{ outcome.argued }}</li>{% endif %}
+      {% if outcome.taken %}<li>{{ outcome.taken }}</li>{% endif %}
     </ol>
-    {% if meeting.outcome.quote %}
+    {% endif %}
+    {% if outcome.quote %}
     <blockquote class="quote">
-      {{ meeting.outcome.quote.text }}
-      {% if meeting.outcome.quote.chapter %}<span class="source">{{ chapter_phrase([meeting.outcome.quote.chapter]) }}</span>{% endif %}
+      {{ outcome.quote.text }}
+      {% if outcome.quote.chapter %}<span class="source">{{ chapter_phrase([outcome.quote.chapter]) }}</span>{% endif %}
     </blockquote>
+    {% endif %}
+    {# Полная форма — в порядке поста в канале. Незаписанная часть не оставляет
+       заголовка: пустой раздел «Главные споры» читается как «спорить было не о чем». #}
+    {% if outcome.lead %}<p class="recap-lead">{{ outcome.lead }}</p>{% endif %}
+    {% for title, items in (("По главам", outcome.by_chapter), ("Главные споры", outcome.debates)) if items %}
+    <h3 class="recap-heading">{{ title }}</h3>
+    <ul class="recap-items">
+      {% for item in items %}
+      <li>
+        {% if item.chapters or item.heading %}<p class="recap-item-head">{% if item.chapters %}<span class="num" title="{{ chapter_phrase(item.chapters) }}">{{ item.chapters | chapter_numbers }}</span>{% endif %}{% if item.heading %}<strong>{{ item.heading }}</strong>{% endif %}</p>{% endif %}
+        <p>{{ item.text }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+    {% if outcome.aside %}<p class="recap-aside">{{ outcome.aside }}</p>{% endif %}
+    {% if outcome.verdict %}
+    <h3 class="recap-heading">Общий итог</h3>
+    <p class="recap-verdict">{{ outcome.verdict }}</p>
     {% endif %}
   </section>
   {% else %}
@@ -32,9 +77,18 @@
   {% endif %}
 {% endif %}
 {% if meeting.topics %}
-<p class="topics">Темы: {% for topic in meeting.topics %}<a href="{{ url('/shelf/topics') }}">{{ topic }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+<p class="topics">Темы: {% for topic in meeting.topics %}{% set notes = club.topic_notes.get(topic) %}{% if notes %}<a href="{{ notes }}"{{ notes | new_tab }}>{{ topic }}</a>{% else %}{{ topic }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</p>
 {% endif %}
+{% if not is_past %}
+{% if club.terms %}
+<ul class="terms">{% for term in club.terms %}<li>{{ term }}</li>{% endfor %}</ul>
+{% endif %}
+{% if calendar_url %}
+<p class="calendar"><a href="{{ calendar_url }}">В календарь</a></p>
+{% endif %}
+{% endif %}
+
 {% if meeting.links %}
-<ul class="links">{% for link in meeting.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>
+<ul class="links">{% for link in meeting.links %}<li><a href="{{ link.url }}"{{ link.url | new_tab }}>{{ link.title }}</a></li>{% endfor %}</ul>
 {% endif %}
 {% endblock %}

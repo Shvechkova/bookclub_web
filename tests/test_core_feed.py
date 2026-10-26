@@ -174,7 +174,9 @@ def test_books_are_segments_and_their_meetings_sit_inside():
     assert [type(entry) for entry in feed] == [BookSegment, BookSegment]
     assert feed[0].book.id == "b2"
     assert [m.meeting.id for m in feed[0].meetings] == ["m3"]
-    assert [m.meeting.id for m in feed[1].meetings] == ["m2", "m1"]
+    assert [m.meeting.id for m in feed[1].meetings] == ["m1", "m2"], (
+        "внутри книги встречи идут по порядку чтения: с первой"
+    )
 
 
 def test_a_meeting_outside_any_book_sits_between_segments():
@@ -208,3 +210,37 @@ def test_a_book_without_meetings_keeps_its_place_by_number():
     assert [entry.book.id for entry in feed] == ["current", "archive"]
     assert feed[1].meetings == ()
     assert feed[1].book.period == "весна 2025"
+
+
+# --- прочитанные книги -------------------------------------------------------
+
+
+def test_finished_books_go_from_the_latest_closed_to_the_first():
+    club = view(
+        books=[
+            a_book("first", number=1, status=BookStatus.CLOSED),
+            a_book("third", number=3, status=BookStatus.CLOSED),
+            a_book("second", number=2, status=BookStatus.CLOSED),
+        ]
+    )
+
+    assert [book.id for book in club.finished_books()] == ["third", "second", "first"]
+
+
+def test_only_closed_books_count_as_finished():
+    club = view(
+        books=[
+            a_book("closed", number=1, status=BookStatus.CLOSED),
+            a_book("dropped", number=2, status=BookStatus.DROPPED),
+            a_book("reading", number=3, status=BookStatus.READING),
+            a_book("queued", number=4, status=BookStatus.QUEUED),
+        ]
+    )
+
+    assert [book.id for book in club.finished_books()] == ["closed"]
+
+
+def test_without_closed_books_nothing_is_finished():
+    club = view(books=[a_book("reading", status=BookStatus.READING)])
+
+    assert club.finished_books() == ()

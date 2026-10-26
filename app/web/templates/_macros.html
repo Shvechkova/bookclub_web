@@ -10,3 +10,38 @@
 <a href="{{ url('/meetings/' ~ numbered.meeting.id) }}">{{ view.title_of(numbered.meeting) }}</a>
 {% if numbered.meeting.format %}<span class="format">{{ numbered.meeting.format.name }}</span>{% endif %}
 {% endmacro %}
+
+{# Обложка книги — одна разметка на весь сайт. Без файла обложки стоит плашка
+   с названием и автором: без неё блок проседает и сетка прыгает. Там, где
+   обложка стоит не на странице самой книги, она ведёт на эту страницу. #}
+{% macro cover(book, link=true, lazy=true) %}
+{% if link %}<a class="cover" href="{{ url('/books/' ~ book.id) }}">{% else %}<span class="cover">{% endif %}
+  {% if book.cover %}
+  <img src="{{ url('/static/' ~ book.cover) }}" alt="Обложка книги {{ book.title }}" width="600" height="838"{% if lazy %} loading="lazy"{% endif %}>
+  {% else %}
+  <span class="cover-blank"><span class="cover-title">{{ book.title }}</span><span class="cover-author">{{ book.author }}</span></span>
+  {% endif %}
+  {# Печать — украшение: статус «закрыта» словами стоит рядом с обложкой. #}
+  {% if book.status.value == "closed" %}<svg class="stamp" aria-hidden="true" focusable="false"><use href="#stamp"/></svg>{% endif %}
+{% if link %}</a>{% else %}</span>{% endif %}
+{% endmacro %}
+
+{# Картинка встречи: афиша до, карточка итогов после — выбирает ядро. Размеры
+   заданы, чтобы раскладка не прыгала, пока файл грузится. По нажатию
+   открывается сам файл: это и есть полный размер. Стоит на первом экране,
+   поэтому грузится сразу. #}
+{% macro meeting_image(image) %}
+<figure class="meeting-image">
+  <a href="{{ url('/static/' ~ image.src) }}">
+    <img src="{{ url('/static/' ~ image.src) }}" alt="{{ image.alt }}" width="1080" height="1350" fetchpriority="high">
+  </a>
+</figure>
+{% endmacro %}
+
+{# Состояние книги плашкой. Читаемая — читательский билет: корешок с номером
+   встречи по книге оторван и лежит рядом, как билет, по которому уже прошли.
+   Номер — последней назначенной встречи: счёт у каждой книги свой. #}
+{% macro book_status(book, view) %}
+{% set meetings = view.meetings_of(book) %}
+{% if book.status.value == "reading" %}<span class="status status--reading ticket"><span class="ticket-main">{{ book.status | status_label }}<small>билет</small></span>{% if meetings %}<span class="ticket-stub" aria-hidden="true">встреча №{{ meetings | length }}</span>{% endif %}</span>{% else %}<span class="status status--{{ book.status.value }}">{{ book.status | status_label }}</span>{% endif %}
+{%- endmacro %}

@@ -19,22 +19,49 @@ from app.core.models import (
     DiscussedChapter,
     Meeting,
     MeetingFormat,
+    Place,
+    Space,
 )
+
+
+def a_place(**overrides) -> Place:
+    values = dict(
+        venue="хакспейс s4m.space",
+        building="Дом77",
+        room="комната 413",
+        street="Ленинградская 77",
+        floor="4 этаж",
+        city="Самара",
+    )
+    values.update(overrides)
+    return Place(**values)
 
 
 def a_club(**overrides) -> Club:
     values = dict(
         name="Кабанья Читальня",
         descriptor="IT книжный клуб",
-        about="О клубе",
-        place="дом77, комната 413",
+        about=("О клубе",),
+        place=a_place(),
         slot="среда, раз в две недели",
         time="19:30",
-        duration="90 минут",
-        rules=("Правило",),
+        duration_minutes=90,
+        timezone="Europe/Samara",
     )
     values.update(overrides)
     return Club(**values)
+
+
+def a_space(**overrides) -> Space:
+    values = dict(
+        name="s4m.space",
+        site="https://s4m.space/",
+        channel="https://t.me/s4m_space",
+        chat="https://t.me/+chat",
+        thread="https://t.me/c/1/2",
+    )
+    values.update(overrides)
+    return Space(**values)
 
 
 def a_book(
@@ -97,7 +124,7 @@ def a_meeting(
         id=meeting_id,
         date=_day(day),
         time="19:30",
-        place="дом77, комната 413",
+        place=a_place(),
         book_id=book,
         chapters=discussed,
         format=MeetingFormat(name=fmt) if fmt else None,

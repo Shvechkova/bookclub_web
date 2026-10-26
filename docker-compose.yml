@@ -1,0 +1,10 @@
+services:
+  web:
+    build: .
+    image: bookclub-web
+    ports:
+      - "${PORT:-8737}:8000"
+    volumes:
+      # Данные клуба берутся с диска: правка club.yaml — и перезапуск, без пересборки.
+      - ./data:/srv/data:ro
+    restart: unless-stopped

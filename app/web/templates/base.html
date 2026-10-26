@@ -3,14 +3,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{{ club.name }}{% endblock %}</title>
+  <title>{% block title %}{{ site_title }}{% endblock %}</title>
+  <meta name="description" content="{{ description }}">
   <link rel="icon" href="{{ url('/static/logo-mark.png') }}">
+  {# Абсолютной разметки нет, пока не задан адрес сайта: канонический адрес
+     наугад увёл бы поисковик, а карточка без абсолютной картинки не соберётся. #}
+  {% if canonical %}
+  <link rel="canonical" href="{{ canonical }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ club.name }}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ canonical }}">
+  {# Картинка карточки — логотип; страница встречи ставит сюда свою картинку. #}
+  <meta property="og:image" content="{% block og_image %}{{ absolute('/static/logo-mark.png') }}{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{{ organization | tojson }}</script>
+  {% if event %}<script type="application/ld+json">{{ event | tojson }}</script>{% endif %}
+  {% endif %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Golos+Text:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url('/static/style.css') }}">
 </head>
 <body>
+  {# Бургер раскрывается скриптом. Пока класса `js` нет, меню открыто:
+     без скриптов кнопке нечем его раскрыть, и прятать пункты нельзя. #}
+  <script>document.documentElement.classList.add("js")</script>
+  {# Печать закрытой книги описана один раз: у кольцевой надписи есть id, и
+     копия на каждой обложке дала бы на странице повторяющиеся id. #}
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <filter id="stamp-rough"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4"/></filter>
+    <symbol id="stamp" viewBox="0 0 120 120">
+      <path id="stamp-ring" fill="none" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
+      <circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="4"/>
+      <circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <text font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="800" letter-spacing="2.2" fill="currentColor"><textPath href="#stamp-ring">{{ club.name | upper }} · ПРОЧИТАНО · </textPath></text>
+      <text x="60" y="64" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="800" letter-spacing="1" fill="currentColor">ЗАКРЫТА</text>
+    </symbol>
+  </svg>
   <header class="top">
     {# Логотип клуба — картинкой: рукописную «Читальню» шрифтом не набрать. #}
     <a class="logo" href="{{ url('/') }}" aria-label="{{ club.name }}, {{ club.descriptor }}">
@@ -20,13 +52,24 @@
         <span class="logo-descriptor">{{ club.descriptor }}</span>
       </span>
     </a>
-    <nav class="sections">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sections">
+      <span class="menu-toggle-bars" aria-hidden="true"></span>
+      <span class="menu-toggle-label">Меню</span>
+    </button>
+    <nav class="sections" id="sections">
       <a href="{{ url('/') }}"{% if section == "now" %} aria-current="page"{% endif %}>Сейчас</a>
-      <a href="{{ url('/history') }}"{% if section == "history" %} aria-current="page"{% endif %}>История</a>
-      <a href="{{ url('/shelf') }}"{% if section == "shelf" %} aria-current="page"{% endif %}>Полка</a>
+      <a href="{{ url('/history') }}"{% if section == "history" %} aria-current="page"{% endif %}>Полка</a>
       <a href="{{ url('/about') }}"{% if section == "about" %} aria-current="page"{% endif %}>О клубе</a>
-      {% if club.telegram %}<a class="telegram" href="{{ club.telegram }}">В телеграм</a>{% endif %}
     </nav>
+    <script>
+      (function () {
+        var toggle = document.currentScript.parentNode.querySelector(".menu-toggle");
+        toggle.addEventListener("click", function () {
+          var open = toggle.getAttribute("aria-expanded") !== "true";
+          toggle.setAttribute("aria-expanded", String(open));
+        });
+      })();
+    </script>
   </header>
 
   {% if club.marquee %}
@@ -37,6 +80,20 @@
 
   {% if club.marquee | length > 1 %}
   <div class="marquee marquee--bottom" aria-hidden="true"><div class="marquee-track">{% for _ in range(8) %}<span>{{ club.marquee[1] }}</span>{% endfor %}</div></div>
+  {% endif %}
+
+  {# Чат клуба живёт в подвале, рядом с площадкой: в шапке остались только
+     разделы. Подвал есть, пока есть хоть одна из этих ссылок. #}
+  {% if club.space or club.telegram %}
+  <footer class="bottom">
+    {% if club.space %}<span class="lives-in">Клуб живёт в {{ club.space.name }}</span>{% endif %}
+    <nav class="space-links">
+      {% if club.space and club.space.site %}<a href="{{ club.space.site }}"{{ club.space.site | new_tab }}>сайт</a>{% endif %}
+      {% if club.space and club.space.channel %}<a href="{{ club.space.channel }}"{{ club.space.channel | new_tab }}>канал</a>{% endif %}
+      {% if club.space and club.space.chat %}<a href="{{ club.space.chat }}"{{ club.space.chat | new_tab }}>чат</a>{% endif %}
+      {% if club.telegram %}<a href="{{ club.telegram }}"{{ club.telegram | new_tab }}>чат читальни</a>{% endif %}
+    </nav>
+  </footer>
   {% endif %}
 </body>
 </html>

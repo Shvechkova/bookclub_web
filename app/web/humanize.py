@@ -33,6 +33,17 @@ WEEKDAYS = (
     "воскресенье",
 )
 
+# «Когда?» — винительный падеж с предлогом: «приходи в среду».
+ON_WEEKDAYS = (
+    "в понедельник",
+    "во вторник",
+    "в среду",
+    "в четверг",
+    "в пятницу",
+    "в субботу",
+    "в воскресенье",
+)
+
 STATUS_LABELS = {
     "voting": "голосуем",
     "queued": "в списке",
@@ -54,6 +65,16 @@ def full_date(day: Day) -> str:
 
 def weekday(day: Day) -> str:
     return WEEKDAYS[day.weekday()]
+
+
+def on_weekday(day: Day) -> str:
+    """«в среду»."""
+    return ON_WEEKDAYS[day.weekday()]
+
+
+def short_date(day: Day) -> str:
+    """«07.10» — как дата стоит на афишах и в подписях карточек."""
+    return f"{day.day:02d}.{day.month:02d}"
 
 
 def status_label(status) -> str:
@@ -81,3 +102,31 @@ def chapters_count(count: int) -> str:
 def chapters_of(count: int) -> str:
     """Родительный падеж после «из»: «из 1 главы», «из 3 глав»."""
     return f"{count} {plural(count, 'главы', 'глав', 'глав')}"
+
+
+def minutes(count: int) -> str:
+    """«90 минут», «31 минута»: длительность хранится числом, склоняем при выводе."""
+    tail = count % 100
+    if 11 <= tail <= 14:
+        word = "минут"
+    elif count % 10 == 1:
+        word = "минута"
+    elif count % 10 in (2, 3, 4):
+        word = "минуты"
+    else:
+        word = "минут"
+    return f"{count} {word}"
+
+
+def chapter_numbers(numbers) -> str:
+    """«08», «06–07», «03, 07»: номера глав плашкой, как в оглавлении встречи.
+
+    Тот же разбор, что у `chapter_phrase`, только без слова «глава»: плашка
+    стоит перед пунктом итогов, и слово там лишнее.
+    """
+    numbers = sorted(numbers)
+    if not numbers:
+        return ""
+    if len(numbers) > 1 and numbers[-1] - numbers[0] + 1 == len(numbers):
+        return f"{numbers[0]:02d}–{numbers[-1]:02d}"
+    return ", ".join(f"{number:02d}" for number in numbers)

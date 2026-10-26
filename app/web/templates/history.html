@@ -1,21 +1,24 @@
 {% extends "base.html" %}
-{% from "_macros.html" import empty, meeting_line %}
-{% block title %}История · {{ club.name }}{% endblock %}
+{% from "_macros.html" import cover, empty, meeting_line, book_status %}
+{% block title %}Полка · {{ club.name }}{% endblock %}
 {% block main %}
-<h1>История</h1>
+<h1>Полка</h1>
 {% if not feed %}
 {{ empty("Лента наполняется книгами и встречами клуба: здесь появится всё, что уже прошло.") }}
 {% endif %}
 {% for entry in feed %}
   {% if entry.book is defined %}
-  <section class="segment">
-    <h2><a href="{{ url('/books/' ~ entry.book.id) }}">{{ entry.book.title }}</a></h2>
-    <p class="meta">{{ entry.book.author }} · <span class="status status--{{ entry.book.status.value }}">{{ entry.book.status | status_label }}</span>{% if entry.book.period %} · {{ entry.book.period }}{% endif %}</p>
-    {% if entry.meetings %}
-    <ul class="meetings">
-      {% for item in entry.meetings %}<li>{{ meeting_line(item, view) }}</li>{% endfor %}
-    </ul>
-    {% endif %}
+  <section class="segment{% if entry.book.status.value == "closed" %} segment--closed{% endif %}">
+    {{ cover(entry.book) }}
+    <div class="segment-body">
+      <h2><a href="{{ url('/books/' ~ entry.book.id) }}">{{ entry.book.title }}</a></h2>
+      <p class="meta">{{ entry.book.author }} · {{ book_status(entry.book, view) }}{% if entry.book.period %} · {{ entry.book.period }}{% endif %}</p>
+      {% if entry.meetings %}
+      <ul class="meetings">
+        {% for item in entry.meetings %}<li>{{ meeting_line(item, view) }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
   </section>
   {% else %}
   <p class="lone">{{ meeting_line(entry.meeting, view) }}</p>

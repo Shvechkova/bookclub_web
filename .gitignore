@@ -5,3 +5,4 @@ __pycache__/
 public/
 bookclub_web.egg-info/
 *.egg-info/
+.superpowers/

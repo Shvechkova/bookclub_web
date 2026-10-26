@@ -36,8 +36,8 @@ def test_the_game_does_not_depend_on_club_data():
     assert client.get(GAME_PATH + "style.css").status_code == 200
 
 
-def test_the_shelf_sends_the_visitor_to_the_game_on_this_site():
-    html = empty_club().get("/shelf").text
+def test_the_home_page_sends_the_visitor_to_the_game_on_this_site():
+    html = empty_club().get("/").text
 
     assert f'href="{GAME_PATH}"' in html
     assert "github.com" not in html

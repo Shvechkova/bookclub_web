@@ -1,24 +1,72 @@
 {% extends "base.html" %}
-{% from "_macros.html" import empty %}
 {% block title %}О клубе · {{ club.name }}{% endblock %}
 {% block main %}
-<h1>О клубе</h1>
-<p class="about">{{ club.about }}</p>
+{# Заставка страницы: кабан стоит в пустой правой части колонки и чуть выходит
+   за неё — отражённый, смотрит на заголовок. Текст рядом с ним уже, чтобы
+   не залезть под картинку. #}
+<section class="about-head">
+  <div class="about-head-text">
+    <p class="hero-eyebrow">О клубе{% if club.since %} · с {{ club.since }}{% endif %}</p>
+    <h1>{{ club.about_title or "О клубе" }}</h1>
+    {% if club.about_hand %}
+    <p class="about-hand">{% for line in club.about_hand.splitlines() %}<span class="about-hand-line">{{ line }}</span>{% if not loop.last %} {% endif %}{% endfor %}</p>
+    {% endif %}
+    {# Кабан стоит перед лидом: на компьютере он вынесен вправо абсолютно, а
+       на телефоне обтекается лидом справа и не наезжает на строки выше. #}
+    <img class="about-boar" src="{{ url('/static/logo-mark.png') }}" alt="" width="504" height="473">
+    {% if club.about %}<p class="about-lead">{{ club.about[0] }}</p>{% endif %}
+  </div>
+</section>
 
-<dl class="conditions">
-  <dt>Где</dt><dd>{{ club.place }}</dd>
-  <dt>Когда</dt><dd>{{ club.slot }}, в {{ club.time }}</dd>
-  <dt>Сколько идёт</dt><dd>{{ club.duration }}</dd>
-</dl>
-
-<h2>Договор клуба</h2>
-{% if club.rules %}
-<ol class="rules">{% for rule in club.rules %}<li>{{ rule }}</li>{% endfor %}</ol>
+{# Карточки фактов говорят то же, что остальные абзацы `about`, только
+   короче: с ними абзацы не повторяем. #}
+{% if club.facts %}
+<ul class="about-facts">
+  {% for fact in club.facts %}
+  <li class="about-fact"><p class="about-fact-label">{{ fact.label }}</p><p class="about-fact-text">{{ fact.text }}</p></li>
+  {% endfor %}
+</ul>
 {% else %}
-{{ empty("Договор клуба появится здесь: это правила, на которые все согласились.") }}
+{% for paragraph in club.about[1:] %}<p class="about">{{ paragraph }}</p>{% endfor %}
 {% endif %}
 
-{% if club.telegram %}
-<p class="chat"><a href="{{ club.telegram }}">Чат клуба в телеграме</a></p>
+{% if club.rules or club.routine %}
+<section class="about-routine">
+  <h2>Как проходит встреча</h2>
+  {% if club.rules %}
+  <ul class="about-rules">
+    {% for rule in club.rules %}<li class="about-rule"><h3 class="about-rule-title">{{ rule.label }}</h3><p>{{ rule.text }}</p></li>{% endfor %}
+  </ul>
+  {% else %}
+  <ul class="routine">{% for line in club.routine %}<li>{{ line }}</li>{% endfor %}</ul>
+  {% endif %}
+</section>
 {% endif %}
+
+<section class="about-place">
+  <h2>Где и когда</h2>
+  <div class="about-when">
+    <p class="about-when-slot">{{ club.slot }}</p>
+    <p class="about-when-time">{{ club.time }} · {{ club.duration_minutes | minutes }}</p>
+    <dl class="conditions">
+      <dt>Место</dt><dd>{% if club.space and club.space.site %}<a class="about-venue" href="{{ club.space.site }}"{{ club.space.site | new_tab }}>{{ club.place.venue }}</a>{% else %}{{ club.place.venue }}{% endif %}</dd>
+      {# Адрес ведёт на карту: по карточке места доходят до двери быстрее,
+         чем по строке адреса. Значок — подсказка, что ссылка про место. #}
+      <dt>Адрес</dt><dd>{% if club.place.map %}<a class="about-map" href="{{ club.place.map }}"{{ club.place.map | new_tab }}><svg class="about-map-pin" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>{{ club.place.full }}</a>{% else %}{{ club.place.full }}{% endif %}</dd>
+    </dl>
+  </div>
+  {% if club.space or club.telegram %}
+  {# Ветка клуба открывается только участникам общего чата площадки,
+     поэтому сначала — вступить в чат. Свой чат читальни — для тех, кто уже
+     пришёл: туда зовут после первой встречи. #}
+  <p class="hero-heading">Куда писать</p>
+  <p class="about-contacts">
+    {% if club.space and club.space.chat %}<a class="button button--magenta" href="{{ club.space.chat }}"{{ club.space.chat | new_tab }}>Вступить в чат {{ club.space.name }}</a>{% endif %}
+    {% if club.space and club.space.thread %}<a class="button button--cyan" href="{{ club.space.thread }}"{{ club.space.thread | new_tab }}>Ветка книжного клуба</a>{% endif %}
+    {% if club.space and club.space.channel %}<a class="button button--outline" href="{{ club.space.channel }}"{{ club.space.channel | new_tab }}>Канал {{ club.space.name }}</a>{% endif %}
+    {% if club.space and club.space.site %}<a class="button button--outline" href="{{ club.space.site }}"{{ club.space.site | new_tab }}>Сайт {{ club.space.name }}</a>{% endif %}
+    {% if club.telegram %}<span class="about-club-chat"><a class="button button--outline" href="{{ club.telegram }}"{{ club.telegram | new_tab }}>Чат читальни</a> <span class="about-club-chat-note">— после первого посещения</span></span>{% endif %}
+  </p>
+  {% endif %}
+</section>
 {% endblock %}

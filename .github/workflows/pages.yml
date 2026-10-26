@@ -38,11 +38,30 @@ jobs:
         run: pytest
 
       - name: Выгрузить сайт
-        # Сайт живёт в папке проекта, а не в корне домена: без префикса
-        # абсолютные ссылки уехали бы на shvechkova.github.io/history.
+        # Свой домен задаётся переменной репозитория SITE_DOMAIN (Settings →
+        # Secrets and variables → Actions → Variables) и тем же именем в
+        # Settings → Pages → Custom domain. С ним сайт живёт в корне домена.
+        #
+        # Без домена сайт живёт в папке проекта: без префикса абсолютные
+        # ссылки уехали бы на shvechkova.github.io/history. Имя владельца в
+        # адресе — строчными, иначе канонический адрес разойдётся с тем, по
+        # которому страницу открывают.
+        #
+        # SITE_URL нужен канону, карточкам пересылки и карте сайта.
         env:
-          SITE_BASE: /${{ github.event.repository.name }}
-        run: python -m app.web.export public
+          DOMAIN: ${{ vars.SITE_DOMAIN }}
+          REPO: ${{ github.event.repository.name }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ -n "$DOMAIN" ]; then
+            export SITE_BASE=""
+            export SITE_URL="https://$DOMAIN"
+          else
+            export SITE_BASE="/$REPO"
+            export SITE_URL="https://$(echo "$OWNER" | tr '[:upper:]' '[:lower:]').github.io"
+          fi
+          echo "Сайт будет жить на $SITE_URL$SITE_BASE"
+          python -m app.web.export public
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

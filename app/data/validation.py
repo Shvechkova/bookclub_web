@@ -75,17 +75,27 @@ def _meetings_make_sense(data: ClubData) -> list[str]:
             problems.append(
                 f"встреча {meeting.id}: без книги у встречи должно быть собственное название"
             )
-        if meeting.chapters and not meeting.book_id:
+        # Главы в пунктах итогов проверяются тем же правилом, что и разобранные:
+        # номер, которого нет в книге, на странице встал бы ссылкой в никуда.
+        referenced = [("разобрана", discussed.number) for discussed in meeting.chapters]
+        if meeting.outcome is not None:
+            referenced += [
+                ("в итогах упомянута", number)
+                for item in meeting.outcome.items()
+                for number in item.chapters
+            ]
+        if referenced and not meeting.book_id:
             problems.append(
                 f"встреча {meeting.id}: главы указаны без книги — "
-                "разобранные главы бывают только у встречи с книжной частью"
+                "разобранные главы и главы в итогах бывают только у встречи "
+                "с книжной частью"
             )
         if book is not None:
             numbers = {chapter.number for chapter in book.chapters}
-            for discussed in meeting.chapters:
-                if discussed.number not in numbers:
+            for verb, number in referenced:
+                if number not in numbers:
                     problems.append(
-                        f"встреча {meeting.id}: разобрана глава {discussed.number}, "
+                        f"встреча {meeting.id}: {verb} глава {number}, "
                         f"а в книге {book.id} глав {len(numbers)}"
                     )
     return problems

@@ -1,22 +1,67 @@
 {% extends "base.html" %}
-{% from "_macros.html" import empty %}
+{% from "_macros.html" import empty, cover, meeting_image %}
 {% block main %}
+{# Заставка — для того, кто о клубе не слышал: чем клуб является, о чём в нём
+   говорят и куда нажать. Цифр нет намеренно, дата и адрес стоят ниже. #}
+<section class="hero">
+  <p class="hero-eyebrow">{{ club.tagline or club.descriptor }}{% if club.since %} · с {{ club.since }}{% endif %}</p>
+  {# Строки манифеста — из данных: перевод строки там задаёт, где фраза
+     делится по смыслу, а не где её разрежет ширина экрана. #}
+  <h1 class="hero-title">{% for line in (club.manifesto or club.tagline or club.name).splitlines() %}<span class="hero-line">{{ line }}</span>{% if not loop.last %} {% endif %}{% endfor %}</h1>
+  {% if club.terms or recent_topics %}
+  <div class="hero-cols{% if not recent_topics %} hero-cols--single{% endif %}">
+    {% if club.terms %}
+    <div class="hero-col">
+      <h2 class="hero-heading">Как у нас</h2>
+      <ul class="hero-terms">{% for item in club.terms %}<li>{{ item }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if recent_topics %}
+    <div class="hero-col">
+      <h2 class="hero-heading">О чём говорили недавно</h2>
+      <ul class="plates">
+        {% for topic in recent_topics %}
+        {% set tone = "plate--cyan" if loop.index is odd else "plate--magenta" %}
+        <li>{% if topic.notes_url %}<a class="plate {{ tone }}" href="{{ topic.notes_url }}"{{ topic.notes_url | new_tab }}>{{ topic.name }}</a>{% else %}<span class="plate {{ tone }}">{{ topic.name }}</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  <p class="hero-cta">
+    {% if upcoming %}<a class="button button--magenta" href="{{ url('/meetings/' ~ upcoming.meeting.id) }}">Прийти {{ upcoming.meeting.date | day_month }}</a>{% else %}<a class="button button--magenta" href="#how-to-come">Как прийти</a>{% endif %}
+  </p>
+</section>
+
 {% if upcoming %}
 <section class="next">
-  <p class="label">Ближайшая встреча · {{ upcoming.meeting.date | day_month }}</p>
-  <h1>{{ view.title_of(upcoming.meeting) }}</h1>
-  {% if upcoming.meeting.announce %}
-  <ul class="announce">{% for item in upcoming.meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
-  {% endif %}
-  {% if upcoming.meeting.format %}
-  <p class="format">Второй час: {{ upcoming.meeting.format.name }}{% if upcoming.meeting.format.note %} — {{ upcoming.meeting.format.note }}{% endif %}</p>
-  {% endif %}
-  <p class="where">{{ upcoming.meeting.time }} · {{ upcoming.meeting.place }}{% if upcoming.meeting.host %} · ведёт {{ upcoming.meeting.host }}{% endif %}</p>
-  <p><a href="{{ url('/meetings/' ~ upcoming.meeting.id) }}">Подробности встречи</a></p>
+  {# Афиша — рядом с текстом встречи, как обложка рядом с книгой; без афиши
+     блок остаётся одной колонкой, без места под картинку. Заголовок — h2:
+     главный заголовок страницы теперь манифест в заставке. #}
+  <div class="headline">
+  <div class="headline-text">
+    <p class="label">Ближайшая встреча · {{ upcoming.meeting.date | day_month }}</p>
+    {% if view.is_first_of_book(upcoming.meeting) %}
+    <p class="sticker"><span class="sticker-lead">Начинаем новую книгу</span><span class="sticker-number">встреча #{{ upcoming.number }}</span></p>
+    {% endif %}
+    <h2 class="next-title">{{ view.title_of(upcoming.meeting) }}</h2>
+    {% if upcoming.meeting.announce %}
+    <ul class="announce">{% for item in upcoming.meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if upcoming.meeting.format %}
+    <p class="format">Второй час: {{ upcoming.meeting.format.name }}{% if upcoming.meeting.format.note %} — {{ upcoming.meeting.format.note }}{% endif %}</p>
+    {% endif %}
+    <p class="where">{{ upcoming.meeting.time }} · {{ upcoming.meeting.place.venue }}{% if upcoming.meeting.host %} · ведёт {{ upcoming.meeting.host }}{% endif %}</p>
+    <p class="address">{{ upcoming.meeting.place.full }}</p>
+    <p><a href="{{ url('/meetings/' ~ upcoming.meeting.id) }}">Подробности встречи</a></p>
+  </div>
+  {% if upcoming_image %}{{ meeting_image(upcoming_image) }}{% endif %}
+  </div>
 </section>
 {% else %}
 <section class="next">
-  <h1>Следующая встреча не назначена</h1>
+  <h2 class="next-title">Следующая встреча не назначена</h2>
   {% if latest %}
   <p>Последняя была {{ latest.meeting.date | day_month }}:
     <a href="{{ url('/meetings/' ~ latest.meeting.id) }}">{{ view.title_of(latest.meeting) }}</a></p>
@@ -26,27 +71,149 @@
 </section>
 {% endif %}
 
-{% if book %}
-<section class="reading">
-  <h2>Читаем</h2>
-  <p><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a> — {{ book.author }}</p>
-  {% if progress and progress.done %}
-  <p class="progress">Пройдено {{ progress.done }} из {{ progress.taken | chapters_of }}</p>
-  {% else %}
-  <p class="progress">Чтение ещё не начиналось</p>
-  {% endif %}
+{% if debates %}
+<section class="debates">
+  <h2>О чём спорим</h2>
+  <ol class="debate-cards">
+    {% for card in debates %}
+    <li class="debate-card {{ 'debate-card--magenta' if loop.index is odd else 'debate-card--cyan' }}">
+      {% if card.debate.heading %}<h3>{{ card.debate.heading }}</h3>{% endif %}
+      <p>{{ card.debate.text }}</p>
+      <p class="debate-caption"><a href="{{ url('/meetings/' ~ card.meeting.id) }}">{{ card.meeting.date | short_date }} · {{ view.short_title_of(card.meeting) }}</a></p>
+    </li>
+    {% endfor %}
+  </ol>
+  <p class="more"><a href="{{ url('/history') }}">Все итоги встреч →</a></p>
 </section>
 {% endif %}
 
-{% if latest and latest.meeting.outcome %}
-<section class="outcome">
-  <h2>Итоги прошлой встречи</h2>
-  <ol>
-    {% if latest.meeting.outcome.agreed %}<li>{{ latest.meeting.outcome.agreed }}</li>{% endif %}
-    {% if latest.meeting.outcome.argued %}<li>{{ latest.meeting.outcome.argued }}</li>{% endif %}
-    {% if latest.meeting.outcome.taken %}<li>{{ latest.meeting.outcome.taken }}</li>{% endif %}
-  </ol>
-  <p><a href="{{ url('/meetings/' ~ latest.meeting.id) }}">Встреча целиком</a></p>
+{% if gallery %}
+{# Вкладки — ссылки на страницы встреч: без скрипта они и работают ссылками,
+   а показана картинка по умолчанию. Скрипт превращает их в переключатель. #}
+<section class="gallery">
+  <h2 id="gallery-heading">Как это было</h2>
+  <div class="gallery-body">
+    <div class="gallery-tabs" role="tablist" aria-labelledby="gallery-heading">
+      {% for item in gallery %}
+      {% set selected = item.meeting.id == gallery_default.meeting.id %}
+      <a class="gallery-tab" role="tab" id="gallery-tab-{{ item.meeting.id }}" href="{{ url('/meetings/' ~ item.meeting.id) }}" aria-controls="gallery-panel-{{ item.meeting.id }}" aria-selected="{{ 'true' if selected else 'false' }}" tabindex="{{ '0' if selected else '-1' }}"><span class="gallery-tab-date">{{ item.meeting.date | short_date }}{% if item.is_upcoming %} · скоро{% endif %}</span><span class="gallery-tab-number">встреча #{{ view.number_of(item.meeting.id) }}</span><span class="gallery-tab-title">{{ view.short_title_of(item.meeting) }}</span></a>
+      {% endfor %}
+    </div>
+    <div class="gallery-panels">
+      {% for item in gallery %}
+      {% set selected = item.meeting.id == gallery_default.meeting.id %}
+      <figure class="gallery-panel" role="tabpanel" id="gallery-panel-{{ item.meeting.id }}" aria-labelledby="gallery-tab-{{ item.meeting.id }}"{% if not selected %} hidden{% endif %}>
+        <a class="gallery-image" href="{{ url('/static/' ~ item.image.src) }}"><img src="{{ url('/static/' ~ item.image.src) }}" alt="{{ item.image.alt }}" width="1080" height="1350"{% if not selected %} loading="lazy"{% endif %}></a>
+        <figcaption>{{ "итоги" if item.is_recap else "афиша" }} · {{ item.meeting.date | short_date }} · <a href="{{ url('/meetings/' ~ item.meeting.id) }}">встреча целиком →</a></figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+  <script>
+    (function () {
+      var root = document.currentScript.parentNode;
+      var tabs = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+      function select(tab, focus) {
+        tabs.forEach(function (other) {
+          var on = other === tab;
+          other.setAttribute("aria-selected", String(on));
+          other.tabIndex = on ? 0 : -1;
+          document.getElementById(other.getAttribute("aria-controls")).hidden = !on;
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (tab, index) {
+        tab.addEventListener("click", function (event) {
+          event.preventDefault();
+          select(tab, false);
+        });
+        // Стрелки ходят по вкладкам по кругу: вертикальный список на широком
+        // экране и строка на узком — обе пары стрелок работают.
+        tab.addEventListener("keydown", function (event) {
+          var step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+          if (!step) return;
+          event.preventDefault();
+          select(tabs[(index + step + tabs.length) % tabs.length], true);
+        });
+      });
+    })();
+  </script>
 </section>
 {% endif %}
+<p class="game-plate">Разминка перед встречей — пиксельная игра клуба. <a href="{{ url(game_url) }}">Играть →</a></p>
+
+{% if book %}
+<section class="reading">
+  <h2>Читаем</h2>
+  <div class="reading-body">
+    {{ cover(book) }}
+    <div class="reading-text">
+      <p class="reading-title"><a href="{{ url('/books/' ~ book.id) }}">{{ book.title }}</a><br><span class="author-hand">{{ book.author }}</span></p>
+      {# Ведём планом: ближайшие главы важнее служебной строки о том, что
+         чтение ещё не начиналось. #}
+      {% if upcoming and upcoming_chapters %}
+      <p class="next-chapters">{{ upcoming.meeting.date | day_month }} берём {{ chapter_phrase(upcoming_chapters | map(attribute="number") | list) }}:
+        {% for chapter in upcoming_chapters %}{{ chapter.title }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+      {% endif %}
+      {% if progress and progress.done %}
+      <p class="progress">Пройдено {{ progress.done }} из {{ progress.taken | chapters_of }}</p>
+      {% elif not upcoming_chapters %}
+      <p class="progress">Чтение ещё не начиналось</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if finished %}
+<section class="finished">
+  <h2>Уже прочитали</h2>
+  <ol class="finished-list">
+    {% for item in finished %}
+    <li>
+      {{ cover(item) }}
+      <p class="finished-title"><a href="{{ url('/books/' ~ item.id) }}">{{ item.title }}</a></p>
+      <p class="finished-author author-hand">{{ item.author }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{# Как прийти — последним: сюда ведёт кнопка заставки, если встреча не
+   назначена. Шаги — служебный текст, всё переменное берётся из данных. #}
+{% set place = upcoming.meeting.place if upcoming else club.place %}
+<section class="how" id="how-to-come">
+  <h2>Как прийти</h2>
+  <ol class="steps">
+    <li class="step">
+      <span class="step-num" aria-hidden="true">1</span>
+      <h3>Глянь ближайшую</h3>
+      <p>{% if upcoming %}Дата и главы — в блоке выше.{% else %}Дату объявляют в чате, как только назначат.{% endif %} Регистрироваться не нужно.</p>
+    </li>
+    <li class="step">
+      <span class="step-num" aria-hidden="true">2</span>
+      <h3>Прочитай. Или нет</h3>
+      <p>Прочитать главы — хорошо. Не успел — всё равно приходи: слушать и спрашивать тоже участие.</p>
+    </li>
+    <li class="step">
+      <span class="step-num" aria-hidden="true">3</span>
+      <h3>Приходи{% if upcoming %} {{ upcoming.meeting.date | on_weekday }}{% endif %}</h3>
+      <p>{{ club.slot | capitalize }}, {{ upcoming.meeting.time if upcoming else club.time }}. {{ place.venue | capitalize }}: {{ place.full }}.</p>
+    </li>
+    {% if club.space and club.space.chat %}
+    <li class="step">
+      <span class="step-num" aria-hidden="true">4</span>
+      <h3>Заходи в чат спейса</h3>
+      <p>Анонсы и ветка книжного клуба живут в чате {{ club.space.name }}.</p>
+    </li>
+    {% endif %}
+  </ol>
+  <p class="how-actions">
+    {% if upcoming %}<a class="button button--magenta" href="{{ url('/meetings/' ~ upcoming.meeting.id) }}">Ближайшая встреча — {{ upcoming.meeting.date | day_month }}</a>{% endif %}
+    {% if club.space and club.space.chat %}<a class="button button--cyan" href="{{ club.space.chat }}"{{ club.space.chat | new_tab }}>Вступить в чат {{ club.space.name }}</a>{% endif %}
+    {% if club.space and club.space.thread %}<a class="button button--outline" href="{{ club.space.thread }}"{{ club.space.thread | new_tab }}>Ветка книжного клуба</a>{% endif %}
+  </p>
+  {% if club.space and club.space.thread %}<p class="how-note">Ветка открывается тем, кто уже в чате, поэтому сначала чат.</p>{% endif %}
+</section>
 {% endblock %}

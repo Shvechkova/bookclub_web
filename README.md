@@ -24,6 +24,33 @@ git submodule update --init vendor/tyzharchitector
 
 Путь к данным переопределяется переменной `CLUB_DATA`.
 
+## Docker
+
+Без Python на машине — в контейнере. Подмодуль с игрой выкачать заранее: образ
+берёт её из рабочей папки.
+
+```bash
+git submodule update --init vendor/tyzharchitector
+docker compose up --build
+```
+
+Открыть http://127.0.0.1:8737 — порт нарочно необычный, чтобы не спорить с другими проектами. Занят и он — `PORT=8080 docker compose up --build`.
+
+Папка `data/` подключается в контейнер с диска, только для чтения.
+Поэтому после правки `club.yaml` хватает перезапуска, пересобирать не нужно:
+
+```bash
+docker compose restart web
+```
+
+Данные читаются при старте, так что без перезапуска правка не видна.
+
+Остановить:
+
+```bash
+docker compose down
+```
+
 ## Выгрузка в статику
 
 ```bash
@@ -49,12 +76,39 @@ MSYS_NO_PATHCONV=1 SITE_BASE=/bookclub_web python -m app.web.export public
 
 `MSYS_NO_PATHCONV=1` нужен только в Git Bash на Windows — см. `PITFALLS.md`.
 
+`SITE_URL` задаёт схему и домен — то, чего не собрать из относительных ссылок:
+канонический адрес страницы, карточку для пересылки в телеграм и карту сайта.
+
+```bash
+MSYS_NO_PATHCONV=1 SITE_BASE=/bookclub_web SITE_URL=https://shvechkova.github.io \
+  python -m app.web.export public
+```
+
+С ней рядом со страницами появляются `sitemap.xml` и `robots.txt`. Без неё их
+нет, и на страницах нет канонических адресов и Open Graph: адрес, собранный из
+заголовков запроса, врёт за прокси и на статике, а неверный канонический адрес
+уводит поисковик вернее, чем его отсутствие.
+
 ## Выкатка на GitHub Pages
 
 `.github/workflows/pages.yml` собирает и публикует сайт при каждом push в `main`:
 выкачивает подмодуль с игрой, ставит зависимости, прогоняет тесты и выгружает
-сайт с префиксом по имени репозитория. Перед первой выкаткой в настройках
-репозитория нужно включить **Settings → Pages → Source: GitHub Actions**.
+сайт. Перед первой выкаткой в настройках репозитория нужно включить
+**Settings → Pages → Source: GitHub Actions**.
+
+Свой домен подключается в двух местах, и имя в них должно совпадать:
+
+1. **Settings → Pages → Custom domain** — домен, плюс галочка Enforce HTTPS,
+   когда GitHub выпустит сертификат. У регистратора — запись `CNAME` на
+   `shvechkova.github.io` для поддомена или четыре `A`-записи GitHub для
+   корня домена.
+2. **Settings → Secrets and variables → Actions → Variables** — переменная
+   `SITE_DOMAIN`, тот же домен без `https://`.
+
+С доменом сайт собирается в корень `https://<домен>`. Без переменной — в папку
+`/<имя репозитория>` на `shvechkova.github.io`. Файл `CNAME` в выгрузку класть
+не нужно: при выкатке через Actions GitHub берёт домен из настроек, а не из
+файла.
 
 ## Тесты
 

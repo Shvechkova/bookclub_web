@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from app.core.models import BookStatus, Outcome, Quote
 from app.core.view import ClubView
 from app.web.app import create_app
-from tests.factories import a_book, a_club, a_meeting, some_data
+from tests.factories import a_book, a_club, a_meeting, a_space, some_data
 
 TODAY = date(2026, 9, 21)
 
@@ -26,20 +26,41 @@ def page(path, **kwargs) -> str:
 # --- 4.1 навигация и адреса --------------------------------------------------
 
 
-def test_every_page_carries_the_same_four_sections():
+def test_every_page_carries_the_same_three_sections():
     setup = dict(
         club=a_club(telegram="https://t.me/kabanya"),
         books=[a_book("b1", status=BookStatus.CLOSED)],
         meetings=[a_meeting("m1", "2026-09-09", book="b1", closed=(1,))],
     )
 
-    for path in ("/", "/history", "/shelf", "/shelf/topics", "/about", "/meetings/m1", "/books/b1"):
+    for path in ("/", "/history", "/about", "/meetings/m1", "/books/b1"):
         html = page(path, **setup)
         assert 'href="/"' in html
         assert 'href="/history"' in html
-        assert 'href="/shelf"' in html
+        assert 'href="/shelf"' not in html
         assert 'href="/about"' in html
         assert "https://t.me/kabanya" in html
+
+
+def test_every_page_ends_with_a_footer_linking_to_the_space():
+    setup = dict(
+        club=a_club(space=a_space()),
+        books=[a_book("b1", status=BookStatus.CLOSED)],
+        meetings=[a_meeting("m1", "2026-09-09", book="b1", closed=(1,))],
+    )
+
+    for path in ("/", "/history", "/about", "/meetings/m1", "/books/b1"):
+        html = page(path, **setup)
+        assert "<footer" in html
+        assert "https://s4m.space/" in html
+        assert "https://t.me/s4m_space" in html
+        assert "https://t.me/+chat" in html
+
+
+def test_without_a_space_the_footer_is_not_shown():
+    html = page("/about")
+
+    assert "<footer" not in html
 
 
 def test_the_current_section_is_marked_as_active():
@@ -84,7 +105,8 @@ def test_now_shows_the_upcoming_meeting():
 
     assert "23 сентября" in html
     assert "19:30" in html
-    assert "дом77, комната 413" in html
+    assert "хакспейс s4m.space" in html
+    assert "Дом77, Ленинградская 77, 4 этаж, комната 413, Самара" in html
     assert "Настя" in html
     assert "Мифический человеко-месяц" in html
     assert "главы 1–2" in html
@@ -102,27 +124,6 @@ def test_now_shows_how_much_of_the_book_is_done():
     )
 
     assert "1 из 3" in html
-
-
-def test_now_shows_the_outcome_of_the_last_meeting():
-    outcome = Outcome(
-        agreed="Согласились, что оценки всегда врут.",
-        argued="Спорили про мифический человеко-месяц.",
-        taken="Забираем правило не добавлять людей на горящий проект.",
-        quote=Quote(text="Девять женщин не родят ребёнка за месяц.", chapter=2),
-    )
-    html = page(
-        "/",
-        books=[a_book("b1", chapters=12)],
-        meetings=[
-            a_meeting("past", "2026-09-09", book="b1", closed=(1,), outcome=outcome),
-            a_meeting("next", "2026-09-23", book="b1", planned=(2,)),
-        ],
-    )
-
-    assert "Согласились, что оценки всегда врут." in html
-    assert "Спорили про мифический человеко-месяц." in html
-    assert 'href="/meetings/past"' in html
 
 
 def test_now_says_plainly_when_no_meeting_is_scheduled():
@@ -153,7 +154,7 @@ def test_history_groups_meetings_under_their_books():
     )
 
     assert html.index("Вторая книга") < html.index("Первая книга")
-    assert "#1" in html and "#2" in html
+    assert html.count('<span class="num">#1</span>') == 2, "каждая книга считает встречи с единицы"
 
 
 def test_history_shows_a_meeting_outside_any_book_in_place():
@@ -230,14 +231,36 @@ def test_a_past_meeting_shows_its_outcome_and_quote():
     assert "глава 16" in html
 
 
-def test_meeting_topics_link_to_the_catalogue():
+def test_meeting_topics_link_to_their_notes_and_nowhere_else():
     html = page(
         "/meetings/m1",
-        meetings=[a_meeting("m1", "2026-09-09", title="Встреча", topics=("Саги",))],
+        club=a_club(topic_notes={"Саги": "https://notes/saga"}),
+        meetings=[a_meeting("m1", "2026-09-09", title="Встреча", topics=("Саги", "Кворум"))],
     )
 
-    assert "Саги" in html
-    assert "/shelf/topics" in html
+    topics = html[html.index('<p class="topics">'):]
+    topics = topics[: topics.index("</p>")]
+    assert '<a href="https://notes/saga"' in topics
+    assert ">Саги</a>" in topics
+    assert "Кворум" in topics and ">Кворум</a>" not in topics
+    assert "/shelf" not in html
+
+
+def test_the_site_has_three_sections_and_the_feed_is_called_shelf():
+    html = page("/history")
+
+    nav = html[html.index('<nav class="sections"'):]
+    nav = nav[: nav.index("</nav>")]
+    assert nav.count("<a ") == 3
+    assert '<a href="/history" aria-current="page">Полка</a>' in nav
+    assert "История" not in nav
+    assert "<h1>Полка</h1>" in html
+    assert "<title>Полка ·" in html
+
+
+def test_the_concept_catalogue_section_is_gone():
+    for path in ("/shelf", "/shelf/topics"):
+        assert client().get(path).status_code == 404, path
 
 
 def test_a_past_meeting_without_an_outcome_says_so():

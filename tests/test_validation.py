@@ -16,12 +16,18 @@ BASE = {
     "club": {
         "name": "Клуб",
         "descriptor": "IT книжный клуб",
-        "about": "О клубе",
-        "place": "дом77",
+        "about": ["О клубе"],
+        "place": {
+            "venue": "хакспейс s4m.space",
+            "building": "Дом77",
+            "street": "Ленинградская 77",
+            "room": "комната 413",
+            "city": "Самара",
+        },
         "slot": "среда, раз в две недели",
         "time": "19:30",
-        "duration": "90 минут",
-        "rules": ["Правило"],
+        "duration_minutes": 90,
+        "timezone": "Europe/Samara",
     },
     "books": [
         {
@@ -125,6 +131,55 @@ def test_meeting_chapter_must_exist_in_the_book(tmp_path):
     assert "9" in failure(tmp_path, mutate)
 
 
+def test_an_outcome_item_must_point_at_a_chapter_of_the_book(tmp_path):
+    def mutate(raw):
+        raw["meetings"][0]["outcome"] = {
+            "by_chapter": [{"chapters": [40], "heading": "Оценка сроков", "text": "…"}]
+        }
+
+    message = failure(tmp_path, mutate)
+
+    assert "m1" in message
+    assert "40" in message
+
+
+def test_a_debate_must_point_at_a_chapter_of_the_book_too(tmp_path):
+    def mutate(raw):
+        raw["meetings"][0]["outcome"] = {"debates": [{"chapters": [3], "text": "…"}]}
+
+    message = failure(tmp_path, mutate)
+
+    assert "m1" in message
+    assert "3" in message
+
+
+def test_an_outcome_item_with_chapters_needs_a_book(tmp_path):
+    def mutate(raw):
+        meeting = raw["meetings"][0]
+        del meeting["book"]
+        del meeting["chapters"]
+        meeting["title"] = "Лайвкодинг"
+        meeting["outcome"] = {"by_chapter": [{"chapters": [1], "text": "…"}]}
+
+    message = failure(tmp_path, mutate)
+
+    assert "m1" in message
+    assert "без книги" in message
+
+
+def test_an_outcome_item_without_chapters_is_fine_without_a_book(tmp_path):
+    def mutate(raw):
+        meeting = raw["meetings"][0]
+        del meeting["book"]
+        del meeting["chapters"]
+        meeting["title"] = "Лайвкодинг"
+        meeting["outcome"] = {"debates": [{"heading": "Бюджеты", "text": "…"}]}
+
+    data = load_club_data(data_file(tmp_path, mutate))
+
+    assert data.meeting("m1").outcome.debates[0].heading == "Бюджеты"
+
+
 def test_meeting_book_must_exist(tmp_path):
     def mutate(raw):
         raw["meetings"][0]["book"] = "нет-такой"
@@ -144,3 +199,60 @@ def test_topic_notes_key_must_be_used_by_a_meeting(tmp_path):
         raw["club"]["topic_notes"] = {"Закон Кнвея": "https://example.org"}
 
     assert "Закон Кнвея" in failure(tmp_path, mutate)
+
+
+def test_a_list_item_that_parsed_into_a_mapping_is_rejected(tmp_path):
+    """«Вход свободный: без регистраций» YAML читает как словарь.
+
+    Без проверки такая строка молча доезжает до страницы в виде словаря, а не
+    падает: ошибка данных должна называться на входе.
+    """
+
+    def mutate(raw):
+        raw["club"]["terms"] = [{"Вход свободный": "без регистраций"}]
+
+    assert "кавычки" in failure(tmp_path, mutate)
+
+
+def test_place_as_a_string_is_rejected(tmp_path):
+    """Строкой место больше не задаётся: из неё не собрать полный адрес."""
+
+    def mutate(raw):
+        raw["club"]["place"] = "дом77, комната 413"
+
+    assert "venue" in failure(tmp_path, mutate)
+
+
+def test_place_without_a_venue_is_rejected(tmp_path):
+    def mutate(raw):
+        del raw["club"]["place"]["venue"]
+
+    assert "venue" in failure(tmp_path, mutate)
+
+
+def test_place_without_a_room_is_rejected(tmp_path):
+    def mutate(raw):
+        del raw["club"]["place"]["room"]
+
+    assert "room" in failure(tmp_path, mutate)
+
+
+def test_a_club_without_a_timezone_is_rejected(tmp_path):
+    """Без пояса ссылка «в календарь» поставит встречу не на тот час."""
+
+    def mutate(raw):
+        del raw["club"]["timezone"]
+
+    assert "timezone" in failure(tmp_path, mutate)
+
+
+def test_duration_must_be_a_positive_number_of_minutes(tmp_path):
+    def mutate(raw):
+        raw["club"]["duration_minutes"] = "90 минут"
+
+    assert "duration_minutes" in failure(tmp_path, mutate)
+
+    def zero(raw):
+        raw["club"]["duration_minutes"] = 0
+
+    assert "duration_minutes" in failure(tmp_path, zero)

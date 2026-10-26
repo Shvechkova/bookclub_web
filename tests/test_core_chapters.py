@@ -49,17 +49,33 @@ def test_a_meeting_inserted_in_the_middle_shifts_the_rest():
     assert after.number_of("m2") == 3
 
 
-def test_meetings_without_a_book_are_numbered_too():
+def test_each_book_counts_its_meetings_from_one():
+    club = view(
+        books=[a_book("b1"), a_book("b2", number=2)],
+        meetings=[
+            a_meeting("m1", "2026-01-07", book="b1", closed=(1,)),
+            a_meeting("m2", "2026-01-21", book="b1", closed=(2,)),
+            a_meeting("m3", "2026-02-04", book="b2", closed=(1,)),
+        ]
+    )
+
+    assert club.number_of("m2") == 2
+    assert club.number_of("m3") == 1, "у новой книги счёт встреч начинается заново"
+
+
+def test_meetings_without_a_book_are_counted_among_themselves():
     club = view(
         books=[a_book("b1")],
         meetings=[
             a_meeting("m1", "2026-01-07", book="b1", closed=(1,)),
             a_meeting("m2", "2026-01-21", title="Голосование"),
             a_meeting("m3", "2026-02-04", book="b1", closed=(2,)),
+            a_meeting("m4", "2026-02-18", title="Разбор года"),
         ]
     )
 
-    assert club.number_of("m3") == 3
+    assert club.number_of("m3") == 2
+    assert club.number_of("m4") == 2
 
 
 # --- 3.2 пройденные главы ----------------------------------------------------
