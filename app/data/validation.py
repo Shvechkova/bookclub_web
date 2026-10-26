@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from app.core.models import BookStatus, ClubData
+from app.core.view import fold_name
 
 
 class DataError(Exception):
@@ -21,7 +22,8 @@ def validate(data: ClubData) -> None:
     problems += _single_reading_book(data)
     problems += _chapters_taken_exist(data)
     problems += _meetings_make_sense(data)
-    problems += _topic_notes_are_used(data)
+    problems += _glossary_names_are_unique(data)
+    problems += _glossary_refers_to_what_exists(data)
     if problems:
         raise DataError("данные клуба не прошли проверку:\n- " + "\n- ".join(problems))
 
@@ -101,10 +103,55 @@ def _meetings_make_sense(data: ClubData) -> list[str]:
     return problems
 
 
-def _topic_notes_are_used(data: ClubData) -> list[str]:
-    used = {topic for meeting in data.meetings for topic in meeting.topics}
-    return [
-        f"конспект понятия «{topic}» задан, но такой темы нет ни на одной встрече"
-        for topic in data.club.topic_notes
-        if topic not in used
-    ]
+def _glossary_names_are_unique(data: ClubData) -> list[str]:
+    """Id, названия и синонимы словаря не повторяются, регистр не в счёт.
+
+    Тема находит понятие по любому из имён без учёта регистра, поэтому два
+    понятия с именем «ADR» и «adr» сделали бы ссылку темы делом случая.
+    """
+    problems = []
+    ids: set[str] = set()
+    owners: dict[str, str] = {}
+    for term in data.glossary:
+        if term.id in ids:
+            problems.append(f"словарь: id {term.id} повторяется")
+        ids.add(term.id)
+        for name in dict.fromkeys(fold_name(name) for name in term.names):
+            owner = owners.get(name)
+            if owner is not None:
+                problems.append(
+                    f"словарь: имя «{name}» есть и у понятия {owner}, и у {term.id}"
+                    " — одно из них лишнее или это синоним одного понятия"
+                )
+            else:
+                owners[name] = term.id
+    return problems
+
+
+def _glossary_refers_to_what_exists(data: ClubData) -> list[str]:
+    """Главы понятия есть в книгах клуба, связанные понятия — в словаре."""
+    problems = []
+    ids = {term.id for term in data.glossary}
+    for term in data.glossary:
+        for reference in term.chapters:
+            book = data.book(reference.book_id)
+            if book is None:
+                problems.append(
+                    f"словарь, понятие {term.id}: глава из книги {reference.book_id}, "
+                    "которой нет в данных клуба"
+                )
+            elif book.chapter(reference.number) is None:
+                problems.append(
+                    f"словарь, понятие {term.id}: глава {reference.number}, "
+                    f"а в книге {book.id} глав {len(book.chapters)}"
+                )
+        for related in term.related:
+            if related == term.id:
+                problems.append(f"словарь, понятие {term.id}: связано само с собой")
+            elif related not in ids:
+                problems.append(
+                    f"словарь, понятие {term.id}: связано с {related}, "
+                    "а такого понятия в словаре нет"
+                )
+    return problems
+

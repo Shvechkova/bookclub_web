@@ -33,34 +33,17 @@ TEMPLATES = HERE / "templates"
 STATIC = HERE / "static"
 ROOT = HERE.parent.parent
 DEFAULT_DATA = ROOT / "data" / "club.yaml"
-GAME_DIR = ROOT / "vendor" / "tyzharchitector"
-GAME_PATH = "/game/"
 
 
 def default_view() -> ClubView:
-    """Данные клуба из файла. Путь можно переопределить переменной CLUB_DATA."""
-    return ClubView(load_club_data(os.environ.get("CLUB_DATA", DEFAULT_DATA)))
-
-
-def _mount_game(app: FastAPI) -> None:
-    """Раздаёт игру-разминку с нашего домена.
-
-    Игра подключена подмодулем закреплённой версии: её код мы не копируем и не
-    правим. Если подмодуль не выкачан, страница честно говорит, чего не хватает,
-    и остальной сайт от этого не страдает.
-    """
-    if (GAME_DIR / "index.html").exists():
-        app.mount(GAME_PATH, StaticFiles(directory=GAME_DIR, html=True), name="game")
-        return
-
-    @app.get(GAME_PATH, response_class=HTMLResponse)
-    def game_missing() -> HTMLResponse:
-        return HTMLResponse(
-            "<!doctype html><meta charset=utf-8>"
-            "<p>Разминка не выкачана. Выполните: "
-            "<code>git submodule update --init vendor/tyzharchitector</code>",
-            status_code=503,
+    """Данные клуба из файла. Путь можно переопределить переменной CLUB_DATA,
+    словарь — переменной CLUB_GLOSSARY; без неё словарь лежит рядом с данными."""
+    return ClubView(
+        load_club_data(
+            os.environ.get("CLUB_DATA", DEFAULT_DATA),
+            os.environ.get("CLUB_GLOSSARY") or None,
         )
+    )
 
 
 def create_app(
@@ -87,7 +70,6 @@ def create_app(
     club_view = view if view is not None else default_view()
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
-    _mount_game(app)
 
     def absolute(path: str) -> str:
         return f"{origin}{prefix}{path}" if origin else ""
@@ -153,7 +135,6 @@ def create_app(
             debates=club_view.recent_debates(day),
             gallery=club_view.gallery(day),
             gallery_default=club_view.gallery_default(day),
-            game_url=GAME_PATH,
         )
 
     @app.get("/history", response_class=HTMLResponse)
@@ -216,6 +197,16 @@ def create_app(
             has_history=club_view.has_recorded_history(found),
             passed=club_view.passed_numbers(found),
             description=seo.book_description(found, club_view.club),
+        )
+
+    @app.get("/glossary", response_class=HTMLResponse)
+    def glossary(request: Request) -> HTMLResponse:
+        return render(
+            request,
+            "glossary.html",
+            section="glossary",
+            index=club_view.glossary_index(),
+            description=seo.glossary_description(club_view.club),
         )
 
     @app.get("/about", response_class=HTMLResponse)

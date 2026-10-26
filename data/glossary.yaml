@@ -1,0 +1,2539 @@
+# Словарь клуба: короткие определения понятий, которые звучат на встречах.
+# Формат — в data/README.md, раздел «Словарь», образец — glossary.example.yaml.
+# Длинные статьи живут в репозитории конспектов, здесь — только адрес.
+# Определения взяты из конспектов глав и статей topics/; понятия без источника
+# в конспектах помечены комментарием.
+
+terms:
+  # --- темы встреч по «Мифическому человеко-месяцу» -------------------------
+
+  - id: brooks-law
+    name: Закон Брукса
+    aliases: ["Brooks's law"]
+    summary: >
+      Если проект опаздывает, добавление людей задержит его ещё больше: новичков
+      надо обучить, работу — перекроить, а на координацию уходит всё больше
+      времени. Позже Брукс назвал закон грубым, но полезным правилом.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 2 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+      - { book: building-microservices, chapter: 15 }
+      - { book: fundamental-software-architecture, chapter: 22 }
+    related: [two-pizza-team, conway-law, man-month, communication-channels]
+
+  - id: second-system-effect
+    name: Эффект второй системы
+    aliases: [Second-system effect, Погоня за функциями]
+    summary: >
+      Вторая система архитектора — самая опасная: в неё попадают все
+      «украшения», отложенные в первой, и она раздувается. Сюда же относится
+      доводка до совершенства техник, которые уже устарели.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 5 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [conceptual-integrity]
+
+  - id: two-pizza-team
+    name: Команда на две пиццы
+    aliases: [Команда на одну пиццу, Two-pizza team, Команды на две пиццы]
+    summary: >
+      Правило Amazon: команда не должна быть больше, чем можно накормить двумя
+      пиццами. Суть не в размере, а в автономии: команда владеет своими
+      системами целиком и мало зависит от других.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [conway-law, brooks-law, stream-aligned-team, strong-ownership]
+
+  - id: adr
+    name: ADR
+    aliases: [Architecture Decision Record, Запись архитектурного решения]
+    summary: >
+      Запись архитектурного решения: короткий текст на одну-две страницы о том,
+      что решили и почему, с контекстом и последствиями. Часто лежит в Git
+      рядом с кодом.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+    related: [sdd, architecture-by-implication, architecturally-significant-decision, rfc]
+
+  # Без источника в конспектах: определение общее.
+  - id: sdd
+    name: SDD
+    aliases: [Spec-Driven Development, Разработка от спецификации]
+    summary: >
+      Разработка от спецификации: сначала пишут спецификацию — требования,
+      решения, план задач, — а код по ней пишет человек или нейросеть.
+      Спецификация лежит в репозитории и меняется вместе с кодом.
+    related: [adr]
+
+  - id: conway-law
+    name: Закон Конвея
+    aliases: ["Conway's law"]
+    summary: >
+      Организация, которая проектирует систему, создаёт систему, повторяющую её
+      структуру коммуникаций: четыре группы на компиляторе дадут
+      четырёхпроходный компилятор. Слабо связанные команды строят слабо
+      связанные системы.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 10 }
+      - { book: building-microservices, chapter: 1 }
+      - { book: building-microservices, chapter: 2 }
+      - { book: building-microservices, chapter: 15 }
+    related: [two-pizza-team, bounded-context, stream-aligned-team, strong-ownership]
+
+  - id: iterative-development
+    name: Итеративная разработка
+    aliases: [Инкрементная разработка, Iterative development, Каркас Миллза, "Выращивать, а не строить"]
+    summary: >
+      Систему строят короткими циклами, и она работает на каждом шаге:
+      пользователи пробуют её рано, а объём можно резать под бюджет. Брукс
+      признал, что «планируйте на выброс» лечит симптом, а болезнь — водопадная
+      модель.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 11 }
+      - { book: brooks-mythical-man-month, chapter: 16 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [waterfall-model, daily-build, rapid-prototyping]
+
+  - id: top-down-design
+    name: Нисходящее проектирование
+    aliases: [Пошаговое уточнение, Top-down design]
+    summary: >
+      Проектирование от общего к частному: задачу пошагово уточняют, пока не
+      дойдут до кода. Подход Вирта даёт модульность и раннее тестирование,
+      Брукс назвал его главной формализацией десятилетия.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 13 }
+    related: [structured-programming]
+
+  - id: structured-programming
+    name: Структурное программирование
+    aliases: [Structured programming]
+    summary: >
+      Подход Дейкстры: программу продумывают управляющими структурами —
+      ветвлениями и циклами, — а не переходами GO TO.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 13 }
+    related: [top-down-design]
+
+  - id: regression-testing
+    name: Регрессионное тестирование
+    aliases: [Регресс, Regression testing]
+    summary: >
+      Повторная проверка уже работавшего после каждой правки. Без неё никак:
+      исправление ошибки с вероятностью 20–50 % вносит новую, потому что у
+      дефекта скрытые связи по всей системе.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 11 }
+      - { book: brooks-mythical-man-month, chapter: 13 }
+
+  # Без источника в конспектах: определение общее.
+  - id: survivorship-bias
+    name: Ошибка выжившего
+    aliases: [Survivorship bias]
+    summary: >
+      Вывод по тем, кто дошёл до нас, без учёта тех, кто отсеялся по дороге.
+      Кажется, что у опенсорса документация лучше, но проекты с плохой просто
+      не попадаются на глаза.
+
+  # Без источника в конспектах: определение общее.
+  - id: bpmn
+    name: BPMN
+    aliases: [Business Process Model and Notation]
+    summary: >
+      Нотация схем бизнес-процессов: события, задачи, развилки и передача
+      работы между участниками. Схему читают и аналитики, и разработчики.
+    related: [uml]
+
+  - id: uml
+    name: UML
+    aliases: [Unified Modeling Language, Унифицированный язык моделирования]
+    summary: >
+      Унифицированный язык моделирования — формальный стандарт диаграмм,
+      объединивший подходы 1980-х. На практике из него живут в основном
+      диаграммы классов и последовательностей.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 21 }
+    related: [c4-model, bpmn, archimate]
+
+  # --- статьи topics/ репозитория конспектов -------------------------------
+
+  - id: architecture-sinkhole
+    name: Архитектурная воронка
+    aliases: [Architecture sinkhole, Антипаттерн архитектурная воронка, Architectural Funnel]
+    summary: >
+      Антипаттерн многоуровневой архитектуры: запрос проходит все уровни
+      насквозь, и ни один не выполняет бизнес-логики — уровни становятся
+      туннелем для данных.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%90%D0%BD%D1%82%D0%B8%D0%BF%D0%B0%D1%82%D1%82%D0%B5%D1%80%D0%BD%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B2%D0%BE%D1%80%D0%BE%D0%BD%D0%BA%D0%B0.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 10 }
+    related: [architecture-by-implication, layered-architecture, layers-of-isolation]
+
+  - id: architecture-by-implication
+    name: Подразумеваемая архитектура
+    aliases: [Architecture by Implication, Антипаттерн подразумеваемой архитектуры, Бессистемная архитектура, Случайная архитектура, Accidental architecture]
+    summary: >
+      Антипаттерн: архитектуру никто не выбирал, она сложилась сама — из
+      привычек, структуры фреймворка или отсутствия решения. Чаще всего так
+      получается многоуровневая архитектура.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%90%D0%BD%D1%82%D0%B8%D0%BF%D0%B0%D1%82%D1%82%D0%B5%D1%80%D0%BD%20%D0%BF%D0%BE%D0%B4%D1%80%D0%B0%D0%B7%D1%83%D0%BC%D0%B5%D0%B2%D0%B0%D0%B5%D0%BC%D0%BE%D0%B9%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D1%8B%20%28Architecture%20by%20Implication%29.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 10 }
+    related: [architecture-sinkhole, adr, layered-architecture]
+
+  - id: c4-model
+    name: Модель C4
+    aliases: [C4, C4 model]
+    summary: >
+      Способ рисовать архитектуру на четырёх уровнях подробности: контекст,
+      контейнеры, компоненты и код. Саймон Браун придумал её, чтобы закрыть
+      недостатки UML.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%9C%D0%BE%D0%B4%D0%B5%D0%BB%D1%8C%20C4.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 21 }
+    related: [uml, archimate]
+
+  - id: bounded-context
+    name: Ограниченный контекст
+    aliases: [Bounded Context]
+    summary: >
+      Понятие DDD: граница, внутри которой модель предметной области
+      согласована и однозначна, а снаружи непрозрачна. У каждого контекста свой
+      единый язык; на этой идее выросли микросервисы.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%9E%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%87%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%BA%D1%81%D1%82%20%28Bounded%20Context%29%20%D0%B2%20DDD.md
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 3 }
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+      - { book: learning-domain-driver-design, chapter: 16 }
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: building-microservices, chapter: 2 }
+    related: [conway-law, microservices, ubiquitous-language, subdomain, context-map]
+
+  - id: orchestration-choreography
+    name: Оркестровка и хореография
+    aliases: [Оркестровка, Хореография, Orchestration, Choreography, Оркестрованная сага, Хореографическая сага]
+    summary: >
+      Два способа согласовать сервисы в одной бизнес-транзакции. При
+      оркестровке поток ведёт сервис-посредник, как дирижёр; при хореографии
+      сервисы общаются напрямую, без центра, как танцоры.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%9E%D1%80%D0%BA%D0%B5%D1%81%D1%82%D1%80%D0%BE%D0%B2%D0%BA%D0%B0%20%28orchestration%29%20%D0%B8%20%D1%85%D0%BE%D1%80%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D1%8F%20%28choreography%29.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 13 }
+      - { book: fundamental-software-architecture, chapter: 14 }
+      - { book: fundamental-software-architecture, chapter: 16 }
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: building-microservices, chapter: 6 }
+      - { book: building-microservices, chapter: 17 }
+    related: [front-controller, acid-base, broker-topology, mediator-topology, saga]
+
+  - id: front-controller
+    name: Паттерн фронт-контроллера
+    aliases: [Front Controller, Front Controller Pattern, Фронт-контроллер]
+    summary: >
+      Гибрид хореографии и оркестровки: первый вызванный сервис сам становится
+      посредником и, кроме своих предметных обязанностей, согласует работу
+      остальных.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%9F%D0%B0%D1%82%D1%82%D0%B5%D1%80%D0%BD%20%D1%84%D1%80%D0%BE%D0%BD%D1%82-%D0%BA%D0%BE%D0%BD%D1%82%D1%80%D0%BE%D0%BB%D0%BB%D0%B5%D1%80%D0%B0%20%28Front%20Controller%20Pattern%29.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+    related: [orchestration-choreography]
+
+  - id: acid-base
+    name: ACID и BASE
+    aliases: [ACID, BASE, ACID vs. BASE]
+    summary: >
+      Две модели транзакций. ACID — атомарность, согласованность, изоляция и
+      долговечность, строгие гарантии реляционной базы. BASE — доступность
+      важнее мгновенной согласованности: данные сходятся со временем, так живут
+      микросервисы.
+    article: https://github.com/Shvechkova/summary/blob/main/topics/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20ACID%20vs.%20BASE%20%E2%80%94%20%D1%82%D1%80%D0%B0%D0%BD%D0%B7%D0%B0%D0%BA%D1%86%D0%B8%D0%B8%20%D0%B2%20%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B5%20%D0%BD%D0%B0%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B5%20%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%BE%D0%B2%20%D0%B8%20%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%B0%D1%85.md
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 13 }
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: building-microservices, chapter: 6 }
+    related: [orchestration-choreography, saga, service-based-architecture, two-phase-commit]
+
+  # --- конспекты: «Фундаментальный подход к программной архитектуре» -------
+
+  - id: first-law-of-software-architecture
+    name: Первый закон архитектуры ПО
+    aliases: [Всё в архитектуре — компромиссы, Анализ компромиссов, Trade-off analysis]
+    summary: >
+      Всё в архитектуре — компромиссы: идеальных решений нет, есть только
+      наилучший баланс в конкретном контексте бизнеса, команды и ресурсов.
+      Поэтому главный навык архитектора — анализировать компромиссы, а не искать
+      «правильный» ответ.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 1 }
+      - { book: fundamental-software-architecture, chapter: 2 }
+    related: [second-law-of-software-architecture, least-worst-architecture, architectural-thinking]
+
+  - id: second-law-of-software-architecture
+    name: Второй закон архитектуры ПО
+    aliases: ["Почему важнее, чем как"]
+    summary: >
+      Обоснование решения важнее его технической реализации. Архитектору нужно
+      фиксировать причины выбора, а не только сам выбор.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 1 }
+    related: [first-law-of-software-architecture, adr]
+
+  - id: architecture-characteristics
+    name: Свойства архитектуры
+    aliases: [Архитектурные свойства, Architecture characteristics, Качественные атрибуты, Нефункциональные требования, Cross-functional requirements, CFR, Кросс-функциональные требования]
+    summary: >
+      Характеристики системы, которые определяют не что она делает, а как она
+      это делает: доступность, масштабируемость, безопасность, тестируемость и
+      т.п. Свойство считается архитектурным, если оно не связано с предметной
+      логикой, влияет на структуру системы и важно для её успеха. Делятся на
+      эксплуатационные, структурные и сквозные, бывают явными и неявными;
+      держать стоит 3–5 ключевых.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 1 }
+      - { book: fundamental-software-architecture, chapter: 4 }
+      - { book: fundamental-software-architecture, chapter: 5 }
+      - { book: fundamental-software-architecture, chapter: 7 }
+      - { book: building-microservices, chapter: 9 }
+      - { book: building-microservices, chapter: 12 }
+    related: [fitness-function, least-worst-architecture, slo]
+
+  - id: architectural-thinking
+    name: Архитектурное мышление
+    aliases: [Architectural thinking, Техническая широта]
+    summary: >
+      Особый взгляд архитектора на систему: понимание, что архитектура и
+      проектирование идут параллельно, широта технических знаний вместо узкой
+      глубины, анализ компромиссов и перевод бизнес-требований в свойства
+      архитектуры.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 2 }
+    related: [first-law-of-software-architecture]
+
+  - id: frozen-caveman
+    name: Замороженный троглодит
+    aliases: [Frozen caveman, Антипаттерн «Замороженный троглодит»]
+    summary: >
+      Антипаттерн: архитектор цепляется за старые решения или страхи из прошлого
+      негативного опыта и не пересматривает их в новом контексте.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 2 }
+
+  - id: ivory-tower-architect
+    name: Башня из слоновой кости
+    aliases: [Ivory tower, Архитектор в башне из слоновой кости]
+    summary: >
+      Антипаттерн, при котором архитектор принимает решения в отрыве от команды
+      и спускает их сверху. Ему противопоставляется архитектор-практик,
+      работающий вместе с разработчиками и объясняющий, зачем нужны правила.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 2 }
+      - { book: fundamental-software-architecture, chapter: 5 }
+    related: [architectural-thinking]
+
+  - id: modularity
+    name: Модульность
+    aliases: [Modularity, Модуль, Module]
+    summary: >
+      Принцип разбиения системы на логические блоки (модули) с чёткой
+      ответственностью, высокой связностью внутри и слабой связанностью между
+      ними. Модуль — абстрактная логическая группировка кода, а его физическое
+      воплощение называется компонентом.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+      - { book: fundamental-software-architecture, chapter: 8 }
+    related: [cohesion, coupling]
+
+  - id: cohesion
+    name: Связность
+    aliases: [Cohesion]
+    summary: >
+      Мера того, насколько элементы внутри модуля функционально едины. Виды идут
+      от лучшей функциональной (всё работает на одну цель) до худшей случайной
+      (элементы просто лежат в одном файле). Структурно её оценивают метрикой
+      LCOM.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+      - { book: building-microservices, chapter: 2 }
+    related: [coupling, lcom, modularity, constantine-law, information-hiding]
+
+  - id: lcom
+    name: LCOM
+    aliases: [Lack of Cohesion in Methods, Недостаток связности методов]
+    summary: >
+      Метрика связности класса: показывает, насколько его методы используют одни
+      и те же поля. Высокий LCOM означает низкую связность и повод разделить
+      класс, но метрика видит только структуру, а не смысл.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+    related: [cohesion]
+
+  - id: coupling
+    name: Связанность
+    aliases: [Coupling, Афферентная связанность, Эфферентная связанность, Сцепление]
+    summary: >
+      Степень зависимости модулей друг от друга. Афферентная связанность (Ca)
+      считает, сколько модулей зависят от данного, эфферентная (Ce) — от
+      скольких зависит он сам; из них выводятся абстрактность, нестабильность и
+      расстояние от главной последовательности.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+      - { book: building-microservices, chapter: 2 }
+    related: [cohesion, connascence, main-sequence, constantine-law]
+
+  - id: main-sequence
+    name: Расстояние от главной последовательности
+    aliases: [Distance from the main sequence, Абстрактность и нестабильность, Зона мучений, Зона бесполезности]
+    summary: >
+      Метрика Роберта Мартина D = |A + I − 1|, где A — абстрактность, а I = Ce /
+      (Ca + Ce) — нестабильность модуля. Чем ближе D к нулю, тем лучше баланс;
+      крайние области называют зоной мучений и зоной бесполезности.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+    related: [coupling]
+
+  - id: connascence
+    name: Коннасценция
+    aliases: [Connascence]
+    summary: >
+      Более тонкое понятие зависимости: два компонента коннасцентны, если
+      изменение одного требует изменения другого. Бывает статической (имени,
+      типа, смысла, позиции, алгоритма) и динамической (исполнения,
+      синхронности, значений, идентичности); по правилам Вейриха сильные формы
+      заменяют слабыми, особенно между далёкими компонентами.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 3 }
+    related: [coupling, cohesion]
+
+  - id: least-worst-architecture
+    name: Наименее худшая архитектура
+    aliases: [Least worst architecture]
+    summary: >
+      Принцип: стремиться не к лучшей архитектуре, а к наименее худшей. Все
+      свойства нельзя максимизировать одновременно, а их избыток ведёт к
+      переусложнению.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 4 }
+      - { book: fundamental-software-architecture, chapter: 5 }
+    related: [first-law-of-software-architecture, architecture-characteristics]
+
+  - id: scalability
+    name: Масштабируемость
+    aliases: [Scalability]
+    summary: >
+      Эксплуатационное свойство архитектуры: способность системы расти под
+      нагрузкой, например обслуживать тысячи и миллионы пользователей.
+      Монолитные стили оценивают её низко, распределённые позволяют
+      масштабировать отдельные сервисы.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 4 }
+      - { book: fundamental-software-architecture, chapter: 5 }
+    related: [architecture-characteristics]
+
+  - id: fitness-function
+    name: Функция пригодности
+    aliases: [Fitness function, Функции пригодности, Функции приспособленности, Функция приспособленности]
+    summary: >
+      Любой механизм, дающий объективную оценку того, соблюдается ли свойство
+      архитектуры: тест на циклические зависимости, порог сложности, время
+      отклика. Идея взята из генетических алгоритмов; такие проверки встраивают
+      в CI/CD, чтобы архитектура не дрейфовала.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 6 }
+      - { book: fundamental-software-architecture, chapter: 7 }
+      - { book: building-microservices, chapter: 16 }
+    related: [cyclomatic-complexity, architecture-characteristics, chaos-engineering, evolutionary-architecture]
+
+  - id: cyclomatic-complexity
+    name: Цикломатическая сложность
+    aliases: [Cyclomatic complexity, CC]
+    summary: >
+      Метрика Маккейба: число независимых путей выполнения в коде, CC = E − N +
+      2P. Высокая сложность усложняет тестирование и поддержку; обычно советуют
+      держать её у методов ниже 5–10.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 6 }
+      - { book: fundamental-software-architecture, chapter: 7 }
+    related: [fitness-function]
+
+  - id: chaos-engineering
+    name: Хаос-инжиниринг
+    aliases: [Chaos engineering, Chaos Monkey, Simian Army]
+    summary: >
+      Проверка отказоустойчивости и соответствия требованиям через намеренное
+      внесение сбоев в работающую систему. Пример — набор инструментов Simian
+      Army от Netflix, включая Chaos Monkey; это один из способов реализовать
+      функции пригодности.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 7 }
+      - { book: building-microservices, chapter: 10 }
+      - { book: building-microservices, chapter: 12 }
+    related: [fitness-function, resilience, testing-in-production]
+
+  - id: domain-partitioning
+    name: Предметное разбиение
+    aliases: [Domain partitioning, Domain-driven разбиение]
+    summary: >
+      Высокоуровневое разбиение архитектуры по бизнес-функциям и рабочим
+      потокам, когда логика одного процесса собрана в одном месте. Лучше
+      подходит модульному монолиту и микросервисам и позволяет строить команды
+      вокруг бизнес-функций.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 8 }
+    related: [technical-partitioning]
+
+  - id: technical-partitioning
+    name: Техническое разбиение
+    aliases: [Technical partitioning]
+    summary: >
+      Разбиение архитектуры по техническим уровням: представление, бизнес-
+      правила, сервисы, хранение данных. Код легко найти, но один бизнес-процесс
+      оказывается размазан по всем уровням; так устроены многоуровневая и
+      конвейерная архитектуры.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 8 }
+      - { book: fundamental-software-architecture, chapter: 10 }
+    related: [domain-partitioning, layered-architecture]
+
+  - id: entity-trap
+    name: Западня сущности
+    aliases: [Entity trap, Ловушка сущности]
+    summary: >
+      Антипаттерн выявления компонентов: архитектор принимает связи в базе
+      данных за рабочие процессы и создаёт OrderManager, CustomerManager и
+      прочие «менеджеры» вместо компонентов вокруг процессов. Логика
+      размывается, связанность растёт.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 8 }
+
+  - id: event-storming
+    name: Штурм событий
+    aliases: [Event Storming, Ивентсторминг, EventStorming, Событийный штурм]
+    summary: >
+      Совместная техника проектирования, где архитекторы, разработчики и
+      аналитики выявляют события предметной области, затем команды и агрегаты, а
+      компоненты строят вокруг обработчиков событий. Предполагает обмен
+      сообщениями между компонентами.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 12 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+      - { book: building-microservices, chapter: 2 }
+    related: [ubiquitous-language, domain-event, domain-driven-design, aggregate, bounded-context]
+
+  - id: architecture-quantum
+    name: Архитектурный квант
+    aliases: [Architecture quantum]
+    summary: >
+      Минимальная независимо развёртываемая и масштабируемая единица системы с
+      собственными данными. У монолитных стилей (многоуровневого, конвейерного,
+      микроядерного) квант всегда один.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 8 }
+      - { book: fundamental-software-architecture, chapter: 18 }
+    related: [architecture-style, microservices]
+
+  - id: architecture-style
+    name: Архитектурный стиль
+    aliases: [Architecture style]
+    summary: >
+      Обобщённый шаблон, задающий, как организованы компоненты, как они
+      взаимодействуют и какие ограничения действуют на систему. Стили делят на
+      монолитные (многоуровневый, конвейерный, микроядерный) и распределённые.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 9 }
+    related: [architecture-quantum, client-server-architecture, fallacies-of-distributed-computing]
+
+  - id: big-ball-of-mud
+    name: Большой ком грязи
+    aliases: [Big Ball of Mud, Распределённый большой ком грязи]
+    summary: >
+      Антипаттерн системы без внятной архитектуры, где всё зависит от всего.
+      Возникает из-за отсутствия архитектурного контроля, спешки и нехватки
+      навыков; код трудно менять и тестировать.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 9 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [architecture-style, transaction-script]
+
+  - id: client-server-architecture
+    name: Клиент-серверная архитектура
+    aliases: [Client-server, Двухуровневая архитектура, Трёхуровневая архитектура, Цельная архитектура]
+    summary: >
+      Базовый стиль, который делит функциональность на клиент (фронтенд),
+      запрашивающий услуги, и сервер (бэкенд), их предоставляющий. Он сменил
+      цельную архитектуру одного процесса на одной машине и развился в трёх- и
+      N-уровневые системы.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 9 }
+    related: [architecture-style, layered-architecture]
+
+  - id: fallacies-of-distributed-computing
+    name: Заблуждения о распределённых вычислениях
+    aliases: [Fallacies of distributed computing, Восемь заблуждений]
+    summary: >
+      Восемь ложных допущений, сформулированных Питером Дойчем с коллегами: сеть
+      надёжна, задержка нулевая, пропускная способность бесконечна, сеть
+      безопасна, топология не меняется, администратор один, передача бесплатна,
+      сеть однородна. На них спотыкаются распределённые архитектуры.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 9 }
+    related: [architecture-style]
+
+  - id: layered-architecture
+    name: Многоуровневая архитектура
+    aliases: [Layered architecture, N-tier architecture, Слоистая архитектура]
+    summary: >
+      Монолитный стиль с техническим разбиением на горизонтальные уровни:
+      представление, бизнес-логика, доступ к данным и база данных. Он простой и
+      дешёвый, поэтому хорош как отправная точка, но плохо масштабируется и
+      развёртывается.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+    related: [layers-of-isolation, architecture-sinkhole, technical-partitioning, service-layer, ports-and-adapters]
+
+  - id: layers-of-isolation
+    name: Уровни изоляции
+    aliases: [Layers of isolation, Закрытые уровни, Открытые уровни, Closed layers, Open layers]
+    summary: >
+      Принцип многоуровневой архитектуры: изменения на одном уровне не
+      затрагивают другие, пока контракты между ними не меняются. Его
+      обеспечивают закрытые уровни, которые запрос обязан пройти по порядку;
+      открытый уровень можно обойти, что снижает изоляцию.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 10 }
+    related: [layered-architecture, separation-of-concerns]
+
+  - id: separation-of-concerns
+    name: Разделение ответственности
+    aliases: [Separation of concerns]
+    summary: >
+      Принцип, по которому каждый уровень или компонент отвечает только за свою
+      зону и работает лишь с относящейся к ней логикой. Это упрощает разработку,
+      но обходится потерей общей гибкости.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 10 }
+    related: [layers-of-isolation, layered-architecture]
+
+  - id: pipeline-architecture
+    name: Конвейерная архитектура
+    aliases: [Pipeline architecture, Каналы и фильтры, Pipes and filters]
+    summary: >
+      Монолитный стиль, где данные идут по цепочке фильтров, соединённых
+      однонаправленными каналами, как в Unix-командах через «|». Фильтры бывают
+      производителями, преобразователями, тестерами и потребителями; каждый
+      решает одну задачу.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 11 }
+    related: [architecture-style, technical-partitioning]
+
+  - id: microkernel-architecture
+    name: Микроядерная архитектура
+    aliases: [Microkernel architecture, Архитектура плагинов, Plug-in architecture]
+    summary: >
+      Монолитный стиль из минимального ядра и независимых подключаемых
+      компонентов (плагинов). Ядро загружает плагины через реестр и общается с
+      ними по контрактам, поэтому новые функции добавляются без изменения ядра;
+      так устроены IDE и браузеры.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 12 }
+    related: [architecture-style, pipeline-architecture]
+
+  - id: service-based-architecture
+    name: Архитектура на основе сервисов
+    aliases: [Service-based architecture]
+    summary: >
+      Распределённый стиль, в котором приложение делится на несколько (обычно от
+      4 до 12) крупных, отдельно развёртываемых сервисов предметной области с
+      отдельным интерфейсом и чаще всего общей базой данных. Она проще и дешевле
+      микросервисов и позволяет пользоваться обычными ACID-транзакциями внутри
+      сервиса.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 13 }
+    related: [microservices, acid-base, modular-monolith]
+
+  - id: event-driven-architecture
+    name: "Архитектура, управляемая событиями"
+    aliases: [Event-Driven Architecture, EDA, Событийно-ориентированная архитектура]
+    summary: >
+      Распределённый асинхронный стиль, в котором отдельные компоненты получают
+      и обрабатывают события, не завязываясь друг на друга напрямую. Даёт
+      высокую производительность и масштабируемость, но усложняет обработку
+      ошибок, тестирование и отладку. Строится в одной из двух топологий:
+      брокера или медиатора.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 14 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [broker-topology, mediator-topology, event-notification, event-carried-state-transfer, domain-event]
+
+  - id: broker-topology
+    name: Топология брокера
+    aliases: [Broker topology]
+    summary: >
+      Вариант архитектуры, управляемой событиями, без центрального координатора.
+      Обработчик получает инициирующее событие через брокер, делает свою работу
+      и объявляет о ней событием обработки, на которое реагируют другие. Легко
+      расширяется и масштабируется, но плохо контролирует ход процесса и не
+      умеет перезапускать бизнес-транзакции.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 14 }
+    related: [mediator-topology, event-driven-architecture, orchestration-choreography]
+
+  - id: mediator-topology
+    name: Топология медиатора
+    aliases: [Mediator topology, Медиатор событий]
+    summary: >
+      Вариант архитектуры, управляемой событиями, где медиатор событий принимает
+      инициирующее событие из очереди и по шагам рассылает команды обработчикам
+      через выделенные каналы. Даёт контроль над рабочим процессом и обработкой
+      ошибок, но повышает связанность, а медиатор становится единой точкой
+      отказа.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 14 }
+    related: [broker-topology, event-driven-architecture, orchestration-choreography]
+
+  - id: space-based-architecture
+    name: Архитектура на основе пространства
+    aliases: [Space-Based Architecture, SBA]
+    summary: >
+      Распределённый стиль для экстремальной масштабируемости и адаптируемости:
+      транзакции обрабатываются в реплицированном кэше в памяти блоков
+      обработки, а база данных обновляется асинхронно. Название идёт от
+      пространства кортежей (tuple space). Очень производительна, но сложна,
+      дорога и плохо тестируется.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 15 }
+
+  - id: orchestrated-soa
+    name: Оркестрированная сервис-ориентированная архитектура
+    aliases: [Orchestrated service-oriented architecture, SOA, Service-oriented architecture, Сервис-ориентированная архитектура]
+    summary: >
+      Распределённый стиль конца 1990-х с сугубо техническим разбиением, главная
+      цель которого — многократное использование сервисов на уровне предприятия.
+      Иерархия сервисов связана через центральный механизм оркестровки. Из-за
+      повторного использования изменения в общем сервисе бьют по всей системе.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 16 }
+      - { book: building-microservices, chapter: 1 }
+    related: [microservices]
+
+  - id: microservices
+    name: Архитектура микросервисов
+    aliases: [Microservices, Microservice, Микросервис, Микросервисная архитектура, Микросервисы]
+    summary: >
+      Распределённый стиль с предметным разбиением, где каждый небольшой,
+      независимо развёртываемый сервис со своей базой данных — физическое
+      воплощение ограниченного контекста. Ради развязывания здесь сознательно
+      дублируют код вместо многократного использования. Название ввели Фаулер и
+      Льюис в 2014 году.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+      - { book: building-microservices, chapter: 1 }
+    related: [bounded-context, service-granularity, saga, subdomain, deep-module]
+
+  - id: service-granularity
+    name: Гранулярность сервисов
+    aliases: [Гранулярность, Granularity, Service granularity]
+    summary: >
+      Размер сервиса. Частая ошибка — делать сервисы слишком мелкими, из-за чего
+      растут сетевые вызовы и связанность. Границы подбирают итеративно по
+      назначению сервиса, по транзакциям между сущностями и по объёму
+      хореографии между сервисами.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+    related: [microservices, saga]
+
+  - id: backend-for-frontend
+    name: Бэкенд для фронтенда
+    aliases: [Backends for Frontends, BFF, Backend for Frontend]
+    summary: >
+      Паттерн, при котором для каждого типа клиента (веб, iOS, Android, IoT)
+      делается отдельный API, подстраивающий данные под нужды именно этого
+      фронтенда.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: fundamental-software-architecture, chapter: 18 }
+      - { book: building-microservices, chapter: 14 }
+      - { book: building-microservices, chapter: 17 }
+    related: [stream-aligned-team, conway-law]
+
+  - id: sidecar
+    name: Паттерн sidecar
+    aliases: [Sidecar]
+    summary: >
+      Вспомогательный компонент, запускаемый рядом с каждым микросервисом и
+      берущий на себя эксплуатационные задачи: мониторинг, журналирование,
+      автоматический выключатель, шифрование. Так код предметной области
+      дублируется ради развязывания, а эксплуатационные функции переиспользуются
+      ради эффективности.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+    related: [service-mesh, microservices]
+
+  - id: service-mesh
+    name: Сервисная сетка
+    aliases: [Service mesh, Сервисная сеть]
+    summary: >
+      Сеть из sidecar-компонентов всех микросервисов, образующая единый
+      эксплуатационный интерфейс. Через её консоль централизованно управляют
+      мониторингом, журналированием, безопасностью и обнаружением сервисов.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: building-microservices, chapter: 5 }
+    related: [sidecar, api-gateway, service-discovery, smart-endpoints-dumb-pipes]
+
+  - id: saga
+    name: Сага
+    aliases: [Saga pattern, Saga, Паттерн саги]
+    summary: >
+      Способ координировать транзакцию, пересекающую сервисы: последовательность
+      локальных транзакций, а при сбое — компенсирующие действия. Бывает
+      оркестрованной (с медиатором) и хореографированной (через события). Лучший
+      совет — избегать транзакций между сервисами и пересмотреть гранулярность.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 17 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+      - { book: building-microservices, chapter: 6 }
+      - { book: building-microservices, chapter: 17 }
+    related: [acid-base, orchestration-choreography, service-granularity, process-manager, eventual-consistency]
+
+  - id: modular-monolith
+    name: Модульный монолит
+    aliases: [Modular monolith]
+    summary: >
+      Монолит с одной базой данных и одним развёртываемым модулем, внутри
+      которого компоненты разделены по предметным областям. Прост и дёшев, а
+      если заранее разбить БД по компонентам, позже легче перейти к
+      микросервисам.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 18 }
+      - { book: building-microservices, chapter: 1 }
+    related: [service-based-architecture, microservices, distributed-monolith]
+
+  - id: architecturally-significant-decision
+    name: Архитектурно значимое решение
+    aliases: [Architecturally significant decision]
+    summary: >
+      По определению Майкла Нейгарда, решение, которое влияет на структуру
+      системы, её нефункциональные свойства, зависимости, интерфейсы или
+      технологические методы разработки. Выбор технологии тоже может быть
+      архитектурным решением, если сделан ради такого свойства.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+    related: [adr]
+
+  - id: covering-your-assets
+    name: Излишняя перестраховка
+    aliases: [Covering Your Assets, CYA]
+    summary: >
+      Антипаттерн, при котором архитектор откладывает или избегает решений из
+      страха ошибиться. Лечится решением в последний ответственный момент и
+      тесной работой с разработчиками.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+    related: [last-responsible-moment, groundhog-day-antipattern]
+
+  - id: last-responsible-moment
+    name: Последний ответственный момент
+    aliases: [Last responsible moment]
+    summary: >
+      Момент, когда собрано достаточно информации, чтобы обосновать и проверить
+      решение. Дальше ждать не стоит: это тормозит команды и ведёт к
+      аналитическому параличу.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+    related: [covering-your-assets]
+
+  - id: groundhog-day-antipattern
+    name: День сурка
+    aliases: [Groundhog Day]
+    summary: >
+      Антипаттерн, при котором уже принятое решение обсуждают снова и снова,
+      потому что никто не понимает его обоснования. Помогает объяснять решение
+      не только технически, но и через стоимость, время выхода на рынок и
+      стратегию компании.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+    related: [covering-your-assets, adr]
+
+  - id: rfc
+    name: Запрос комментариев
+    aliases: [Request for Comments, RFC]
+    summary: >
+      Черновик решения, выставленный на обсуждение с дедлайном; в ADR это
+      отдельный статус. Помогает вовлечь разработчиков и собрать обратную связь
+      до утверждения.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 19 }
+      - { book: fundamental-software-architecture, chapter: 23 }
+    related: [adr]
+
+  - id: risk-storming
+    name: Риск-штурм
+    aliases: [Risk storming]
+    summary: >
+      Коллективный метод поиска архитектурных рисков по диаграмме. Сначала
+      каждый участник сам отмечает риски, чтобы избежать группового мышления,
+      затем команда приходит к консенсусу по оценкам и вырабатывает меры по
+      снижению рисков, обсуждая их цену с бизнесом. Проводится регулярно.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 20 }
+    related: [risk-matrix, adr]
+
+  - id: risk-matrix
+    name: Матрица рисков
+    aliases: [Risk matrix]
+    summary: >
+      Оценка риска по двум осям — влиянию и вероятности, каждая от 1 до 3; итог
+      равен их произведению: 1–2 низкий, 3–4 средний, 6–9 высокий. Сначала
+      оценивают влияние, потом вероятность. Незнакомые технологии автоматически
+      считаются высоким риском.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 20 }
+    related: [risk-storming]
+
+  - id: archimate
+    name: ArchiMate
+    aliases: [Архимат]
+    summary: >
+      Стандарт Open Group для моделирования корпоративной архитектуры: бизнес-
+      процессов, приложений и ИТ-инфраструктуры. Лаконичный язык, популярный
+      среди архитекторов предприятий.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 21 }
+    related: [uml, c4-model]
+
+  - id: bullet-riddled-corpse
+    name: "Тело, изрешеченное пулями"
+    aliases: [Bullet-Riddled Corpse]
+    summary: >
+      Антипаттерн презентаций: слайд забит текстом, который докладчик зачитывает
+      дословно. Перегружает аудиторию и рассеивает внимание.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 21 }
+
+  - id: control-freak-architect
+    name: Архитектор-диктатор
+    aliases: [Control freak architect]
+    summary: >
+      Архитектор, который контролирует каждую деталь, вплоть до паттернов,
+      классов и псевдокода, и ставит команде слишком жёсткие рамки. «Крадёт
+      искусство программирования» у разработчиков; оправдан разве что в коротких
+      срочных проектах с неопытной командой.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 22 }
+
+  - id: technology-radar
+    name: Технологический радар
+    aliases: [Technology Radar, ThoughtWorks Technology Radar]
+    summary: >
+      Инструмент ThoughtWorks для классификации технологий и практик по четырём
+      кольцам: Adopt (принять), Trial (испытывать), Assess (оценивать) и Hold
+      (отложить). Архитектору советуют завести личный радар для планирования
+      своего развития.
+    chapters:
+      - { book: fundamental-software-architecture, chapter: 24 }
+
+  # --- конспекты: «Изучаем DDD» --------------------------------------------
+
+  - id: domain
+    name: Предметная область
+    aliases: [Domain, Домен]
+    summary: >
+      Сфера деятельности компании: чем она занимается и какие услуги даёт
+      клиентам. Компания может работать в нескольких предметных областях сразу,
+      а сама область складывается из поддоменов.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+    related: [subdomain, domain-expert]
+
+  - id: subdomain
+    name: Поддомен
+    aliases: [Subdomain]
+    summary: >
+      Часть предметной области, отвечающая за конкретную бизнес-функцию; его
+      границы задаёт набор согласованных сценариев с общими участниками, данными
+      и правилами. Поддомены выявляют из бизнеса, а не проектируют, и бывают
+      основными, универсальными и вспомогательными. Поддомен считается хорошей
+      отправной точкой для границ микросервиса.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+      - { book: learning-domain-driver-design, chapter: 3 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+    related: [core-subdomain, generic-subdomain, supporting-subdomain, bounded-context]
+
+  - id: core-subdomain
+    name: Основной поддомен
+    aliases: [Core subdomain, Основная предметная область, Core domain]
+    summary: >
+      Поддомен, который отличает компанию от конкурентов и даёт ей конкурентное
+      преимущество. Обычно сложен и часто меняется, поэтому его разрабатывают
+      внутри компании лучшими специалистами, с моделью предметной области вместо
+      CRUD.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+    related: [subdomain, generic-subdomain, supporting-subdomain, domain-model]
+
+  - id: generic-subdomain
+    name: Универсальный поддомен
+    aliases: [Generic subdomain]
+    summary: >
+      Деятельность, которую все компании выполняют одинаково: аутентификация,
+      бухгалтерия, платежи, шифрование. Задачи сложные, но уже решены, поэтому
+      выгоднее купить или взять готовое решение, чем изобретать своё.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+    related: [subdomain, core-subdomain, supporting-subdomain]
+
+  - id: supporting-subdomain
+    name: Вспомогательный поддомен
+    aliases: [Supporting subdomain]
+    summary: >
+      Поддомен, который поддерживает бизнес, но не даёт конкурентного
+      преимущества. Логика простая, похожая на CRUD или ETL, меняется редко; его
+      можно сделать своими силами или отдать на аутсорсинг. Тип поддомена со
+      временем может смениться, например вспомогательный стать основным.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+    related: [subdomain, core-subdomain, generic-subdomain, transaction-script]
+
+  - id: domain-expert
+    name: Эксперт предметной области
+    aliases: [Domain expert, Специалист в предметной области]
+    summary: >
+      Представитель бизнеса с глубоким знанием области, которую моделирует
+      система; не аналитик и не программист. Он формулирует реальные задачи и
+      служит источником истины, а разработчики должны понимать его язык и
+      логику, а не строить решения на предположениях.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 1 }
+      - { book: learning-domain-driver-design, chapter: 2 }
+    related: [ubiquitous-language, event-storming]
+
+  - id: ubiquitous-language
+    name: Единый язык
+    aliases: [Ubiquitous Language, Универсальный язык]
+    summary: >
+      Язык бизнеса, на котором говорят все участники проекта и который
+      используется везде: в обсуждениях, требованиях, тестах и коде. Он должен
+      быть согласованным и однозначным, без синонимов, и развиваться вместе с
+      пониманием области. Единый язык действует только внутри своего
+      ограниченного контекста.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 2 }
+      - { book: learning-domain-driver-design, chapter: 3 }
+      - { book: learning-domain-driver-design, chapter: 12 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+      - { book: building-microservices, chapter: 2 }
+    related: [bounded-context, domain-model, domain-expert, domain-driven-design]
+
+  - id: domain-model
+    name: Модель предметной области
+    aliases: [Domain Model, Доменная модель]
+    summary: >
+      Упрощённая целенаправленная абстракция реальности, отражающая сущности,
+      поведение, правила и связи для конкретной задачи. Как паттерн бизнес-
+      логики объединяет данные и поведение в объектах без зависимостей от БД и
+      собирается из агрегатов, объектов-значений, событий и доменных сервисов.
+      Применяется в основных поддоменах со сложной логикой.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 2 }
+      - { book: learning-domain-driver-design, chapter: 6 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [aggregate, value-object, active-record, ports-and-adapters]
+
+  - id: partnership
+    name: Партнёрство
+    aliases: [Partnership]
+    summary: >
+      Паттерн интеграции контекстов, при котором команды тесно сотрудничают и
+      согласуют изменения на ходу, без навязывания модели. Требует частой
+      синхронизации и непрерывной интеграции; когда команды расходятся, его
+      меняют на «потребитель–поставщик».
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [shared-kernel, customer-supplier, context-map]
+
+  - id: shared-kernel
+    name: Общее ядро
+    aliases: [Shared Kernel, Общие рамки, Shared scope]
+    summary: >
+      Часть модели, которую совместно используют несколько контекстов, обычно
+      как общая библиотека. Создаёт сильную связанность, поэтому общую часть
+      держат минимальной, в идеале только контракты и DTO. Применяется как
+      исключение, когда дублирование дороже координации.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+    related: [partnership, context-map]
+
+  - id: customer-supplier
+    name: Потребитель–поставщик
+    aliases: [Customer–Supplier, Клиент–поставщик, Upstream/downstream]
+    summary: >
+      Отношения контекстов, где нижестоящий (потребитель) зависит от
+      вышестоящего (поставщика), а команды независимы и интересы не всегда
+      совпадают. Дисбаланс сил решают тремя способами: конформист,
+      предохранительный слой или сервис с открытым протоколом.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+    related: [conformist, anti-corruption-layer, open-host-service]
+
+  - id: conformist
+    name: Конформист
+    aliases: [Conformist]
+    summary: >
+      Паттерн, при котором потребитель принимает модель поставщика как есть.
+      Подходит, если эта модель стандартна или и так устраивает потребителя.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+    related: [customer-supplier, anti-corruption-layer]
+
+  - id: anti-corruption-layer
+    name: Предохранительный слой
+    aliases: [Anti-corruption Layer, ACL, Антикоррупционный слой]
+    summary: >
+      Слой, через который потребитель преобразует чужую модель в свою и защищает
+      внутреннюю модель от «загрязнения». Нужен, когда потребитель реализует
+      основной поддомен, модель поставщика неудобна или устарела, а интерфейс
+      часто меняется. Может быть встроен в код, вынесен в API-шлюз или в
+      отдельный сервис.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+    related: [open-host-service, customer-supplier, conformist, bounded-context]
+
+  - id: open-host-service
+    name: Сервис с открытым протоколом
+    aliases: [Open-Host Service, OHS]
+    summary: >
+      Поставщик сам выставляет стабильный публичный интерфейс на опубликованном
+      языке, отделённый от внутренней модели. Внутреннюю модель можно менять, не
+      ломая потребителей, а для плавного перехода поддерживают несколько версий
+      API. Делает микросервис «глубже».
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [published-language, anti-corruption-layer, customer-supplier]
+
+  - id: published-language
+    name: Опубликованный язык
+    aliases: [Published Language]
+    summary: >
+      Упрощённая и стабильная модель, оптимизированная для интеграции, которую
+      контекст показывает внешним потребителям. Во внешний мир уходят публичные
+      события на этом языке, а внутренние события предметной области остаются
+      приватными.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+      - { book: learning-domain-driver-design, chapter: 16 }
+    related: [open-host-service, domain-event]
+
+  - id: separate-ways
+    name: Разные пути
+    aliases: [Separate Ways]
+    summary: >
+      Команды отказываются от интеграции и дублируют функциональность. Уместно,
+      когда сотрудничество слишком дорого, поддомен универсальный или модели
+      слишком различаются; для основных поддоменов не подходит.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [customer-supplier, generic-subdomain]
+
+  - id: context-map
+    name: Карта контекстов
+    aliases: [Context Map]
+    summary: >
+      Визуальное представление всех ограниченных контекстов, их границ и
+      паттернов интеграции между ними, а также командных зависимостей. Её
+      поддерживают совместно и постоянно обновляют; по ней ищут антипаттерны в
+      существующей системе.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 4 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+    related: [bounded-context, partnership, anti-corruption-layer]
+
+  - id: transaction-script
+    name: Транзакционный сценарий
+    aliases: [Transaction Script]
+    summary: >
+      Паттерн, где каждая бизнес-операция системы реализована отдельной
+      процедурой, работающей с БД напрямую; операция либо выполняется целиком,
+      либо откатывается. Прост и быстр, подходит для вспомогательных поддоменов,
+      ETL и интеграций, но на сложной логике превращается в «большой ком грязи».
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 5 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [active-record, layered-architecture, supporting-subdomain]
+
+  - id: active-record
+    name: Активная запись
+    aliases: [Active Record]
+    summary: >
+      Объект, соответствующий строке в БД и умеющий сам себя загружать и
+      сохранять, часто через ORM. Логика остаётся простой и организована как
+      транзакционный сценарий, но удобнее работать со связанными структурами
+      данных. Это паттерн по Фаулеру, не только фреймворк; в основных поддоменах
+      ему не место.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 5 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [transaction-script, domain-model, layered-architecture]
+
+  - id: idempotency
+    name: Идемпотентность
+    aliases: [Idempotency, Идемпотентные операции]
+    summary: >
+      Свойство операции давать тот же результат при повторном вызове. Спасает от
+      дублей при сетевых сбоях и повторной доставке событий: например,
+      передавать итоговое значение, а не команду «увеличить на один».
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 5 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+      - { book: building-microservices, chapter: 5 }
+      - { book: building-microservices, chapter: 6 }
+      - { book: building-microservices, chapter: 12 }
+    related: [outbox, message-broker, saga, resilience]
+
+  - id: value-object
+    name: Объект-значение
+    aliases: [Value Object]
+    summary: >
+      Неизменяемый объект, который определяется значениями своих полей, а не
+      идентификатором; любое изменение порождает новый экземпляр. Инкапсулирует
+      валидацию и поведение (деньги, email, телефон) и избавляет от одержимости
+      примитивами. Используйте их везде, где возможно, особенно для свойств
+      сущностей.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+    related: [entity, aggregate]
+
+  - id: entity
+    name: Сущность
+    aliases: [Entity]
+    summary: >
+      Объект с уникальным идентификатором, который сохраняется всю его жизнь,
+      при этом состояние может меняться. В DDD сущности почти не живут сами по
+      себе, а входят в состав агрегата.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+    related: [value-object, aggregate]
+
+  - id: aggregate
+    name: Агрегат
+    aliases: [Aggregate, Корень агрегата, Aggregate Root]
+    summary: >
+      Группа сущностей и объектов-значений, которая служит границей
+      согласованности: внутри неё инварианты соблюдаются всегда. Меняется только
+      командами через корневую сущность, в одной транзакции; на другие агрегаты
+      ссылается лишь по ID. Агрегат должен быть минимальным и не делится между
+      микросервисами.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 12 }
+      - { book: learning-domain-driver-design, chapter: 14 }
+      - { book: building-microservices, chapter: 2 }
+      - { book: building-microservices, chapter: 8 }
+    related: [entity, value-object, domain-event, domain-model, domain-driven-design]
+
+  - id: domain-event
+    name: Событие предметной области
+    aliases: [Domain Event, Доменное событие]
+    summary: >
+      Сообщение о значимом для бизнеса факте, который уже произошёл, поэтому
+      название пишут в прошедшем времени (TicketEscalated). Агрегат публикует
+      его, чтобы другие части системы реагировали; в Event Sourcing такие
+      события хранят состояние. Для интеграции между контекстами их не
+      используют: они приватны и привязывают потребителя к реализации.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+      - { book: learning-domain-driver-design, chapter: 7 }
+      - { book: learning-domain-driver-design, chapter: 12 }
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [aggregate, event-sourcing, published-language, event-storming]
+
+  - id: domain-service
+    name: Доменный сервис
+    aliases: [Domain Service, Сервис предметной области]
+    summary: >
+      Объект без состояния с бизнес-логикой, которая не принадлежит ни одному
+      агрегату и требует данных из нескольких источников, например расчёт SLA.
+      Это не микросервис и не API, а просто объект с бизнес-методами.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+    related: [aggregate, domain-model]
+
+  - id: eventual-consistency
+    name: Итоговая согласованность
+    aliases: [Eventual consistency, Согласованность в конечном счёте, Окончательная согласованность]
+    summary: >
+      Данные разных агрегатов или сервисов приходят в согласованное состояние не
+      сразу, а со временем. Строгая согласованность возможна только внутри
+      одного агрегата; всё, что за его пределами, согласуется так, например
+      через саги.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 6 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+    related: [aggregate, saga, acid-base]
+
+  - id: event-sourcing
+    name: События как источник данных
+    aliases: [Event Sourcing, Event-Sourced Domain Model, "Модель предметной области, основанная на событиях", Источники событий, Источник событий]
+    summary: >
+      Паттерн, при котором хранят не текущее состояние агрегата, а всю
+      последовательность событий, которые к нему привели; состояние каждый раз
+      воссоздаётся их проигрыванием. Даёт полную историю, аудит, «путешествие во
+      времени» и разные проекции, но сложен в изучении и эволюции. Это
+      внутренний механизм хранения, а не способ интеграции.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 7 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 11 }
+      - { book: learning-domain-driver-design, chapter: 13 }
+      - { book: building-microservices, chapter: 13 }
+    related: [domain-event, cqrs]
+
+  - id: service-layer
+    name: Сервисный слой
+    aliases: [Service Layer, Прикладной слой, Application Layer]
+    summary: >
+      Логическая граница приложения и фасад над бизнес-логикой: задаёт публичные
+      операции системы, оркестрирует их и управляет транзакциями. Нужен при
+      активной записи или модели предметной области; при транзакционном сценарии
+      его роль играет сам сценарий.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+    related: [layered-architecture, active-record]
+
+  - id: ports-and-adapters
+    name: Порты и адаптеры
+    aliases: [Ports and Adapters, Гексагональная архитектура, Hexagonal Architecture, Луковичная архитектура, Чистая архитектура]
+    summary: >
+      Архитектура, в которой ядро с чистой бизнес-логикой ни от чего не зависит
+      и само определяет порты (интерфейсы), а инфраструктура реализует их
+      адаптерами. Все зависимости направлены внутрь; адаптер можно заменить, не
+      трогая ядро. Рекомендуется для модели предметной области.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+    related: [dependency-inversion-principle, layered-architecture, domain-model, cqrs]
+
+  - id: dependency-inversion-principle
+    name: Принцип инверсии зависимостей
+    aliases: [Dependency Inversion Principle, DIP]
+    summary: >
+      Высокоуровневые модули с бизнес-логикой не должны зависеть от
+      низкоуровневых: инфраструктура зависит от абстракций, определённых в ядре.
+      На нём построена архитектура портов и адаптеров.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+    related: [ports-and-adapters]
+
+  - id: cqrs
+    name: CQRS
+    aliases: [Command-Query Responsibility Segregation, Разделение ответственности команд и запросов, Command Query Responsibility Segregation, Разделение ответственности командных запросов]
+    summary: >
+      Модель делится на модель команд, единственную точку записи и источник
+      истины, и сколько угодно моделей чтения, которые строятся проецированием и
+      полностью перестраиваемы. Позволяет держать данные в разных хранилищах;
+      обязателен для Event Sourcing, но применим и без него. В Data Mesh модель
+      команд соответствует OLTP, а модели чтения — OLAP.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: learning-domain-driver-design, chapter: 16 }
+      - { book: building-microservices, chapter: 13 }
+    related: [read-model, event-sourcing, polyglot-persistence, ports-and-adapters]
+
+  - id: read-model
+    name: Модель чтения
+    aliases: [Read Model, Проекция, Projection]
+    summary: >
+      Предварительно построенное представление данных только для чтения, под
+      конкретного потребителя: UI, аналитику, поиск. Обновляется проецированием
+      изменений из модели команд, синхронно по контрольной точке или асинхронно
+      через шину. На EventStorming это зелёные стикеры с данными, которые
+      пользователь видит перед действием.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 12 }
+    related: [cqrs, event-sourcing]
+
+  - id: polyglot-persistence
+    name: Polyglot persistence
+    aliases: [Мультипарадигменное моделирование, Polyglot modelling]
+    summary: >
+      Использование разных хранилищ под разные задачи: документной БД для
+      операций, колоночной для аналитики, поискового движка для поиска. Исходит
+      из того, что универсальной СУБД нет; CQRS позволяет проецировать данные в
+      такие хранилища.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+    related: [cqrs, oltp-olap]
+
+  - id: outbox
+    name: Паттерн исходящих сообщений
+    aliases: [Outbox, Outbox Pattern, Transactional outbox]
+    summary: >
+      Состояние агрегата и новые события сохраняются в одной транзакции, в
+      таблице или поле outbox, а отдельный ретранслятор потом публикует их в
+      шину. Решает проблему надёжной публикации событий без распределённых
+      транзакций и даёт доставку «хотя бы один раз».
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 5 }
+      - { book: learning-domain-driver-design, chapter: 9 }
+    related: [domain-event, saga, idempotency]
+
+  - id: process-manager
+    name: Диспетчер процессов
+    aliases: [Process Manager]
+    summary: >
+      Паттерн для сложных многошаговых процессов с собственной бизнес-логикой:
+      ветвлениями, условиями, повторами. В отличие от саги создаётся явно и
+      обязательно хранит состояние; часто моделируется как агрегат. Если в саге
+      появились if-else, скорее всего это диспетчер процессов.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 9 }
+    related: [saga, aggregate]
+
+  - id: test-pyramid
+    name: Пирамида тестирования
+    aliases: [Testing pyramid, Test pyramid, Тестовая пирамида, Пирамида Майка Кона, Пирамида тестов]
+    summary: >
+      Стратегия с большим числом модульных тестов и меньшим числом
+      интеграционных и сквозных; подходит для модели предметной области, где
+      агрегаты и объекты-значения легко тестировать изолированно. Для
+      транзакционного сценария советуют обратную форму — перевёрнутую пирамиду с
+      упором на сквозные тесты.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 10 }
+      - { book: building-microservices, chapter: 9 }
+    related: [domain-model, testing-quadrants]
+
+  - id: strangler-fig
+    name: Душитель
+    aliases: [Strangler Fig, Паттерн «Душитель», Инжир-душитель, Шаблон «Душитель»]
+    summary: >
+      Путь модернизации, при котором рядом со старой системой создают новый
+      контекст, переносят в него функции, а запросы маршрутизирует фасад. Новый
+      контекст постепенно «душит» старый, как инжир-душитель.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 13 }
+      - { book: building-microservices, chapter: 3 }
+    related: [anti-corruption-layer, big-ball-of-mud, feature-toggle]
+
+  - id: deep-module
+    name: Глубокий модуль
+    aliases: [Deep module, Мелкий модуль, Shallow module]
+    summary: >
+      Модуль с узким простым интерфейсом и сложной скрытой реализацией, по Джону
+      Оустерхауту. Мелкий модуль, у которого интерфейс равен реализации,
+      добавляет движущиеся части без пользы; микросервис должен быть глубоким.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 14 }
+    related: [microservices, open-host-service]
+
+  - id: event-notification
+    name: Уведомление о событии
+    aliases: [Event Notification, Уведомление]
+    summary: >
+      Событие, которое только сообщает о факте изменения и несёт минимум данных,
+      обычно ID и ссылку; детали потребитель запрашивает сам. Не выносит
+      конфиденциальные данные в шину и гарантирует свежие данные при запросе.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [event-carried-state-transfer, event-driven-architecture]
+
+  - id: event-carried-state-transfer
+    name: Передача состояния с помощью события
+    aliases: [Event-Carried State Transfer, ECST]
+    summary: >
+      Событие, которое переносит изменённое состояние целиком или частично.
+      Потребитель строит локальный кеш и работает даже при недоступности
+      источника; подходит, когда допустимы слегка устаревшие данные.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 15 }
+    related: [event-notification, event-driven-architecture]
+
+  - id: oltp-olap
+    name: OLTP и OLAP
+    aliases: [OLTP, OLAP, Транзакционная и аналитическая модели]
+    summary: >
+      Две модели данных под разные цели: OLTP обслуживает операции в реальном
+      времени и строится на сущностях и связях, OLAP служит для анализа и
+      отчётов и строится на фактах и измерениях. Одна модель не подходит для
+      обеих задач.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 8 }
+      - { book: learning-domain-driver-design, chapter: 16 }
+    related: [cqrs, data-mesh]
+
+  - id: data-mesh
+    name: Сеть данных
+    aliases: [Data Mesh]
+    summary: >
+      Подход, переносящий идеи DDD на аналитику: аналитические данные делятся по
+      ограниченным контекстам и принадлежат командам продукта. Четыре принципа —
+      владение данными по предметным областям, данные как продукт,
+      самообслуживаемая платформа и федеративное управление.
+    chapters:
+      - { book: learning-domain-driver-design, chapter: 16 }
+    related: [bounded-context, cqrs]
+
+  # --- конспекты: «Создание микросервисов» ---------------------------------
+
+  - id: independent-deployability
+    name: Независимое развёртывание
+    aliases: [Independent deployability, Независимая развёртываемость]
+    summary: >
+      Возможность выпустить изменение одного сервиса, не развёртывая остальную
+      систему. Главное условие микросервисной архитектуры; требует слабой
+      связанности, стабильных контрактов и отсутствия общей БД.
+    chapters:
+      - { book: building-microservices, chapter: 1 }
+      - { book: building-microservices, chapter: 5 }
+      - { book: building-microservices, chapter: 9 }
+      - { book: building-microservices, chapter: 17 }
+    related: [microservices, distributed-monolith, coupling, consumer-driven-contracts]
+
+  - id: information-hiding
+    name: Скрытие информации
+    aliases: [Information hiding, Сокрытие информации, Инкапсуляция, Модуль Парнаса]
+    summary: >
+      Принцип Дэвида Парнаса: внутренние детали модуля или сервиса спрятаны,
+      наружу виден только чёткий и минимальный интерфейс. Связи между модулями —
+      это предположения, которые они делают друг о друге, поэтому чем меньше
+      видно снаружи, тем свободнее можно менять внутренности.
+    chapters:
+      - { book: building-microservices, chapter: 1 }
+      - { book: building-microservices, chapter: 2 }
+      - { book: building-microservices, chapter: 17 }
+      - { book: brooks-mythical-man-month, chapter: 7 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [cohesion, coupling, microservices, independent-deployability, software-reuse]
+
+  - id: distributed-monolith
+    name: Распределённый монолит
+    aliases: [Distributed monolith]
+    summary: >
+      Система из многих сервисов, которые всё равно приходится развёртывать
+      вместе. Худшее из двух миров: сложность распределённости без
+      независимости. К нему ведут общие библиотеки с доменной логикой и частые
+      согласованные релизы клиента и сервера.
+    chapters:
+      - { book: building-microservices, chapter: 1 }
+      - { book: building-microservices, chapter: 5 }
+    related: [modular-monolith, independent-deployability, coupling]
+
+  - id: stream-aligned-team
+    name: Потоковая команда
+    aliases: [Stream-aligned team, Сквозная команда, Фуллстек-команда]
+    summary: >
+      Команда из модели Team Topologies, которая целиком владеет своим бизнес-
+      срезом — интерфейсом, логикой и данными. Такие команды меняют свою часть
+      системы без согласования с другими, что хорошо сочетается с
+      микросервисами.
+    chapters:
+      - { book: building-microservices, chapter: 1 }
+      - { book: building-microservices, chapter: 14 }
+      - { book: building-microservices, chapter: 15 }
+      - { book: building-microservices, chapter: 17 }
+    related: [conway-law, microservices, enabling-team, platform-team]
+
+  - id: constantine-law
+    name: Закон Константина
+    aliases: ["Constantine's law"]
+    summary: >
+      Устойчивая структура получается при сильной связности внутри модулей и
+      слабой связанности между ними.
+    chapters:
+      - { book: building-microservices, chapter: 2 }
+    related: [cohesion, coupling]
+
+  - id: domain-driven-design
+    name: Предметно-ориентированное проектирование
+    aliases: [DDD, Domain-Driven Design]
+    summary: >
+      Подход Эрика Эванса, в котором модель и код строятся вокруг предметной
+      области бизнеса. Для микросервисов это главный способ искать границы:
+      через единый язык, агрегаты и ограниченные контексты.
+    chapters:
+      - { book: building-microservices, chapter: 2 }
+    related: [ubiquitous-language, aggregate, bounded-context, event-storming]
+
+  - id: feature-toggle
+    name: Переключатель функций
+    aliases: [Feature toggle, Feature flag, Флаг функции, Переключаемые функции]
+    summary: >
+      Флаг, за которым прячется уже развёрнутая функциональность; её можно
+      включить, выключить или показать только части пользователей. Помогает при
+      магистральной разработке скрывать незаконченное, а при миграции и релизах
+      — переключаться и откатываться без нового деплоя.
+    chapters:
+      - { book: building-microservices, chapter: 3 }
+      - { book: building-microservices, chapter: 7 }
+      - { book: building-microservices, chapter: 8 }
+    related: [trunk-based-development, canary-release, progressive-delivery]
+
+  - id: request-response
+    name: Запрос — ответ
+    aliases: [Request-response, Синхронная блокировка]
+    summary: >
+      Стиль взаимодействия, при котором инициатор ждёт результата своего
+      запроса; бывает синхронным (HTTP REST) и асинхронным через очереди. Прост
+      и привычен, но длинные синхронные цепочки дают временную связанность и
+      каскадные сбои.
+    chapters:
+      - { book: building-microservices, chapter: 4 }
+    related: [event-driven-communication, correlation-id]
+
+  - id: event-driven-communication
+    name: Событийное взаимодействие
+    aliases: [Event-driven communication, Событийный стиль, Событийная модель]
+    summary: >
+      Сервис публикует факт «произошло X», не зная получателей, а подписчики
+      сами решают, как реагировать. Даёт слабую связанность и масштабируемость,
+      но усложняет отладку и требует управлять схемой событий как контрактом.
+    chapters:
+      - { book: building-microservices, chapter: 4 }
+    related: [request-response, message-broker]
+
+  - id: correlation-id
+    name: Идентификатор корреляции
+    aliases: [Correlation ID, ID корреляции]
+    summary: >
+      Общий идентификатор, который передаётся во всех вызовах, сообщениях и
+      логах одной цепочки. Позволяет связать асинхронный ответ с запросом,
+      собрать логи одной операции и отследить состояние хореографической саги.
+    chapters:
+      - { book: building-microservices, chapter: 4 }
+      - { book: building-microservices, chapter: 6 }
+      - { book: building-microservices, chapter: 10 }
+    related: [saga, event-driven-communication, distributed-tracing]
+
+  - id: rest
+    name: REST
+    aliases: [REST через HTTP, HATEOAS]
+    summary: >
+      Архитектурный стиль взаимодействия, где работа идёт с ресурсами по URI
+      через стандартные HTTP-методы. Хороший выбор по умолчанию для синхронных
+      внешних API; принцип HATEOAS, при котором клиент идёт по ссылкам из
+      ответа, на практике применяют редко.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [request-response, api-gateway]
+
+  - id: message-broker
+    name: Брокер сообщений
+    aliases: [Message broker]
+    summary: >
+      Посредник для асинхронной связи, который хранит сообщения и берёт на себя
+      их доставку. Очередь отдаёт сообщение одному потребителю из группы, топик
+      — всем подписанным группам. Гарантированная доставка не значит «ровно один
+      раз», поэтому возможны дубликаты.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [event-driven-communication, idempotency, smart-endpoints-dumb-pipes]
+
+  - id: tolerant-reader
+    name: Устойчивое считывание
+    aliases: [Tolerant Reader, Толерантный читатель, Закон Постела]
+    summary: >
+      Потребитель берёт из сообщения только нужные ему поля и игнорирует
+      остальные и неизвестные, чтобы не ломаться при изменениях контракта.
+      Опирается на закон Постела: будь консервативен в том, что отправляешь, и
+      либерален в том, что принимаешь.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [expand-contract]
+
+  - id: expand-contract
+    name: Расширение и сжатие
+    aliases: [Expand and contract, Expand-contract]
+    summary: >
+      Способ вносить ломающие изменения в интерфейс без одновременного деплоя:
+      сначала добавить новую версию рядом со старой, дать клиентам перейти,
+      затем удалить старую. На практике сервис временно обслуживает обе конечные
+      точки, например /v1 и /v2.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [tolerant-reader, independent-deployability]
+
+  - id: service-discovery
+    name: Обнаружение сервисов
+    aliases: [Service Discovery]
+    summary: >
+      Механизм, через который сервисы регистрируются («я здесь») и находятся
+      потребителями в динамичной среде. Реализуется через DNS, реестры вроде
+      Consul или встроенные средства Kubernetes.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [service-mesh, api-gateway]
+
+  - id: api-gateway
+    name: API-шлюз
+    aliases: [API Gateway]
+    summary: >
+      Обратный прокси на границе системы для трафика «север — юг»:
+      маршрутизирует внешние запросы к микросервисам, занимается
+      аутентификацией, ограничением скорости и логированием. Бизнес-логику и
+      агрегацию вызовов в него помещать не стоит.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [service-mesh, smart-endpoints-dumb-pipes]
+
+  - id: smart-endpoints-dumb-pipes
+    name: "Умные конечные точки, глупые каналы"
+    aliases: [Smart endpoints and dumb pipes]
+    summary: >
+      Принцип: бизнес-логика живёт в самих микросервисах, а шлюзы, брокеры и
+      сервисные сети несут только универсальную, не зависящую от домена логику.
+      Иначе инфраструктура превращается в новый ESB.
+    chapters:
+      - { book: building-microservices, chapter: 5 }
+    related: [api-gateway, service-mesh, message-broker]
+
+  - id: two-phase-commit
+    name: Двухфазная фиксация
+    aliases: [Two-Phase Commit, 2PC, Распределённая транзакция]
+    summary: >
+      Протокол распределённой транзакции: координатор сначала спрашивает
+      участников о готовности, затем рассылает команду фиксации или отката.
+      Держит блокировки, плохо масштабируется и зависает при сбоях, поэтому
+      между микросервисами его избегают.
+    chapters:
+      - { book: building-microservices, chapter: 6 }
+    related: [saga, acid-base]
+
+  - id: compensating-transaction
+    name: Компенсирующая транзакция
+    aliases: [Compensating transaction, Обратное восстановление]
+    summary: >
+      Новая транзакция, которая семантически отменяет уже выполненный шаг саги,
+      например возврат денег вместо отката платежа. Прошлое не стереть, но
+      последствия можно логически нейтрализовать; рискованные шаги лучше ставить
+      позже, чтобы компенсаций было меньше.
+    chapters:
+      - { book: building-microservices, chapter: 6 }
+    related: [saga]
+
+  - id: continuous-integration
+    name: Непрерывная интеграция
+    aliases: [Continuous Integration, CI]
+    summary: >
+      Практика частой, не реже раза в день, интеграции кода в основную ветку с
+      автоматической сборкой и тестами. По Джезу Хамблу, настоящая CI требует
+      автотестов и приоритетного исправления «красной» сборки; одного CI-сервера
+      недостаточно.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+    related: [trunk-based-development, build-pipeline, continuous-delivery]
+
+  - id: trunk-based-development
+    name: Магистральная разработка
+    aliases: [Trunk-Based Development, TBD]
+    summary: >
+      Все работают в одной основной ветке, а короткие ветки живут меньше дня;
+      незаконченное прячут за переключателями функций. Избавляет от тяжёлых
+      слияний долгоживущих веток и поддерживает частую интеграцию.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+    related: [continuous-integration, feature-toggle]
+
+  - id: build-pipeline
+    name: Конвейер сборки
+    aliases: [Build pipeline, Конвейер развёртывания]
+    summary: >
+      Разбиение сборки на этапы: сначала быстрые дешёвые проверки, затем
+      медленные и дорогие. Артефакт собирается один раз и проходит все этапы и
+      среды без пересборки, а конфигурация задаётся снаружи.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+    related: [continuous-integration, continuous-delivery]
+
+  - id: continuous-delivery
+    name: Непрерывная доставка
+    aliases: [Continuous Delivery, CD]
+    summary: >
+      Подход, при котором каждый коммит в основную ветку — потенциальный релиз,
+      а путь до продакшена смоделирован как конвейер из автоматических и ручных
+      этапов. В любой момент можно безопасно развернуть последнюю успешную
+      версию.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+    related: [continuous-deployment, build-pipeline, continuous-integration]
+
+  - id: continuous-deployment
+    name: Непрерывное развёртывание
+    aliases: [Continuous Deployment]
+    summary: >
+      Расширение непрерывной доставки: каждая сборка, прошедшая проверки, сама
+      уходит в продакшен без ручного подтверждения.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+    related: [continuous-delivery]
+
+  - id: monorepo
+    name: Монорепозиторий
+    aliases: [Monorepo, Монорепо]
+    summary: >
+      Код многих сервисов хранится в одном репозитории. Даёт атомарные коммиты
+      сразу в несколько сервисов и простое переиспользование кода, но при росте
+      требует сложной сборки, явного владения кодом и дорогих инструментов.
+    chapters:
+      - { book: building-microservices, chapter: 7 }
+
+  - id: infrastructure-as-code
+    name: Инфраструктура как код
+    aliases: [Infrastructure as Code, IaC]
+    summary: >
+      Описание и настройка инфраструктуры в машиночитаемом коде, который
+      хранится в системе контроля версий. Делает среды воспроизводимыми,
+      изменения — проверяемыми, а автоматизацию — возможной.
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+
+  - id: zero-downtime-deployment
+    name: Развёртывание без простоя
+    aliases: [Zero-downtime deployment, Rolling update]
+    summary: >
+      Выпуск новой версии так, что потребители, люди или другие сервисы, ничего
+      не замечают. Делается постепенной заменой экземпляров или сине-зелёным
+      переключением и позволяет релизить часто, в рабочее время.
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+    related: [blue-green-deployment, independent-deployability]
+
+  - id: faas
+    name: Функция как услуга
+    aliases: [FaaS, Serverless, Бессерверные вычисления]
+    summary: >
+      Модель, где код разворачивается как функции, запускаемые по триггеру, а
+      масштабированием и доступностью управляет платформа. Платишь только за
+      время выполнения; ограничения — холодный старт, лимиты времени и
+      отсутствие состояния между вызовами.
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+
+  - id: progressive-delivery
+    name: Поэтапная доставка
+    aliases: [Progressive Delivery]
+    summary: >
+      Набор приёмов контролируемого выпуска функциональности, «непрерывная
+      доставка с полным контролем радиуса взрыва». В основе — разделение
+      развёртывания (установки кода в среду) и релиза (открытия функции
+      пользователям).
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+    related: [feature-toggle, canary-release, blue-green-deployment]
+
+  - id: canary-release
+    name: Канареечный релиз
+    aliases: [Canary release, Канареечное развёртывание]
+    summary: >
+      Новая версия сначала доступна небольшой части пользователей или трафика и
+      при отсутствии проблем постепенно расширяется до всех. Долю трафика можно
+      увеличивать вручную или автоматически по метрикам ошибок и задержек.
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+    related: [progressive-delivery, feature-toggle, blue-green-deployment]
+
+  - id: blue-green-deployment
+    name: Сине-зелёное развёртывание
+    aliases: [Blue-green deployment]
+    summary: >
+      Новая («зелёная») версия разворачивается рядом с работающей («синей»),
+      проверяется, и только потом на неё переключается трафик. Если проблема
+      найдена до переключения, клиенты её не видят.
+    chapters:
+      - { book: building-microservices, chapter: 8 }
+    related: [zero-downtime-deployment, canary-release, progressive-delivery]
+
+  - id: testing-quadrants
+    name: Квадрант Марика
+    aliases: [Testing quadrants, Тестовые квадранты, Квадранты тестирования]
+    summary: >
+      Классификация тестов по двум осям: по цели (помогают разработчикам или
+      бизнесу) и по охвату (узкие или широкие). Получаются четыре квадранта: от
+      модульных тестов до приёмочных, исследовательских и нагрузочных.
+    chapters:
+      - { book: building-microservices, chapter: 9 }
+    related: [test-pyramid]
+
+  - id: consumer-driven-contracts
+    name: "Контракты, ориентированные на потребителя"
+    aliases: [Consumer-Driven Contracts, CDC, Контрактное тестирование, Contract tests]
+    summary: >
+      Команда-потребитель описывает в тестах свои ожидания от сервиса-
+      производителя, а производитель запускает эти тесты в своей сборке
+      изолированно, без развёртывания остальной системы. Так ломающие изменения
+      ловятся до релиза без дорогих сквозных тестов; типичный инструмент — Pact.
+    chapters:
+      - { book: building-microservices, chapter: 9 }
+      - { book: building-microservices, chapter: 17 }
+    related: [test-pyramid, conway-law, testing-in-production]
+
+  - id: testing-in-production
+    name: Тестирование в эксплуатации
+    aliases: [Testing in production, Эксплуатационное тестирование]
+    summary: >
+      Проверка качества прямо в проде, раз все проблемы до релиза выявить
+      невозможно. Сюда относятся дымовые тесты, канареечные релизы,
+      синтетические транзакции, A/B-тесты, параллельное выполнение и хаос-
+      инжиниринг; главное правило — такие тесты не должны вызывать сбоев и
+      портить данные.
+    chapters:
+      - { book: building-microservices, chapter: 9 }
+      - { book: building-microservices, chapter: 10 }
+      - { book: building-microservices, chapter: 17 }
+    related: [synthetic-transaction, chaos-engineering]
+
+  - id: observability
+    name: Наблюдаемость
+    aliases: [Observability]
+    summary: >
+      Свойство системы: насколько хорошо можно понять её внутреннее состояние по
+      внешним выходным данным. Мониторинг — это то, что мы делаем, а
+      наблюдаемость позволяет задавать системе вопросы, о которых заранее не
+      подумали; модель «трёх столпов» (метрики, логи, трассировка) автор считает
+      упрощением.
+    chapters:
+      - { book: building-microservices, chapter: 10 }
+      - { book: building-microservices, chapter: 17 }
+    related: [distributed-tracing, slo]
+
+  - id: distributed-tracing
+    name: Распределённая трассировка
+    aliases: [Distributed tracing, Трассировка, Трейсинг]
+    summary: >
+      Отслеживание потока вызовов между сервисами: работа в каждом сервисе
+      записывается в спан, спаны связываются общим trace ID и собираются
+      коллектором в трейс. Чтобы не перегрузить систему, применяют выборку; код
+      лучше инструментировать через открытый стандарт OpenTelemetry.
+    chapters:
+      - { book: building-microservices, chapter: 10 }
+    related: [correlation-id, observability]
+
+  - id: slo
+    name: SLO
+    aliases: [Service-level objective, Цель уровня обслуживания, SLA, SLI]
+    summary: >
+      Цель, которую обещает конкретная команда: например, время безотказной
+      работы или приемлемое время отклика. SLA — внешнее соглашение с
+      последствиями при нарушении, обычно «абсолютный минимум», а SLI —
+      фактический показатель, по которому проверяют выполнение SLO.
+    chapters:
+      - { book: building-microservices, chapter: 10 }
+    related: [error-budget, architecture-characteristics]
+
+  - id: error-budget
+    name: Бюджет ошибок
+    aliases: [Error budget]
+    summary: >
+      Формализованное допустимое количество сбоев, вытекающее из SLO: при цели
+      99,9% за квартал можно «лежать» около двух часов. Пока бюджет есть, можно
+      рисковать и пробовать новое, а когда он исчерпан, команда переключается на
+      надёжность.
+    chapters:
+      - { book: building-microservices, chapter: 10 }
+    related: [slo]
+
+  - id: synthetic-transaction
+    name: Синтетическая транзакция
+    aliases: [Synthetic transaction, Синтетические транзакции, Фейковое поведение пользователя]
+    summary: >
+      Искусственное «пользовательское» действие в реальной системе с известным
+      входом и ожидаемым результатом, например заказ от фейкового клиента. Часто
+      оказывается лучшим индикатором проблем, чем низкоуровневые метрики, но
+      требует строгого контроля побочных эффектов.
+    chapters:
+      - { book: building-microservices, chapter: 9 }
+      - { book: building-microservices, chapter: 10 }
+    related: [testing-in-production]
+
+  - id: least-privilege
+    name: Принцип наименьших привилегий
+    aliases: [Principle of least privilege, Least privilege]
+    summary: >
+      Давать стороне минимальный доступ, нужный для её работы, и только на
+      ограниченное время. Если учётные данные утекут, злоумышленник получит как
+      можно меньше; в микросервисах это поддерживают отдельные учётные данные
+      для каждого экземпляра и ротация ключей.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+    related: [defense-in-depth, zero-trust]
+
+  - id: defense-in-depth
+    name: Глубокая оборона
+    aliases: [Defense in depth, Глубокая защита, Углублённая оборона]
+    summary: >
+      Защита несколькими слоями, как у замка с двумя стенами и крепостью внутри,
+      вместо одного механизма. Микросервисы помогают ей: функциональность
+      разделена, сервисы живут в разных сегментах сети и на разных технологиях;
+      нужна комбинация превентивных, детективных и реагирующих средств.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+    related: [least-privilege, threat-modeling, zero-trust]
+
+  - id: threat-modeling
+    name: Моделирование угроз
+    aliases: [Threat modeling]
+    summary: >
+      Способ выявлять риски, поставив себя на место злоумышленника. Смотреть
+      нужно на систему целиком, иначе возникает ложное ощущение безопасности;
+      взгляд со стороны здесь особенно полезен.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+    related: [defense-in-depth]
+
+  - id: zero-trust
+    name: Нулевое доверие
+    aliases: [Zero trust, Вычисления без периметра, Безусловное доверие]
+    summary: >
+      Образ мышления, при котором окружение считается уже скомпрометированным и
+      внутренняя сеть заслуживает не больше доверия, чем интернет.
+      Противоположность — безусловное доверие ко всему внутри периметра; на
+      практике доверие можно делать спектром и зависеть от конфиденциальности
+      данных.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+      - { book: building-microservices, chapter: 17 }
+    related: [least-privilege, defense-in-depth]
+
+  - id: confused-deputy-problem
+    name: Проблема запутанного заместителя
+    aliases: [Confused deputy problem]
+    summary: >
+      Ситуация, когда сторона с меньшими правами заставляет более
+      привилегированный сервис выполнить действие за неё. Пример: вошедший
+      клиент перебирает номера и получает чужие заказы, потому что нижестоящие
+      сервисы доверяют всем вызовам; помогает децентрализованная авторизация с
+      JWT.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+      - { book: building-microservices, chapter: 17 }
+    related: [zero-trust]
+
+  - id: datensparsamkeit
+    name: Datensparsamkeit
+    aliases: [Экономия данных, Минимизация данных]
+    summary: >
+      Принцип из немецкого законодательства о конфиденциальности: хранить только
+      минимально необходимый объём данных, например возрастной диапазон вместо
+      даты рождения. Данные, которых нет, нельзя украсть и нельзя затребовать.
+    chapters:
+      - { book: building-microservices, chapter: 11 }
+    related: [least-privilege]
+
+  - id: resilience
+    name: Отказоустойчивость
+    aliases: [Resilience, Устойчивость]
+    summary: >
+      По Дэвиду Вудсу складывается из четырёх концепций: надёжности (ожидаемые
+      возмущения), восстановления после сбоя, стабильной расширяемости
+      (неожиданное) и непрерывной адаптивности. Это свойство людей, процессов и
+      организации, а не только ПО: микросервисы помогают в основном с
+      надёжностью.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+      - { book: building-microservices, chapter: 17 }
+    related: [circuit-breaker, bulkhead, chaos-engineering, graceful-degradation]
+
+  - id: graceful-degradation
+    name: Снижение функциональности
+    aliases: [Graceful degradation, Постепенная деградация, Безопасное снижение функциональности]
+    summary: >
+      Способность системы при сбое части сервисов продолжать работать в
+      урезанном виде, а не падать целиком: например, показывать каталог без
+      корзины. Как именно деградировать, часто решает бизнес, а не техника.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+    related: [resilience, circuit-breaker]
+
+  - id: circuit-breaker
+    name: Автоматический выключатель
+    aliases: [Circuit breaker, Предохранитель]
+    summary: >
+      Шаблон из «Release It!» Майкла Нейгарда: после серии ошибок или тайм-аутов
+      выключатель «размыкается», и вызовы к больному сервису сразу завершаются
+      ошибкой, а затем пробными запросами проверяется восстановление. Защищает и
+      потребителя, и перегруженный нижестоящий сервис; ставить его рекомендуют
+      на все синхронные вызовы.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+    related: [bulkhead, graceful-degradation, resilience]
+
+  - id: bulkhead
+    name: Переборка
+    aliases: [Bulkhead, Переборки]
+    summary: >
+      Шаблон из «Release It!»: ресурсы разделяются на отсеки, как герметичные
+      переборки судна, чтобы сбой в одном не утопил всё, например отдельный пул
+      соединений для каждого нижестоящего сервиса. В отличие от тайм-аутов и
+      выключателей, переборки вообще не дают ресурсам закончиться.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+    related: [circuit-breaker, resilience]
+
+  - id: cap-theorem
+    name: Теорема CAP
+    aliases: [CAP theorem, CAP-теорема]
+    summary: >
+      В распределённой системе из согласованности, доступности и устойчивости к
+      разделению можно получить только два свойства. Поскольку разделение сети
+      неизбежно, выбирают между AP (доступно, но в конечном счёте согласовано) и
+      CP (согласовано, но может отказать); выбор можно делать по отдельным
+      возможностям сервиса.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+    related: [acid-base]
+
+  - id: blameless-postmortem
+    name: Культура без поиска виновных
+    aliases: [Blameless postmortem, Постмортем без упрёков, Blameless culture]
+    summary: >
+      Разбор инцидентов без обвинения конкретных людей. Поиск виноватых создаёт
+      культуру страха: о проблемах перестают сообщать, и ошибки повторяются, а
+      открытость помогает учиться на сбоях.
+    chapters:
+      - { book: building-microservices, chapter: 12 }
+    related: [resilience]
+
+  - id: scale-cube
+    name: Куб масштабирования
+    aliases: [Scale cube, Оси масштабирования]
+    summary: >
+      Модель из книги «Искусство масштабирования»: функциональная декомпозиция,
+      горизонтальное дублирование и разделение данных. Автор добавляет четвёртую
+      ось — вертикальное масштабирование; оси можно комбинировать, а начинать
+      советует с самых простых.
+    chapters:
+      - { book: building-microservices, chapter: 13 }
+      - { book: building-microservices, chapter: 17 }
+    related: [sharding]
+
+  - id: sharding
+    name: Разделение данных
+    aliases: [Sharding, Шардирование, Сегментирование, Data partitioning]
+    summary: >
+      Распределение работы по разделам на основе ключа данных, например
+      идентификатора клиента или региона. Хорошо масштабирует запись, но мало
+      помогает надёжности, а выбор и смена ключа раздела и запросы по нескольким
+      сегментам — трудные задачи.
+    chapters:
+      - { book: building-microservices, chapter: 13 }
+    related: [scale-cube]
+
+  - id: cache-invalidation
+    name: Аннулирование кэша
+    aliases: [Cache invalidation, Инвалидация кэша]
+    summary: >
+      Удаление или обновление устаревших данных в кэше: по TTL, условными GET-
+      запросами с ETag, по уведомлениям-событиям, сквозной записью или записью с
+      отложенным обновлением источника. Простое в идее, сложное в исполнении;
+      чем больше уровней кэша, тем старее данные, поэтому кэшировать стоит в как
+      можно меньшем числе мест.
+    chapters:
+      - { book: building-microservices, chapter: 13 }
+
+  - id: premature-optimization
+    name: Преждевременная оптимизация
+    aliases: [Premature optimization]
+    summary: >
+      По Дональду Кнуту, «корень всего зла»: забота об эффективности не там и не
+      тогда. Масштабировать стоит под реальную потребность и проверять гипотезы
+      экспериментами, например нагрузочными тестами; переделка системы под рост
+      — признак успеха, а не неудачи.
+    chapters:
+      - { book: building-microservices, chapter: 13 }
+    related: [scale-cube]
+
+  - id: enabling-team
+    name: Команда поддержки
+    aliases: [Enabling team]
+    summary: >
+      Команда из «Топологий команд», которая помогает потоковым командам как
+      внутренний консультант: например, обеспечивает единый пользовательский
+      опыт или замечает общие проблемы нескольких команд. Современная роль
+      архитектора тоже относится к поддержке, а не к управлению.
+    chapters:
+      - { book: building-microservices, chapter: 14 }
+      - { book: building-microservices, chapter: 15 }
+      - { book: building-microservices, chapter: 16 }
+    related: [stream-aligned-team, community-of-practice, platform-team]
+
+  - id: micro-frontends
+    name: Микрофронтенды
+    aliases: [Micro frontends, Микрофронтенд]
+    summary: >
+      Архитектурный стиль, в котором независимо поставляемые фронтенд-приложения
+      объединяются в единое целое (определение Кэма Джексона). Делает для
+      фронтенда то же, что микросервисы для бэкенда; реализуется через
+      декомпозицию по страницам или по виджетам.
+    chapters:
+      - { book: building-microservices, chapter: 14 }
+    related: [stream-aligned-team]
+
+  - id: strong-ownership
+    name: Сильное владение
+    aliases: [Strong ownership, Владение полным жизненным циклом]
+    summary: >
+      Модель, где микросервисом владеет одна команда и сама решает, какие
+      изменения вносить; внешние команды просят или присылают запросы на
+      извлечение. В пределе команда отвечает за весь жизненный цикл сервиса; для
+      организаций с несколькими командами это наиболее разумная модель.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [collective-ownership, stream-aligned-team, inner-source]
+
+  - id: collective-ownership
+    name: Коллективное владение
+    aliases: [Collective ownership, Совместное владение]
+    summary: >
+      Модель, где изменения в микросервис вносит любая из нескольких команд.
+      Позволяет перебрасывать людей туда, где они нужны, но требует высокой
+      согласованности технологий и в крупном масштабе подрывает преимущества
+      микросервисов; внутри одной команды при этом работает хорошо.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [strong-ownership]
+
+  - id: community-of-practice
+    name: Профессиональное сообщество
+    aliases: [Community of practice, CoP, Сообщество практиков]
+    summary: >
+      Межкомандная группа для обмена опытом между коллегами, например сообщество
+      UI или Kubernetes. В отличие от команды поддержки, участники тратят на
+      него несколько часов в неделю, состав меняется, а фокус — на обучении и
+      обсуждениях.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [enabling-team]
+
+  - id: platform-team
+    name: Команда платформы
+    aliases: [Platform team, Служба доставки]
+    summary: >
+      Команда, которая даёт потоковым командам инструменты самообслуживания:
+      развёртывание, агрегацию логов, аутентификацию между сервисами. Её
+      пользователи — другие разработчики, и работать она должна как продуктовая
+      команда и внутренний консультант.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [paved-road, stream-aligned-team, enabling-team]
+
+  - id: paved-road
+    name: Мощёная дорога
+    aliases: [Paved road]
+    summary: >
+      Принцип: чётко объявить требования и дать механизм, который делает их
+      выполнение самым простым путём, например платформу, автоматически
+      включающую MTLS. Дорога не обязательна — команда может пойти своим путём,
+      но тогда должна понимать ограничения; сюда же относятся опциональные
+      шаблоны микросервисов.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+      - { book: building-microservices, chapter: 16 }
+      - { book: building-microservices, chapter: 17 }
+    related: [platform-team]
+
+  - id: inner-source
+    name: Открытый исходный код внутри компании
+    aliases: [Inner source, Внутренний open source, Доверенные коммиттеры]
+    summary: >
+      Перенос модели open source внутрь организации: доверенные коммиттеры
+      хранят код сервиса, а другие команды присылают запросы на извлечение.
+      Лучше работает для зрелых, стабильных сервисов и требует времени на
+      рецензирование.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+    related: [strong-ownership]
+
+  - id: mob-programming
+    name: Групповое программирование
+    aliases: [Mob programming, Ensemble programming, Ансамблевое программирование, Моб-программирование]
+    summary: >
+      Работа большой группы, иногда всей команды, над одним изменением; часто
+      используется для сложных задач. Как и парное программирование, даёт
+      мгновенное рецензирование, но не всем комфортна, поэтому важна инклюзивная
+      рабочая среда.
+    chapters:
+      - { book: building-microservices, chapter: 15 }
+      - { book: building-microservices, chapter: 16 }
+
+  - id: evolutionary-architecture
+    name: Эволюционная архитектура
+    aliases: [Evolutionary architecture, Эволюционный архитектор]
+    summary: >
+      Подход, при котором архитектор не проектирует идеальный конечный продукт,
+      а создаёт основу, в которой система может появляться и постепенно
+      развиваться серией небольших изменений. Архитектура постоянно меняется, а
+      техническое видение формируется совместно с командами.
+    chapters:
+      - { book: building-microservices, chapter: 16 }
+      - { book: building-microservices, chapter: 17 }
+    related: [architect-as-town-planner, fitness-function]
+
+  - id: architect-as-town-planner
+    name: Архитектор как градостроитель
+    aliases: [Architect as town planner, Градостроитель]
+    summary: >
+      Аналогия Эрика Дёрненбурга: архитектор ПО похож не на архитектора здания,
+      а на градостроителя, который задаёт зоны и больше думает о связях между
+      ними. Внутри зоны (сервиса или команды) можно быть либеральнее, а между
+      зонами — строже.
+    chapters:
+      - { book: building-microservices, chapter: 16 }
+    related: [evolutionary-architecture]
+
+  - id: technical-debt
+    name: Технический долг
+    aliases: [Technical debt, Техдолг]
+    summary: >
+      Возникает, когда система расходится с техническим видением: из-за
+      сознательного отступления или потому, что изменилось само видение.
+      Архитектор должен видеть общую картину и баланс, а долг можно регулярно
+      вести и пересматривать в специальном логе.
+    chapters:
+      - { book: building-microservices, chapter: 16 }
+    related: [evolutionary-architecture]
+
+  # --- конспекты: «Мифический человеко-месяц» ------------------------------
+
+  - id: programming-systems-product
+    name: Системный программный продукт
+    aliases: [Programming systems product]
+    summary: >
+      Программа, которая одновременно стала продуктом (обобщена, протестирована,
+      документирована) и компонентом системы (точные интерфейсы, бюджет
+      ресурсов, совместное тестирование). Каждый шаг утраивает цену, поэтому
+      такой продукт стоит примерно в 9–10 раз дороже программы, работающей у
+      автора.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 1 }
+    related: [man-month]
+
+  - id: man-month
+    name: Человеко-месяц
+    aliases: [Man-month, Мифический человеко-месяц]
+    summary: >
+      Единица трудозатрат, которая молча предполагает, что людей и месяцы можно
+      менять местами. Это верно только для задач без общения: в связанной работе
+      каждый новичок добавляет обучение и каналы связи. Человеко-месяц измеряет
+      стоимость, а не результат; позже Бём показал, что быстрее 3/4 оптимального
+      срока проект не сделать никаким числом людей.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 2 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [brooks-law, communication-channels]
+
+  - id: communication-channels
+    name: Каналы общения
+    aliases: [n(n−1)/2, Communication overhead]
+    summary: >
+      Между n людьми, которым нужно согласовываться, возникает n(n−1)/2 каналов
+      общения, и это число растёт почти квадратично. Поэтому задача организации
+      — сократить нужное общение за счёт разделения труда и специализации.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 2 }
+      - { book: brooks-mythical-man-month, chapter: 7 }
+    related: [brooks-law, man-month, surgical-team]
+
+  - id: surgical-team
+    name: Операционная бригада
+    aliases: [Хирургическая бригада, Surgical team, Бригада Миллза]
+    summary: >
+      Предложенная Миллзом схема команды из десяти человек: проектирует и пишет
+      код один «хирург», второй пилот его страхует, остальные (администратор,
+      редактор, делопроизводитель, инструментальщик, тестировщик, языковед)
+      снимают с него всё прочее. Целостность держится в одной голове, а общения
+      нужно меньше; большие системы строят из нескольких таких бригад.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 3 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+    related: [conceptual-integrity, communication-channels]
+
+  - id: conceptual-integrity
+    name: Концептуальная целостность
+    aliases: [Conceptual integrity]
+    summary: >
+      Важнейшее свойство системы по Бруксу: она выглядит так, будто её придумал
+      один ум. Ради неё лучше отказаться от хороших, но несогласованных функций.
+      Мера качества — отношение функциональности к сложности концепций, а
+      держится целостность на одном архитекторе или маленькой группе
+      единомышленников.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 4 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [architecture-vs-implementation, surgical-team, second-system-effect]
+
+  - id: architecture-vs-implementation
+    name: Отделение архитектуры от реализации
+    aliases: [Architecture vs implementation]
+    summary: >
+      Архитектура — полная спецификация того, что видит пользователь, она
+      отвечает на вопрос «что». Реализация отвечает на вопрос «как» и тоже
+      требует творчества. Как у часов с одинаковым циферблатом и разными
+      механизмами, одну архитектуру можно воплотить по-разному, а заданные рамки
+      только подстёгивают изобретательность исполнителей.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 4 }
+    related: [conceptual-integrity]
+
+  - id: documentary-hypothesis
+    name: Документарная гипотеза
+    aliases: [Documentary hypothesis]
+    summary: >
+      Среди горы бумаг лишь несколько ключевых документов несут основную
+      управленческую работу: цели, спецификация, график, бюджет, размещение и
+      оргструктура. Они отвечают на вопросы «что, когда, по какой цене, где и
+      кто», а письменная формулировка вскрывает пробелы и противоречия в
+      решениях.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 10 }
+    related: [conway-law]
+
+  - id: plan-to-throw-one-away
+    name: Планируйте на выброс
+    aliases: [Plan to throw one away, Опытный завод, Пилотная система]
+    summary: >
+      Первая версия системы обычно медленная, большая или неудобная, поэтому её
+      выброс стоит заложить в план, как химики строят опытный завод. Выбор
+      только между запланированным выбросом и отдачей хлама клиенту. Позже Брукс
+      назвал совет упрощённым: корень проблемы — водопадная модель.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 11 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [waterfall-model, iterative-development, rapid-prototyping]
+
+  - id: milestone
+    name: Веха
+    aliases: [Milestone, Контрольная точка]
+    summary: >
+      Конкретное событие, наступление которого не вызывает сомнений: оно либо
+      произошло, либо нет. «Код готов на 90 %» вехой не считается, с размытой
+      вехой плохие новости смягчают без злого умысла. Проект опаздывает на год
+      по одному дню, и чёткие вехи позволяют это заметить.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 14 }
+      - { book: brooks-mythical-man-month, chapter: 18 }
+
+  - id: silver-bullet
+    name: Серебряной пули нет
+    aliases: [No Silver Bullet, Серебряная пуля]
+    summary: >
+      Тезис Брукса: ни одна технология или методика в одиночку не даст за
+      десятилетие роста производительности на порядок, потому что главная
+      трудность софта в его сущности. Через девять лет пуля так и не нашлась,
+      реальный рост составил 3–5 раз; путь вперёд — сумма скромных улучшений.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 16 }
+      - { book: brooks-mythical-man-month, chapter: 17 }
+    related: [essential-accidental-complexity]
+
+  - id: essential-accidental-complexity
+    name: Сущность и акциденция
+    aliases: [Essential and accidental complexity, Сущностная и акцидентная сложность, Неустранимые свойства софта]
+    summary: >
+      Сущность — сама концептуальная конструкция программы: данные, связи,
+      алгоритмы; её трудно специфицировать, спроектировать и проверить.
+      Акциденция — «несущественное», её запись в языке и машине. Языки высокого
+      уровня и разделение времени убрали много акциденций, а сущностные
+      трудности неустранимы, хотя их последствия можно смягчать.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 16 }
+      - { book: brooks-mythical-man-month, chapter: 17 }
+    related: [silver-bullet]
+
+  - id: buy-versus-build
+    name: "Покупать, а не создавать"
+    aliases: [Buy versus build, Покупай и создавай]
+    summary: >
+      Самый глубокий удар по сущности: взять готовый продукт массового рынка
+      вместо разработки своего, ведь n копий умножают отдачу на n. Прогноз
+      сбылся, а настраиваемость пакетов оказалась важнее, чем Брукс ожидал.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 16 }
+      - { book: brooks-mythical-man-month, chapter: 17 }
+    related: [software-reuse, silver-bullet]
+
+  - id: rapid-prototyping
+    name: Быстрое прототипирование
+    aliases: [Rapid prototyping]
+    summary: >
+      Клиенты не знают, чего хотят, и требования проясняются только на
+      работающих версиях. Поэтому прототип, который можно показать и
+      попробовать, бьёт по сущностной трудности — решить, что именно строить.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 16 }
+    related: [iterative-development, plan-to-throw-one-away]
+
+  - id: software-reuse
+    name: Повторное использование
+    aliases: [Software reuse, Переиспользование]
+    summary: >
+      Переиспользуемый компонент стоит в 2–3 раза дороже одноразового: он должен
+      быть обобщён, протестирован и документирован, как полноценный продукт.
+      Окупается он не сразу, а барьер стоит у потребителя: если найти компонент
+      кажется дороже, чем написать, его напишут заново.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 17 }
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [buy-versus-build, information-hiding]
+
+  - id: waterfall-model
+    name: Водопадная модель
+    aliases: [Каскадная модель, Waterfall model]
+    summary: >
+      Процесс из последовательных этапов, где пользователь видит систему только
+      в конце. Брукс признал её неверной: опыт нижних этапов должен подниматься
+      вверх по течению. Из неё выросли и правило планирования «1/3 — 1/6 — 1/4 —
+      1/4», и совет «планируйте на выброс».
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [iterative-development, plan-to-throw-one-away]
+
+  - id: daily-build
+    name: Ежедневная сборка
+    aliases: [Ежевечерняя сборка, Daily build, Nightly build]
+    summary: >
+      Практика Microsoft: каждую ночь систему собирают и прогоняют тесты, а если
+      сборка сломалась, стоят все. Процесс прозрачен и поднимает дух команды;
+      это предок непрерывной интеграции.
+    chapters:
+      - { book: brooks-mythical-man-month, chapter: 19 }
+    related: [iterative-development]

@@ -24,6 +24,7 @@ from app.core.models import (
     Meeting,
     MeetingImage,
     OutcomeItem,
+    Term,
 )
 
 # Сколько чего показывает главная. Границы — часть выборки, а не вёрстки:
@@ -51,11 +52,37 @@ class Progress:
 
 @dataclass(frozen=True)
 class TopicEntry:
-    """Понятие клуба: где обсуждали и где про него прочитать."""
+    """Тема встреч: где обсуждали и какое понятие словаря за ней стоит.
+
+    `term` пуст, если темы нет в словаре: словарь — справочник, а не обязательный
+    список тем, и тема без определения остаётся просто темой.
+    """
 
     name: str
-    notes_url: str | None
+    term: Term | None
     meetings: tuple[Meeting, ...]
+
+
+@dataclass(frozen=True)
+class GlossaryLetter:
+    """Буква указателя словаря и понятия на неё, по алфавиту."""
+
+    letter: str
+    terms: tuple[Term, ...]
+
+
+@dataclass(frozen=True)
+class TermChapterView:
+    """Глава, где разобрано понятие, с подписью и адресом конспекта.
+
+    Адрес пуст, если у главы в данных книги конспекта нет: подпись тогда
+    стоит текстом, а догадку на месте адреса сайт не подставляет.
+    """
+
+    book: Book
+    chapter: Chapter
+    label: str
+    url: str | None
 
 
 @dataclass(frozen=True)
@@ -315,11 +342,78 @@ class ClubView:
         return tuple(
             TopicEntry(
                 name=name,
-                notes_url=self.club.topic_notes.get(name),
+                term=self.term_for(name),
                 meetings=tuple(by_name[name]),
             )
             for name in order
         )
+
+    # --- словарь ------------------------------------------------------------
+
+    def term_for(self, name: str) -> Term | None:
+        """Понятие словаря по теме: совпадение с названием или синонимом.
+
+        Регистр и «ё» не различаются: тему пишут как придётся — «adr», «ADR»,
+        «Ёмкость» и «Емкость» — и ссылка не должна пропадать из-за этого.
+        """
+        wanted = fold_name(name)
+        for term in self._data.glossary:
+            if any(fold_name(known) == wanted for known in term.names):
+                return term
+        return None
+
+    def term(self, term_id: str) -> Term | None:
+        for term in self._data.glossary:
+            if term.id == term_id:
+                return term
+        return None
+
+    def glossary_index(self) -> tuple[GlossaryLetter, ...]:
+        """Словарь по буквам: сначала кириллица, потом латиница, потом прочее.
+
+        Понятия клуба — вперемешку русские и английские («ADR», «UML»), и общий
+        алфавитный порядок по кодам символов поставил бы латиницу перед
+        кириллицей. Читатель сайта ищет по-русски, поэтому русские буквы первыми.
+        """
+        ordered = sorted(self._data.glossary, key=lambda term: _alphabet_key(term.name))
+        letters: list[str] = []
+        by_letter: dict[str, list[Term]] = {}
+        for term in ordered:
+            letter = _letter_of(term.name)
+            if letter not in by_letter:
+                letters.append(letter)
+                by_letter[letter] = []
+            by_letter[letter].append(term)
+        return tuple(
+            GlossaryLetter(letter=letter, terms=tuple(by_letter[letter])) for letter in letters
+        )
+
+    def term_chapters(self, term: Term) -> tuple[TermChapterView, ...]:
+        """Главы понятия с подписью «книга, гл. N» и адресом конспекта главы.
+
+        Подпись — по короткому названию книги: полное «…, 2-е издание» в строку
+        ссылок не помещается. Книга и глава существуют — это проверено на входе.
+        """
+        views = []
+        for reference in term.chapters:
+            book = self._data.book(reference.book_id)
+            chapter = book.chapter(reference.number) if book else None
+            if book is None or chapter is None:
+                continue
+            views.append(
+                TermChapterView(
+                    book=book,
+                    chapter=chapter,
+                    label=f"{book.short_title or book.title}, гл. {chapter.number}",
+                    url=chapter.notes_url,
+                )
+            )
+        return tuple(views)
+
+    def related_of(self, term: Term) -> tuple[Term, ...]:
+        """Связанные понятия в том порядке, в каком их записали."""
+        found = (self.term(term_id) for term_id in term.related)
+        return tuple(item for item in found if item is not None)
 
     # --- форматы ------------------------------------------------------------
 
@@ -402,8 +496,8 @@ class ClubView:
         """Понятия прошедших встреч, свежие первыми, без повторов.
 
         Тема будущей встречи сюда не идёт: заставка говорит «о чём говорили»,
-        а не «о чём собираемся». Запись берётся из каталога — с адресом
-        конспекта и всеми встречами понятия.
+        а не «о чём собираемся». Запись берётся из каталога — с понятием
+        словаря и всеми встречами темы.
         """
         catalogue = {entry.name: entry for entry in self.topics()}
         seen: list[str] = []
@@ -482,6 +576,37 @@ class ClubView:
             entries.append(BookSegment(book=book, meetings=inside))
         entries.extend(LoneMeeting(meeting=item) for item in lone[position:])
         return tuple(reversed(entries))
+
+
+def fold_name(text: str) -> str:
+    """Имя понятия для сравнения: без регистра, «ё» как «е», без краевых пробелов.
+
+    Одно правило на поиск понятия по теме и на проверку словаря: разойдись они,
+    проверка пропустила бы два понятия, которые тема не различает.
+    """
+    return text.strip().casefold().replace("ё", "е")
+
+
+def _script_rank(char: str) -> int:
+    """Кириллица — 0, латиница — 1, всё прочее (цифры, знаки) — 2."""
+    if "\u0400" <= char <= "\u04ff":
+        return 0
+    if char.isascii() and char.isalpha():
+        return 1
+    return 2
+
+
+def _letter_of(name: str) -> str:
+    """Буква указателя: первая буква названия, «Ё» — под «Е», не буква — «#»."""
+    first = fold_name(name)[:1]
+    if not first or _script_rank(first) == 2:
+        return "#"
+    return first.upper()
+
+
+def _alphabet_key(name: str) -> tuple[int, str]:
+    folded = fold_name(name)
+    return (_script_rank(folded[:1]) if folded else 2, folded)
 
 
 def is_past(meeting: Meeting, today: Day) -> bool:

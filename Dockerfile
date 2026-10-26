@@ -9,8 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /srv
 
 # Сначала только зависимости: слой пересобирается, лишь когда меняется
-# pyproject.toml. Сам пакет потом снимаем — приложение ищет шаблоны, данные
-# и игру относительно исходников, поэтому запускается из /srv, а не из
+# pyproject.toml. Сам пакет потом снимаем — приложение ищет шаблоны и данные
+# относительно исходников, поэтому запускается из /srv, а не из
 # site-packages.
 COPY pyproject.toml ./
 RUN mkdir app && touch app/__init__.py \
@@ -20,8 +20,6 @@ RUN mkdir app && touch app/__init__.py \
 
 COPY app/ app/
 COPY data/ data/
-COPY vendor/tyzharchitector/index.html vendor/tyzharchitector/style.css vendor/tyzharchitector/
-COPY vendor/tyzharchitector/src/ vendor/tyzharchitector/src/
 
 RUN useradd --system --no-create-home --uid 10001 club
 USER club

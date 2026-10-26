@@ -20,9 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Игра-разминка подключена подмодулем: без неё раздел «Полка» ведёт в никуда.
-          submodules: true
 
       - uses: actions/setup-python@v5
         with:

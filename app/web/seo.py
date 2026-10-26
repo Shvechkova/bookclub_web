@@ -60,6 +60,13 @@ def history_description(club: Club) -> str:
     )
 
 
+def glossary_description(club: Club) -> str:
+    return shorten(
+        f"Словарь книжного клуба «{club.name}»: понятия, о которых говорим на "
+        f"встречах, коротко и со ссылками на конспекты глав."
+    )
+
+
 def book_description(book: Book, club: Club) -> str:
     return shorten(
         f"{book.title} — {book.author}. "

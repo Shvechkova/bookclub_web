@@ -73,6 +73,10 @@ club:
     channel: https://t.me/s4m_space
     chat: https://t.me/+W5jzJeFMdNg4ODAy
     thread: https://t.me/c/2521642987/1540
+  warmup:
+    name: Тыжархитектор
+    lead: "Карточный тренажёр по архитектуре: тянешь проблему системы — подбираешь решение"
+    url: https://shvechkova.github.io/tyzharchitector/
   marquee:
     - книги · споры · айтишечка · всегда живые встречи · можно пиво, можно чай · не лекция, не доклад
     - не прочитал — всё равно приходи · вход свободный, без регистраций
@@ -225,26 +229,46 @@ books:
     author: Фредерик Брукс
     status: closed
     cover: covers/brooks-mythical-man-month.jpg
+    notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/README.md
     chapters:
       - title: Смоляная яма
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%201%20%D0%A1%D0%BC%D0%BE%D0%BB%D1%8F%D0%BD%D0%B0%D1%8F%20%D1%8F%D0%BC%D0%B0.md
       - title: Закон Брукса
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%202%20%D0%AD%D1%82%D0%BE%D1%82%20%D0%BC%D0%B8%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%C2%AB%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%BE-%D0%BC%D0%B5%D1%81%D1%8F%D1%86%C2%BB.md
       - title: Хирургическая бригада
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%203%20%D0%9E%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%B1%D1%80%D0%B8%D0%B3%D0%B0%D0%B4%D0%B0.md
       - title: Концептуальная целостность
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%204%20%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D0%BA%D1%80%D0%B0%D1%82%D0%B8%D1%8F%2C%20%D0%B4%D0%B5%D0%BC%D0%BE%D0%BA%D1%80%D0%B0%D1%82%D0%B8%D1%8F%20%D0%B8%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%BD%D0%BE%D0%B5%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.md
       - title: Эффект второй системы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%205%20%D0%AD%D1%84%D1%84%D0%B5%D0%BA%D1%82%20%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D0%B9%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D1%8B.md
       - title: Донести слово
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%206%20%D0%94%D0%BE%D0%BD%D0%B5%D1%81%D1%82%D0%B8%20%D1%81%D0%BB%D0%BE%D0%B2%D0%BE.md
       - title: Вавилонская башня
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%207%20%D0%9F%D0%BE%D1%87%D0%B5%D0%BC%D1%83%20%D0%BD%D0%B5%20%D1%83%D0%B4%D0%B0%D0%BB%D0%BE%D1%81%D1%8C%20%D0%BF%D0%BE%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D1%8C%20%D0%92%D0%B0%D0%B2%D0%B8%D0%BB%D0%BE%D0%BD%D1%81%D0%BA%D1%83%D1%8E%20%D0%B1%D0%B0%D1%88%D0%BD%D1%8E.md
       - title: Оценка сроков
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%208%20%D0%9E%D0%B1%D1%8A%D1%8F%D0%B2%D0%BB%D1%8F%D1%8F%20%D1%83%D0%B4%D0%B0%D1%80.md
       - title: Десять фунтов в пятифунтовом мешке
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%209%20%D0%94%D0%B2%D0%B0%20%D0%B2%20%D0%BE%D0%B4%D0%BD%D0%BE%D0%BC.md
       - title: Документарная гипотеза
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2010%20%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B3%D0%B8%D0%BF%D0%BE%D1%82%D0%B5%D0%B7%D0%B0.md
       - title: Планируйте на выброс
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2011%20%D0%9F%D0%BB%D0%B0%D0%BD%D0%B8%D1%80%D1%83%D0%B9%D1%82%D0%B5%20%D0%BD%D0%B0%20%D0%B2%D1%8B%D0%B1%D1%80%D0%BE%D1%81.md
       - title: Острый инструмент
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2012%20%D0%9E%D1%81%D1%82%D1%80%D1%8B%D0%B9%20%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82.md
       - title: Целое и части
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2013%20%D0%A6%D0%B5%D0%BB%D0%BE%D0%B5%20%D0%B8%20%D1%87%D0%B0%D1%81%D1%82%D0%B8.md
       - title: Назревание катастрофы
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2014%20%D0%9D%D0%B0%D0%B7%D1%80%D0%B5%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%B0%D1%82%D0%B0%D1%81%D1%82%D1%80%D0%BE%D1%84%D1%8B.md
       - title: Другое лицо
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2015%20%D0%9E%D0%B1%D1%80%D0%B0%D1%82%D0%BD%D0%B0%D1%8F%20%D1%81%D1%82%D0%BE%D1%80%D0%BE%D0%BD%D0%B0.md
       - title: Серебряной пули нет
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2016%20%D0%A1%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D1%8F%D0%BD%D0%BE%D0%B9%20%D0%BF%D1%83%D0%BB%D0%B8%20%D0%BD%D0%B5%D1%82.md
       - title: Вновь о серебряной пуле
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2017%20%D0%9D%D0%BE%D0%B2%D1%8B%D0%B9%20%D0%B2%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB%20%C2%AB%D0%A1%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D1%8F%D0%BD%D0%BE%D0%B9%20%D0%BF%D1%83%D0%BB%D0%B8%20%D0%BD%D0%B5%D1%82%C2%BB.md
       - title: "Положения: правда или ложь"
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2018%20%D0%97%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20%C2%AB%D0%9C%D0%B8%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE%20%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%BE-%D0%BC%D0%B5%D1%81%D1%8F%D1%86%D0%B0%C2%BB%20-%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B4%D0%B0%20%D0%B8%D0%BB%D0%B8%20%D0%BB%D0%BE%D0%B6%D1%8C.md
       - title: 20 лет спустя
+        notes_url: https://github.com/Shvechkova/summary/blob/main/books/mythical-man-month/chapters/%D0%93%D0%9B%D0%90%D0%92%D0%90%2019%20%C2%AB%D0%9C%D0%B8%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%BE-%D0%BC%D0%B5%D1%81%D1%8F%D1%86%C2%BB%20%D0%B4%D0%B2%D0%B0%D0%B4%D1%86%D0%B0%D1%82%D1%8C%20%D0%BB%D0%B5%D1%82%20%D1%81%D0%BF%D1%83%D1%81%D1%82%D1%8F.md
 
   - id: kleppmann-ddia-2
     number: 5
@@ -366,6 +390,17 @@ meetings:
           бригада, Концептуальная целостность, Эффект второй системы, Донести
           слово, Вавилонская башня. Хакспейс s4m.space, Дом77, Ленинградская 77,
           4 этаж, комната 413.
+      recap:
+        src: meetings/m-2026-09-23-recap.jpg
+        alt: >
+          Карточка итогов: разобрали главы 1–7, 23.09. Книга выглядит как
+          «история программирования», но снова злободневна: ИИ ломает
+          сложившиеся процессы. Программа «для себя» и продукт несравнимы,
+          новый человек в горящем проекте забирает время наставника, тонущий
+          проект спасёт сдвиг сроков или урезание функций, эффект второй
+          системы реален, проекты гибнут от плохой коммуникации. Спорили,
+          устарела ли книга, нужны ли комментарии в коде, где хранить
+          документацию и насколько новые технологии брать.
 
   - id: m-2026-10-07
     date: 2026-10-07

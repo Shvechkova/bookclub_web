@@ -107,7 +107,7 @@ def test_each_page_describes_itself_and_not_the_whole_site():
 def test_no_two_sections_share_one_description():
     described = {
         path: meta(page(path), "description")
-        for path in ("/", "/history", "/about")
+        for path in ("/", "/history", "/glossary", "/about")
     }
 
     assert len(set(described.values())) == len(described), described
@@ -215,7 +215,7 @@ def test_without_a_site_address_a_meeting_with_a_poster_has_no_card():
 
 
 def test_every_page_describes_the_club_for_search_engines():
-    for path in ("/", "/history", "/about", "/books/b1", "/meetings/m1"):
+    for path in ("/", "/history", "/glossary", "/about", "/books/b1", "/meetings/m1"):
         blocks = [
             block for block in linked_data(page(path)) if block["@type"] == "Organization"
         ]

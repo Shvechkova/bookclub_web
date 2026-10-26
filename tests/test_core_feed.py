@@ -2,7 +2,7 @@
 
 from app.core.models import BookStatus
 from app.core.view import BookSegment, ClubView, LoneMeeting
-from tests.factories import a_book, a_club, a_meeting, some_data
+from tests.factories import a_book, a_club, a_meeting, a_term, some_data
 
 
 def view(books=(), meetings=(), club=None) -> ClubView:
@@ -80,16 +80,19 @@ def test_one_topic_on_several_meetings_is_a_single_entry():
     assert [m.id for m in catalogue[0].meetings] == ["m1", "m2", "m3"]
 
 
-def test_a_topic_links_to_its_notes_when_the_address_is_known():
-    club = view(
-        club=a_club(topic_notes={"Саги": "https://example.org/saga"}),
-        meetings=[a_meeting("m1", "2026-01-07", title="Раз", topics=("Саги", "Кворум"))],
+def test_a_topic_knows_its_glossary_term_when_there_is_one():
+    saga = a_term("saga", "Сага", aliases=("Саги",))
+    club = ClubView(
+        some_data(
+            meetings=[a_meeting("m1", "2026-01-07", title="Раз", topics=("Саги", "Кворум"))],
+            glossary=[saga],
+        )
     )
 
     by_name = {entry.name: entry for entry in club.topics()}
 
-    assert by_name["Саги"].notes_url == "https://example.org/saga"
-    assert by_name["Кворум"].notes_url is None
+    assert by_name["Саги"].term == saga
+    assert by_name["Кворум"].term is None
 
 
 # --- 3.8 заголовок встречи и формат -----------------------------------------

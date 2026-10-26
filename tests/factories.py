@@ -21,6 +21,7 @@ from app.core.models import (
     MeetingFormat,
     Place,
     Space,
+    Term,
 )
 
 
@@ -133,11 +134,18 @@ def a_meeting(
     return Meeting(**values)
 
 
-def some_data(books=(), meetings=(), club: Club | None = None) -> ClubData:
+def a_term(term_id: str, name: str, **overrides) -> Term:
+    values = dict(id=term_id, name=name, summary=f"Что такое {name}.")
+    values.update(overrides)
+    return Term(**values)
+
+
+def some_data(books=(), meetings=(), club: Club | None = None, glossary=()) -> ClubData:
     return ClubData(
         club=club or a_club(),
         books=tuple(books),
         meetings=tuple(meetings),
+        glossary=tuple(glossary),
     )
 
 

@@ -45,3 +45,18 @@
 {% set meetings = view.meetings_of(book) %}
 {% if book.status.value == "reading" %}<span class="status status--reading ticket"><span class="ticket-main">{{ book.status | status_label }}<small>билет</small></span>{% if meetings %}<span class="ticket-stub" aria-hidden="true">встреча №{{ meetings | length }}</span>{% endif %}</span>{% else %}<span class="status status--{{ book.status.value }}">{{ book.status | status_label }}</span>{% endif %}
 {%- endmacro %}
+
+{# Тема встречи: понятие словаря — ссылкой на его якорь с определением
+   подсказкой, тема без понятия — текстом. Подсказка связана со ссылкой через
+   aria-describedby: экранный чтец прочтёт определение, а зрячий увидит его на
+   наведении и фокусе. Атрибута title нет — иначе всплыла бы вторая, системная
+   подсказка. `tip` — id подсказки, единственный на странице. #}
+{% macro topic(name, term, tip, css="") %}
+{%- if term -%}
+<span class="term"><a{% if css %} class="{{ css }}"{% endif %} href="{{ url('/glossary') }}#{{ term.id }}" aria-describedby="{{ tip }}">{{ name }}</a><span class="term-tip" role="tooltip" id="{{ tip }}">{{ term.summary }}</span></span>
+{%- elif css -%}
+<span class="{{ css }}">{{ name }}</span>
+{%- else -%}
+{{ name }}
+{%- endif -%}
+{% endmacro %}

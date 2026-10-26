@@ -6,10 +6,18 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
-from app.core.models import BookStatus, Chapter, Link, MeetingImage, Outcome, OutcomeItem
+from app.core.models import (
+    BookStatus,
+    Chapter,
+    Link,
+    MeetingImage,
+    Outcome,
+    OutcomeItem,
+    Warmup,
+)
 from app.core.view import ClubView
 from app.web.app import create_app
-from tests.factories import a_book, a_club, a_meeting, a_space, some_data
+from tests.factories import a_book, a_club, a_meeting, a_space, a_term, some_data
 
 TODAY = date(2026, 9, 21)
 NEW_TAB = 'target="_blank" rel="noopener"'
@@ -171,13 +179,12 @@ def test_github_notes_open_in_a_new_tab():
     assert NEW_TAB in _anchor(html, "https://github.com/club/notes/ch1.md")
 
 
-def test_topic_notes_open_in_a_new_tab():
-    club = a_club(topic_notes={"Кворум": "https://github.com/club/notes/quorum.md"})
-    meetings = [a_meeting("m1", "2026-09-09", title="Встреча", topics=("Кворум",))]
+def test_glossary_articles_open_in_a_new_tab():
+    term = a_term("quorum", "Кворум", article="https://github.com/club/notes/quorum.md")
+    view = ClubView(some_data(glossary=[term]))
+    html = TestClient(create_app(view=view, today=lambda: TODAY)).get("/glossary").text
 
-    for path in ("/", "/meetings/m1"):
-        html = page(path, meetings=meetings, club=club)
-        assert NEW_TAB in _anchor(html, "https://github.com/club/notes/quorum.md"), path
+    assert NEW_TAB in _anchor(html, "https://github.com/club/notes/quorum.md")
 
 
 def test_telegram_links_open_in_a_new_tab_and_others_do_not():
@@ -223,9 +230,14 @@ SHOWCASE_CLUB = dict(
 )
 
 
-def home(meetings=(), books=(), today=SHOWCASE_TODAY, **club) -> str:
+def home(meetings=(), books=(), today=SHOWCASE_TODAY, glossary=(), **club) -> str:
     view = ClubView(
-        some_data(books=books, meetings=meetings, club=a_club(**{**SHOWCASE_CLUB, **club}))
+        some_data(
+            books=books,
+            meetings=meetings,
+            club=a_club(**{**SHOWCASE_CLUB, **club}),
+            glossary=glossary,
+        )
     )
     response = TestClient(create_app(view=view, today=lambda: today)).get("/")
     assert response.status_code == 200
@@ -296,23 +308,26 @@ def test_the_hero_shows_no_numbers_and_no_address():
     assert "19:30" not in hero
 
 
-def test_the_hero_shows_recent_topics_newest_first_linked_to_notes():
+def test_the_hero_shows_recent_topics_newest_first_linked_to_the_glossary():
     meetings = [
         a_meeting("old", "2026-09-23", title="Старая", topics=("Закон Брукса", "ADR")),
         a_meeting("new", "2026-10-07", title="Новая", topics=("Закон Конвея", "ADR")),
         a_meeting("next", "2026-11-04", title="Будущая", topics=("Шардирование",)),
     ]
-    notes = {"ADR": "https://github.com/club/adr.md"}
-    hero = block(home(meetings=meetings, topic_notes=notes), "hero")
+    adr = a_term("adr", "ADR", summary="Запись решения и его причин.")
+    hero = block(home(meetings=meetings, glossary=[adr]), "hero")
 
     assert "О чём говорили недавно" in hero
     names = re.findall(r'class="plate [^"]*"[^>]*>([^<]+)<', hero)
     assert names == ["Закон Конвея", "ADR", "Закон Брукса"]
     assert re.search(
-        r'<a class="plate[^"]*" href="https://github.com/club/adr.md"'
-        r' target="_blank" rel="noopener">ADR</a>',
+        r'<a class="plate[^"]*" href="/glossary#adr" aria-describedby="hero-tip-2">ADR</a>'
+        r'<span class="term-tip" role="tooltip" id="hero-tip-2">Запись решения и его причин.</span>',
         hero,
     )
+    # Тема без понятия — плашка без ссылки и без подсказки.
+    assert '<span class="plate plate--cyan">Закон Конвея</span>' in hero
+    assert "target=" not in hero
     assert "Шардирование" not in hero
 
 
@@ -412,13 +427,15 @@ def test_the_gallery_shows_the_default_image_and_hides_the_rest():
     assert "афиша · 23.09" in poster_panel
 
 
-def test_without_images_there_is_no_gallery_but_the_game_plate_stays():
+def test_without_images_there_is_no_gallery_but_the_warmup_stays():
     html = home(
-        books=[brooks()], meetings=[a_meeting("m1", "2026-10-07", book="brooks", closed=(1,))]
+        books=[brooks()],
+        meetings=[a_meeting("m1", "2026-10-07", book="brooks", closed=(1,))],
+        warmup=Warmup(name="Тыжархитектор", lead="Тренажёр.", url="https://example.github.io/game/"),
     )
 
     assert 'class="gallery"' not in html
-    assert re.search(r'Разминка перед встречей.*?<a href="/game/">Играть →</a>', html, re.S)
+    assert re.search(r'<aside class="warmup".*?href="https://example.github.io/game/"', html, re.S)
 
 
 # --- витрина: как прийти ------------------------------------------------------

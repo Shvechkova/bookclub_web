@@ -675,14 +675,31 @@ a.plate--magenta:hover { background: var(--magenta); color: var(--paper); }
   color: var(--muted);
 }
 
-/* Плашка игры — пунктиром: это не раздел, а приглашение сбоку. */
-.game-plate {
-  max-width: none;
+/* Разминка — небольшой блок со своим фоном и рамкой: заметнее строки, но
+   не раздел — по размеру он уступает соседним блокам. */
+.warmup {
   margin: 28px 0 0;
-  padding: 14px 16px;
-  border: 2px dashed var(--cyan);
+  padding: 16px 20px;
+  background: var(--ink-soft);
+  border: 2px solid var(--cyan);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
 }
-.game-plate a { font-weight: 700; white-space: nowrap; }
+.warmup-text { min-width: 0; }
+.warmup-text p { margin: 0; max-width: none; }
+.warmup-eyebrow {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--magenta);
+}
+.warmup-text .warmup-name { font-size: 20px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
+.warmup-text .warmup-lead { font-size: 15px; color: var(--muted); margin-top: 4px; overflow-wrap: break-word; }
+.warmup-play { flex: none; }
 
 /* Шаги «Как прийти» — в ряд, крупные номера цветами через одну. */
 .steps {
@@ -730,6 +747,8 @@ a.plate--magenta:hover { background: var(--magenta); color: var(--paper); }
   .hero-cols { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .debate-cards { grid-template-columns: minmax(0, 1fr); }
   .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Кнопка рядом сжала бы фразу в узкий столбик — уходит под текст. */
+  .warmup { flex-direction: column; align-items: flex-start; }
 
   /* Вкладки — строкой над картинкой. Прокручивается вбок сама строка, а не
      страница: строка не шире экрана. */
@@ -873,3 +892,67 @@ img { max-width: 100%; height: auto; }
   .about-hand { font-size: 28px; }
   .about-facts, .about-rules { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* --- словарь ------------------------------------------------------------- */
+
+/* Указатель по буквам — плашками, как теги: по нему прыгают, а не читают. */
+.letters { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 8px; max-width: none; }
+.letters a {
+  display: inline-block;
+  min-width: 34px;
+  padding: 4px 8px;
+  border: 2px solid var(--cyan);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.letters a:nth-child(even) { border-color: var(--magenta); }
+.letters a:hover { background: var(--cyan); color: var(--ink); }
+.letters a:nth-child(even):hover { background: var(--magenta); color: var(--paper); }
+
+/* Шапка закреплена: без отступа якорь увёл бы букву и понятие под неё. */
+.letter, .entry { scroll-margin-top: calc(var(--header) + 12px); }
+.letter-title { font-family: var(--mono); color: var(--magenta); font-size: 28px; margin: 24px 0 8px; }
+
+/* Понятие — с полосой слева, прозрачной, пока на понятие не перешли по
+   якорю: тогда полоса загорается, и видно, куда привела ссылка. */
+.entry { border-left: 4px solid transparent; padding: 10px 0 10px 14px; margin: 0 0 6px; }
+.entry:target { border-left-color: var(--magenta); background: var(--ink-soft); }
+.entry-name { font-size: 20px; margin: 0; overflow-wrap: anywhere; }
+.entry-aliases { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 2px 0 0; overflow-wrap: anywhere; }
+.entry-summary { margin: 8px 0 0; }
+.entry-more { margin: 6px 0 0; font-size: 15px; overflow-wrap: anywhere; }
+.entry-label { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; color: var(--muted); }
+
+/* --- подсказка понятия у темы ------------------------------------------- */
+
+/* Подсказка отсчитывается от списка тем, а не от плашки: края списка всегда
+   внутри страницы, и у правого края экрана подсказка не вылезает за окно —
+   на 360 точках это была бы прокрутка вбок. Скрипта нет: показ — на
+   наведении и фокусе, на касание ссылка просто ведёт в словарь. */
+.plates, .topics { position: relative; }
+.term-tip {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  padding: 10px 14px;
+  background: var(--ink-soft);
+  border: 2px solid var(--cyan);
+  border-left: 6px solid var(--magenta);
+  box-shadow: 4px 4px 0 var(--magenta);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  pointer-events: none;
+}
+.term:hover .term-tip,
+.term:focus-within .term-tip { display: block; }

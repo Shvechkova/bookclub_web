@@ -194,13 +194,6 @@ def test_taken_chapters_must_exist(tmp_path):
     assert "7" in failure(tmp_path, mutate)
 
 
-def test_topic_notes_key_must_be_used_by_a_meeting(tmp_path):
-    def mutate(raw):
-        raw["club"]["topic_notes"] = {"Закон Кнвея": "https://example.org"}
-
-    assert "Закон Кнвея" in failure(tmp_path, mutate)
-
-
 def test_a_list_item_that_parsed_into_a_mapping_is_rejected(tmp_path):
     """«Вход свободный: без регистраций» YAML читает как словарь.
 

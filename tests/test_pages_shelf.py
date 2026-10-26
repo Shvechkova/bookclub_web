@@ -83,7 +83,7 @@ def test_no_page_offers_a_login_or_changes_anything():
         books=[a_book("b1", status=BookStatus.CLOSED)],
         meetings=[a_meeting("m1", "2026-01-07", book="b1", closed=(1,), topics=("Саги",))],
     )
-    paths = ("/", "/history", "/about", "/meetings/m1", "/books/b1")
+    paths = ("/", "/history", "/glossary", "/about", "/meetings/m1", "/books/b1")
 
     for path in paths:
         html = page(path, **setup)

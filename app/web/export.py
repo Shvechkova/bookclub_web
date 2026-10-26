@@ -20,12 +20,12 @@ from datetime import date as Day
 from pathlib import Path
 
 from app.core.view import ClubView
-from app.web.app import GAME_DIR, STATIC, create_app
+from app.web.app import STATIC, create_app
 
 
 def page_paths(view: ClubView) -> list[str]:
     """Все адреса сайта: постоянные разделы плюс встречи и книги."""
-    paths = ["/", "/history", "/about"]
+    paths = ["/", "/history", "/glossary", "/about"]
     paths += [f"/meetings/{meeting.id}" for meeting in view.data.meetings]
     paths += [f"/books/{book.id}" for book in view.data.books]
     return paths
@@ -64,8 +64,6 @@ def export_site(
         written.append(target)
 
     _copy_tree(STATIC, out / "static")
-    if (GAME_DIR / "index.html").exists():
-        _copy_tree(GAME_DIR, out / "game", skip={".git", "test", "node_modules"})
 
     written += _write_sitemap(out, page_paths(view), origin, base)
 
@@ -103,15 +101,10 @@ def _write_sitemap(out: Path, paths: list[str], origin: str, base: str) -> list[
     return [sitemap, robots]
 
 
-def _copy_tree(source: Path, target: Path, skip: set[str] | None = None) -> None:
-    skip = skip or set()
+def _copy_tree(source: Path, target: Path) -> None:
     if target.exists():
         shutil.rmtree(target)
-    shutil.copytree(
-        source,
-        target,
-        ignore=lambda _directory, names: {name for name in names if name in skip},
-    )
+    shutil.copytree(source, target)
 
 
 def main(argv: list[str]) -> int:

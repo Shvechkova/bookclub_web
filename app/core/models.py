@@ -2,12 +2,12 @@
 
 Чистые данные: ни веб-фреймворка, ни шаблонов, ни формата файла. Всё, что можно
 вывести из других полей — число встреч, пройденные главы, номер встречи, каталог
-понятий — здесь не хранится: это вычисления, они живут в `app.core.view`.
+тем встреч — здесь не хранится: это вычисления, они живут в `app.core.view`.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date as Date
 from enum import Enum
 
@@ -273,6 +273,19 @@ class Card:
 
 
 @dataclass(frozen=True)
+class Warmup:
+    """Игра-разминка перед встречей: отдельный проект со своим адресом.
+
+    Сайт игру у себя не держит, только зовёт в неё, поэтому здесь адрес, а не
+    файлы. Фраза одна: шаги и правила живут в самой игре.
+    """
+
+    name: str
+    lead: str
+    url: str
+
+
+@dataclass(frozen=True)
 class Club:
     """Сам клуб: постоянные условия, порядок встречи и связь."""
 
@@ -289,7 +302,6 @@ class Club:
     terms: tuple[str, ...] = ()
     telegram: str | None = None
     space: Space | None = None
-    topic_notes: dict[str, str] = field(default_factory=dict)
     marquee: tuple[str, ...] = ()
     # Год основания и фраза-манифест — для заставки главной. Год есть и в
     # тексте «О клубе», но разбирать прозу ради числа — гадание.
@@ -302,15 +314,52 @@ class Club:
     about_hand: str | None = None
     facts: tuple[Card, ...] = ()
     rules: tuple[Card, ...] = ()
+    # Нет разминки — нет и блока на главной: звать некуда.
+    warmup: Warmup | None = None
+
+
+@dataclass(frozen=True)
+class TermChapter:
+    """Глава конспекта, где понятие разобрано: книга и номер главы в ней.
+
+    Адрес не хранится: его знает глава в данных книги, и второй его копии здесь
+    не с чем было бы сверять.
+    """
+
+    book_id: str
+    number: int
+
+
+@dataclass(frozen=True)
+class Term:
+    """Понятие словаря клуба: короткое определение и куда идти за длинным.
+
+    `summary` — одна-три фразы для подсказки и карточки; длинная статья
+    остаётся во внешнем репозитории конспектов, здесь только её адрес.
+    """
+
+    id: str
+    name: str
+    summary: str
+    aliases: tuple[str, ...] = ()
+    article: str | None = None
+    chapters: tuple[TermChapter, ...] = ()
+    related: tuple[str, ...] = ()
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        """Все имена понятия: название и синонимы, по ним тема находит понятие."""
+        return (self.name, *self.aliases)
 
 
 @dataclass(frozen=True)
 class ClubData:
-    """Всё содержимое файла данных."""
+    """Всё содержимое данных клуба: файл клуба и словарь рядом с ним."""
 
     club: Club
     books: tuple[Book, ...]
     meetings: tuple[Meeting, ...]
+    glossary: tuple[Term, ...] = ()
 
     def book(self, book_id: str) -> Book | None:
         for book in self.books:

@@ -263,12 +263,6 @@ def test_loads_format_of_the_second_hour():
     assert meeting.format.note == "пять минут на человека, без слайдов"
 
 
-def test_loads_topic_notes_as_a_map_of_addresses():
-    club = example().club
-
-    assert club.topic_notes["Закон Конвея"] == "https://example.org/notes/conway"
-
-
 def test_loads_the_tagline_that_names_the_city():
     club = example().club
 
@@ -400,3 +394,54 @@ def test_a_book_may_have_a_short_title():
 
     assert data.book("reading-example").short_title == "Читаемая"
     assert data.book("closed-example").short_title is None
+
+
+def _loaded_with_warmup(tmp_path, warmup):
+    source = yaml.safe_load(EXAMPLE.read_text(encoding="utf-8"))
+    source["club"]["warmup"] = warmup
+    target = tmp_path / "club.yaml"
+    target.write_text(yaml.safe_dump(source, allow_unicode=True), encoding="utf-8")
+    return load_club_data(target)
+
+
+def test_loads_the_warmup_game_with_its_name_lead_and_address(tmp_path):
+    warmup = _loaded_with_warmup(
+        tmp_path,
+        {
+            "name": "Тыжархитектор",
+            "lead": "Карточный тренажёр по архитектуре.",
+            "url": "https://example.github.io/game/",
+        },
+    ).club.warmup
+
+    assert warmup.name == "Тыжархитектор"
+    assert warmup.lead == "Карточный тренажёр по архитектуре."
+    assert warmup.url == "https://example.github.io/game/"
+
+
+def test_a_club_without_a_warmup_loads_without_one(tmp_path):
+    assert _loaded_without(tmp_path, "warmup").club.warmup is None
+
+
+def test_a_warmup_without_an_address_is_rejected_naming_the_field(tmp_path):
+    with pytest.raises(DataError) as error:
+        _loaded_with_warmup(tmp_path, {"name": "Тыжархитектор", "lead": "Тренажёр."})
+
+    assert "url" in str(error.value)
+    assert "warmup" in str(error.value)
+
+
+def test_a_warmup_written_as_a_string_is_rejected(tmp_path):
+    with pytest.raises(DataError) as error:
+        _loaded_with_warmup(tmp_path, "https://example.github.io/game/")
+
+    assert "warmup" in str(error.value)
+
+
+def test_the_example_and_the_club_describe_the_warmup_game():
+    for source in (EXAMPLE, CLUB):
+        warmup = load_club_data(source).club.warmup
+
+        assert warmup.name == "Тыжархитектор"
+        assert warmup.url == "https://shvechkova.github.io/tyzharchitector/"
+        assert warmup.lead

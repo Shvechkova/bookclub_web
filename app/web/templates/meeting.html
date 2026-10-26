@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import meeting_image %}
+{% from "_macros.html" import meeting_image, topic as topic_link %}
 {% block title %}Встреча #{{ number }} · {{ club.name }}{% endblock %}
 {% block og_image %}{% if image %}{{ absolute('/static/' ~ image.src) }}{% else %}{{ super() }}{% endif %}{% endblock %}
 {% block main %}
@@ -77,7 +77,7 @@
   {% endif %}
 {% endif %}
 {% if meeting.topics %}
-<p class="topics">Темы: {% for topic in meeting.topics %}{% set notes = club.topic_notes.get(topic) %}{% if notes %}<a href="{{ notes }}"{{ notes | new_tab }}>{{ topic }}</a>{% else %}{{ topic }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+<p class="topics">Темы: {% for topic in meeting.topics %}{{ topic_link(topic, view.term_for(topic), "topic-tip-" ~ loop.index) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
 {% endif %}
 {% if not is_past %}
 {% if club.terms %}

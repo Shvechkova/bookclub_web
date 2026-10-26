@@ -1,4 +1,4 @@
-"""Чтение файла данных клуба.
+"""Чтение данных клуба: файл клуба и словарь рядом с ним.
 
 Слой доступа к данным: знает про YAML и про диск, модель — нет. Когда появится
 админка, за этим же интерфейсом окажется хранилище с записью.
@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date as Date
 from datetime import datetime
 from pathlib import Path
@@ -33,19 +34,37 @@ from app.core.models import (
     Place,
     Quote,
     Space,
+    Term,
+    TermChapter,
+    Warmup,
 )
 
 
-__all__ = ["DataError", "load_club_data"]
+__all__ = ["DataError", "glossary_beside", "load_club_data"]
+
+# id понятия попадает в якорь адреса словаря: только то, что не надо кодировать.
+TERM_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
-def load_club_data(path: str | Path) -> ClubData:
-    """Читает файл данных и собирает модель клуба."""
+def glossary_beside(path: str | Path) -> Path:
+    """Словарь, который лежит рядом с файлом клуба: `glossary` и те же расширения.
+
+    `club.yaml` → `glossary.yaml`, `club.example.yaml` → `glossary.example.yaml`:
+    образец данных подхватывает образец словаря, а рабочий — рабочий, и одно
+    правило обходится без настройки.
+    """
     path = Path(path)
-    try:
-        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as error:
-        raise DataError(f"не удалось разобрать {path.name}: {error}") from error
+    return path.with_name("glossary" + "".join(path.suffixes))
+
+
+def load_club_data(path: str | Path, glossary: str | Path | None = None) -> ClubData:
+    """Читает файл данных и словарь рядом с ним и собирает модель клуба.
+
+    `glossary` — путь к словарю, если он лежит не рядом. Файла словаря нет —
+    словарь пуст: сайт работает и без определений, просто темы стоят текстом.
+    """
+    path = Path(path)
+    raw = _read(path)
     if not isinstance(raw, dict):
         raise DataError(f"{path.name}: ожидался словарь с разделами club, books, meetings")
 
@@ -57,9 +76,83 @@ def load_club_data(path: str | Path) -> ClubData:
         _meeting(item, club, path.name)
         for item in _section(raw, "meetings", list, path.name)
     )
-    data = ClubData(club=club, books=books, meetings=meetings)
+    terms = _glossary(Path(glossary) if glossary is not None else glossary_beside(path))
+    data = ClubData(club=club, books=books, meetings=meetings, glossary=terms)
     validate(data)
     return data
+
+
+def _read(path: Path) -> Any:
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as error:
+        raise DataError(f"не удалось разобрать {path.name}: {error}") from error
+
+
+def _glossary(path: Path) -> tuple[Term, ...]:
+    if not path.exists():
+        return ()
+    raw = _read(path)
+    if raw is None:
+        return ()
+    if not isinstance(raw, dict) or not isinstance(raw.get("terms") or [], list):
+        raise DataError(f"{path.name}: ожидался словарь с разделом terms — списком понятий")
+    return tuple(
+        _term(item, position, path.name)
+        for position, item in enumerate(raw.get("terms") or [], start=1)
+    )
+
+
+def _term(raw: Any, position: int, source: str) -> Term:
+    if not isinstance(raw, dict):
+        raise DataError(f"{source}: понятие {position} задаётся полями id, name, summary")
+    term_id = str(_required(raw, "id", f"{source}: понятие {position}"))
+    where = f"{source}: понятие {term_id}"
+    if not TERM_ID.match(term_id):
+        raise DataError(
+            f"{where}: id {term_id!r} — только строчные латинские буквы, цифры и "
+            "дефис, например conway-law: он стоит в адресе словаря"
+        )
+    return Term(
+        id=term_id,
+        name=str(_required(raw, "name", where)).strip(),
+        summary=_text(_required(raw, "summary", where), "summary", where).strip(),
+        aliases=_names(raw.get("aliases"), "aliases", where),
+        article=raw.get("article") or None,
+        chapters=_term_chapters(raw.get("chapters"), where),
+        related=_names(raw.get("related"), "related", where),
+    )
+
+
+def _names(value: Any, key: str, where: str) -> tuple[str, ...]:
+    """Список имён. Строка вместо списка — ошибка: `_texts` разложил бы её на буквы."""
+    if value in (None, ""):
+        return ()
+    if not isinstance(value, list):
+        raise DataError(f"{where}: поле {key} — список, например [ADR]")
+    return tuple(name.strip() for name in _texts(value))
+
+
+def _term_chapters(value: Any, where: str) -> tuple[TermChapter, ...]:
+    """Главы конспектов: `{book, chapter}`. Адрес главы берётся из данных книги."""
+    if value in (None, ""):
+        return ()
+    if not isinstance(value, list):
+        raise DataError(f"{where}: поле chapters — список {{book, chapter}}")
+    chapters = []
+    for item in value:
+        # `type(...) is int`, а не isinstance: `true` из YAML — тоже int.
+        if (
+            not isinstance(item, dict)
+            or not item.get("book")
+            or type(item.get("chapter")) is not int
+        ):
+            raise DataError(
+                f"{where}: глава задаётся книгой и номером, "
+                f"{{book: brooks-mythical-man-month, chapter: 5}}, а не {item!r}"
+            )
+        chapters.append(TermChapter(book_id=str(item["book"]), number=item["chapter"]))
+    return tuple(chapters)
 
 
 def _section(raw: dict[str, Any], name: str, kind: type, source: str) -> Any:
@@ -143,6 +236,13 @@ def _space(raw: Any) -> Space | None:
 
 def _club(raw: dict[str, Any]) -> Club:
     where = "раздел club"
+    # Поле убрано, а не забыто: молча пропущенное, оно оставило бы тему без
+    # ссылки, и никто бы не узнал почему.
+    if raw.get("topic_notes"):
+        raise DataError(
+            f"{where}: поля topic_notes больше нет — понятия и адреса статей "
+            "живут в glossary.yaml рядом с данными, адрес идёт в article понятия"
+        )
     return Club(
         name=_required(raw, "name", where),
         descriptor=_required(raw, "descriptor", where),
@@ -157,7 +257,6 @@ def _club(raw: dict[str, Any]) -> Club:
         terms=_paragraphs(raw.get("terms"), "terms", where),
         telegram=raw.get("telegram"),
         space=_space(raw.get("space")),
-        topic_notes=dict(raw.get("topic_notes") or {}),
         marquee=_texts(raw.get("marquee")),
         since=_year(raw.get("since"), where),
         manifesto=_text(raw.get("manifesto"), "manifesto", where),
@@ -165,6 +264,22 @@ def _club(raw: dict[str, Any]) -> Club:
         about_hand=_text(raw.get("about_hand"), "about_hand", where),
         facts=_cards(raw.get("facts"), "facts", where),
         rules=_cards(raw.get("rules"), "rules", where),
+        warmup=_warmup(raw.get("warmup"), where),
+    )
+
+
+def _warmup(raw: Any, where: str) -> Warmup | None:
+    """Игра-разминка. Адрес строкой вместо раздела — ошибка, а не короткая
+    запись: без названия и фразы блок на главной звал бы непонятно куда."""
+    if raw in (None, ""):
+        return None
+    at = f"{where}, warmup"
+    if not isinstance(raw, dict):
+        raise DataError(f"{at}: разминка задаётся полями name, lead и url, а не строкой")
+    return Warmup(
+        name=str(_required(raw, "name", at)).strip(),
+        lead=str(_required(raw, "lead", at)).strip(),
+        url=str(_required(raw, "url", at)).strip(),
     )
 
 

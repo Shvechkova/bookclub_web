@@ -59,6 +59,7 @@
     <nav class="sections" id="sections">
       <a href="{{ url('/') }}"{% if section == "now" %} aria-current="page"{% endif %}>Сейчас</a>
       <a href="{{ url('/history') }}"{% if section == "history" %} aria-current="page"{% endif %}>Полка</a>
+      <a href="{{ url('/glossary') }}"{% if section == "glossary" %} aria-current="page"{% endif %}>Словарь</a>
       <a href="{{ url('/about') }}"{% if section == "about" %} aria-current="page"{% endif %}>О клубе</a>
     </nav>
     <script>

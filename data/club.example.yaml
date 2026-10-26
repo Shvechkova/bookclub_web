@@ -60,11 +60,13 @@ club:
     channel: https://t.me/example_channel
     chat: https://t.me/+examplechat
     thread: https://t.me/c/1234567890/1
+  warmup:
+    name: Тыжархитектор
+    lead: "Карточный тренажёр по архитектуре: тянешь проблему системы — подбираешь решение"
+    url: https://shvechkova.github.io/tyzharchitector/
   marquee:
     - КНИЖНАЯ СРЕДА
     - КОД · КНИГИ · СПОРЫ · КОФЕ · ГЛАВЫ
-  topic_notes:
-    Закон Конвея: https://example.org/notes/conway
 
 books:
   # Книга без записанных встреч: прочитана до того, как клуб начал вести хронику.

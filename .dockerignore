@@ -16,9 +16,6 @@ img/
 logo/
 *.md
 !data/README.md
-vendor/tyzharchitector/.git
-vendor/tyzharchitector/test/
-vendor/tyzharchitector/node_modules/
 
 Dockerfile
 docker-compose.yml

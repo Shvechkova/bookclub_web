@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import empty, cover, meeting_image %}
+{% from "_macros.html" import empty, cover, meeting_image, topic as topic_link %}
 {% block main %}
 {# Заставка — для того, кто о клубе не слышал: чем клуб является, о чём в нём
    говорят и куда нажать. Цифр нет намеренно, дата и адрес стоят ниже. #}
@@ -22,7 +22,7 @@
       <ul class="plates">
         {% for topic in recent_topics %}
         {% set tone = "plate--cyan" if loop.index is odd else "plate--magenta" %}
-        <li>{% if topic.notes_url %}<a class="plate {{ tone }}" href="{{ topic.notes_url }}"{{ topic.notes_url | new_tab }}>{{ topic.name }}</a>{% else %}<span class="plate {{ tone }}">{{ topic.name }}</span>{% endif %}</li>
+        <li>{{ topic_link(topic.name, topic.term, "hero-tip-" ~ loop.index, "plate " ~ tone) }}</li>
         {% endfor %}
       </ul>
     </div>
@@ -140,7 +140,18 @@
   </script>
 </section>
 {% endif %}
-<p class="game-plate">Разминка перед встречей — пиксельная игра клуба. <a href="{{ url(game_url) }}">Играть →</a></p>
+{# Разминка — отдельный проект со своим адресом: блок только зовёт туда.
+   Шагов и правил здесь нет, они живут в самой игре. #}
+{% if club.warmup %}
+<aside class="warmup" aria-labelledby="warmup-name">
+  <div class="warmup-text">
+    <p class="warmup-eyebrow">Разминка</p>
+    <p class="warmup-name" id="warmup-name">{{ club.warmup.name }}</p>
+    <p class="warmup-lead">{{ club.warmup.lead }}</p>
+  </div>
+  <a class="button button--magenta warmup-play" href="{{ club.warmup.url }}"{{ club.warmup.url | new_tab }}>Играть</a>
+</aside>
+{% endif %}
 
 {% if book %}
 <section class="reading">

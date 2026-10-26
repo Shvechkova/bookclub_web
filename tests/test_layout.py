@@ -15,10 +15,19 @@ from datetime import date
 import pytest
 import uvicorn
 
-from app.core.models import BookStatus, Chapter, MeetingImage, Outcome, OutcomeItem, Quote
+from app.core.models import (
+    BookStatus,
+    Chapter,
+    MeetingImage,
+    Outcome,
+    OutcomeItem,
+    Quote,
+    TermChapter,
+    Warmup,
+)
 from app.core.view import ClubView
 from app.web.app import create_app
-from tests.factories import a_book, a_club, a_meeting, a_space, some_data
+from tests.factories import a_book, a_club, a_meeting, a_space, a_term, some_data
 
 playwright_api = pytest.importorskip("playwright.sync_api")
 
@@ -27,6 +36,7 @@ NARROW = {"width": 360, "height": 740}
 PATHS = (
     "/",
     "/history",
+    "/glossary",
     "/about",
     "/meetings/m1",
     "/meetings/m2",
@@ -92,7 +102,6 @@ def crowded_view() -> ClubView:
     club = a_club(
         telegram="https://t.me/example",
         marquee=("КНИЖНАЯ СРЕДА", "КОД · КНИГИ · СПОРЫ · КОФЕ · ГЛАВЫ"),
-        topic_notes={"Согласованное хеширование": "https://example.org/notes/hashing"},
         about=(
             "Читаем техническую литературу и спорим о ней вслух.",
             "Собираемся только очно, в Самаре: трансляций и записей нет.",
@@ -107,6 +116,14 @@ def crowded_view() -> ClubView:
         since=2023,
         manifesto="Читаем техническую литературу\nи спорим о ней вслух",
         terms=("Вход свободный, без регистраций", "Не прочитал — всё равно приходи"),
+        warmup=Warmup(
+            name="Тыжархитектор",
+            lead=(
+                "Карточный тренажёр по архитектуре: тянешь проблему системы — "
+                "подбираешь решение"
+            ),
+            url="https://shvechkova.github.io/tyzharchitector/",
+        ),
     )
     # Прочитанные книги — для сетки на «Сейчас» и обложек в «Истории»;
     # одна без обложки, чтобы в сетке стояла и плашка.
@@ -121,7 +138,35 @@ def crowded_view() -> ClubView:
         )
         for number in (2, 3, 4)
     ]
-    return ClubView(some_data(books=[*finished, book], meetings=meetings, club=club))
+    # Понятия с длинными названиями и определениями: подсказка у плашки справа и
+    # карточка словаря на узком экране не должны раздвигать страницу вбок.
+    glossary = [
+        a_term(
+            "consistent-hashing",
+            "Согласованное хеширование",
+            aliases=("Consistent hashing", "Кольцо хеширования с виртуальными узлами"),
+            summary=(
+                "Способ раскладывать ключи по узлам так, чтобы при добавлении или "
+                "уходе узла переезжала лишь малая доля ключей, а не почти все."
+            ),
+            article="https://github.com/example/notes/blob/main/topics/hashing.md",
+            chapters=(TermChapter("b1", 1), TermChapter("b1", 2)),
+            related=("isolation-levels",),
+        ),
+        a_term(
+            "isolation-levels",
+            "Уровни изоляции транзакций",
+            summary=(
+                "Насколько транзакции видят изменения друг друга: от чтения "
+                "незафиксированного до сериализуемости, где всё как по очереди."
+            ),
+            related=("consistent-hashing",),
+        ),
+        a_term("adr", "ADR", summary="Короткая запись архитектурного решения и его причин."),
+    ]
+    return ClubView(
+        some_data(books=[*finished, book], meetings=meetings, club=club, glossary=glossary)
+    )
 
 
 def free_port() -> int:
@@ -311,7 +356,7 @@ def test_the_sections_stand_on_one_line_with_the_logo_on_a_wide_screen(site):
         try:
             page.goto(site + "/", wait_until="load")
             links = page.locator(".sections a").all()
-            assert len(links) == 3, "в шапке должны быть только три раздела"
+            assert len(links) == 4, "в шапке должны быть только четыре раздела"
             boxes = [link.bounding_box() for link in links]
             assert all(boxes)
             middles = [box["y"] + box["height"] / 2 for box in boxes]
@@ -581,5 +626,100 @@ def test_without_scripts_a_gallery_tab_is_a_link_to_the_meeting(site):
             assert page.locator("#gallery-panel-m1").is_visible()
             page.locator("#gallery-tab-m2").click()
             page.wait_for_url("**/meetings/m2")
+        finally:
+            browser.close()
+
+
+# --- словарь и подсказки понятий --------------------------------------------
+
+
+def test_the_glossary_has_no_horizontal_scrolling_on_a_wide_screen(site):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, WIDE)
+        try:
+            page.goto(site + "/glossary", wait_until="load")
+            scroll_width = page.evaluate("document.documentElement.scrollWidth")
+            client_width = page.evaluate("document.documentElement.clientWidth")
+            assert scroll_width <= client_width
+        finally:
+            browser.close()
+
+
+def test_a_glossary_anchor_is_not_hidden_under_the_header(site):
+    """Шапка закреплена: понятие, на которое перешли, должно стоять под ней."""
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, NARROW)
+        try:
+            page.goto(site + "/glossary#isolation-levels", wait_until="load")
+            header = page.locator("header.top").bounding_box()
+            entry = page.locator("#isolation-levels").bounding_box()
+            assert entry["y"] >= header["y"] + header["height"] - 1, "понятие ушло под шапку"
+        finally:
+            browser.close()
+
+
+@pytest.mark.parametrize("viewport", [NARROW, WIDE], ids=["360", "1280"])
+@pytest.mark.parametrize(
+    "path, link",
+    [
+        ("/", ".hero .plates a[href$='#isolation-levels']"),
+        ("/meetings/m1", ".topics a[href$='#isolation-levels']"),
+    ],
+    ids=["home", "meeting"],
+)
+def test_a_term_tip_shows_on_hover_and_focus_inside_the_screen(site, viewport, path, link):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, viewport)
+        try:
+            page.goto(site + path, wait_until="load")
+            anchor = page.locator(link)
+            tip = page.locator("#" + anchor.get_attribute("aria-describedby"))
+            assert not tip.is_visible(), "подсказка видна без наведения"
+
+            anchor.hover()
+            assert tip.is_visible(), "на наведение подсказки нет"
+            box = tip.bounding_box()
+            assert box["x"] >= 0 and box["x"] + box["width"] <= viewport["width"] + 1
+            scroll_width = page.evaluate("document.documentElement.scrollWidth")
+            client_width = page.evaluate("document.documentElement.clientWidth")
+            assert scroll_width <= client_width, "подсказка раздвинула страницу"
+
+            page.mouse.move(0, 0)
+            anchor.focus()
+            assert tip.is_visible(), "на фокус с клавиатуры подсказки нет"
+        finally:
+            browser.close()
+
+
+def test_the_warmup_block_fits_a_narrow_screen_with_the_button_under_the_text(site):
+    """На телефоне кнопка «Играть» встаёт под текст, а не сжимает его в столбик."""
+    with playwright_api.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport=NARROW)
+        page.route("https://fonts.**", lambda route: route.abort())
+        try:
+            page.goto(site + "/", wait_until="load")
+            block = page.locator(".warmup").bounding_box()
+            _inside_the_narrow_screen(block, "блок разминки")
+            text = page.locator(".warmup-text").bounding_box()
+            button = page.locator(".warmup-play").bounding_box()
+            _inside_the_narrow_screen(button, "кнопка «Играть»")
+            assert button["y"] >= text["y"] + text["height"], "кнопка не под текстом"
+        finally:
+            browser.close()
+
+
+def test_the_warmup_button_stands_beside_the_text_on_a_wide_screen(site):
+    with playwright_api.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport=WIDE)
+        page.route("https://fonts.**", lambda route: route.abort())
+        try:
+            page.goto(site + "/", wait_until="load")
+            text = page.locator(".warmup-text").bounding_box()
+            button = page.locator(".warmup-play").bounding_box()
+            assert button["x"] >= text["x"] + text["width"], "кнопка не справа от текста"
+            # Блок небольшой: не выше пары строк с кнопкой.
+            assert page.locator(".warmup").bounding_box()["height"] <= 160
         finally:
             browser.close()

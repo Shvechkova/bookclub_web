@@ -9,7 +9,6 @@
 ```bash
 python -m venv .venv
 .venv/Scripts/python -m pip install -e ".[dev]"   # Linux/macOS: .venv/bin/python
-git submodule update --init vendor/tyzharchitector
 
 .venv/Scripts/python -m uvicorn app.web.asgi:app --reload
 ```
@@ -22,15 +21,14 @@ git submodule update --init vendor/tyzharchitector
 .venv/Scripts/python -m uvicorn app.web.asgi:app --host 0.0.0.0 --port 8000
 ```
 
-Путь к данным переопределяется переменной `CLUB_DATA`.
+Путь к данным переопределяется переменной `CLUB_DATA`, к словарю — `CLUB_GLOSSARY`
+(по умолчанию `glossary.yaml` рядом с данными).
 
 ## Docker
 
-Без Python на машине — в контейнере. Подмодуль с игрой выкачать заранее: образ
-берёт её из рабочей папки.
+Без Python на машине — в контейнере.
 
 ```bash
-git submodule update --init vendor/tyzharchitector
 docker compose up --build
 ```
 
@@ -57,8 +55,8 @@ docker compose down
 PYTHONPATH=. .venv/Scripts/python -m app.web.export public
 ```
 
-Кладёт сайт в `public/`: каждый адрес — папка с `index.html`, рядом `static/` и
-`game/`. Отдаётся любым статическим хостингом.
+Кладёт сайт в `public/`: каждый адрес — папка с `index.html`, рядом `static/`.
+Отдаётся любым статическим хостингом.
 
 Посмотреть выгрузку:
 
@@ -92,8 +90,7 @@ MSYS_NO_PATHCONV=1 SITE_BASE=/bookclub_web SITE_URL=https://shvechkova.github.io
 ## Выкатка на GitHub Pages
 
 `.github/workflows/pages.yml` собирает и публикует сайт при каждом push в `main`:
-выкачивает подмодуль с игрой, ставит зависимости, прогоняет тесты и выгружает
-сайт. Перед первой выкаткой в настройках репозитория нужно включить
+ставит зависимости, прогоняет тесты и выгружает сайт. Перед первой выкаткой в настройках репозитория нужно включить
 **Settings → Pages → Source: GitHub Actions**.
 
 Свой домен подключается в двух местах, и имя в них должно совпадать:
@@ -129,7 +126,6 @@ app/core/     ядро: модель клуба и вычисления. Без 
 app/data/     чтение файла данных и проверка инвариантов
 app/web/      маршруты, шаблоны, оформление
 data/         данные клуба (club.yaml) и описание формата
-vendor/       чужой код: игра-разминка подмодулем, закреплённой версией
 tests/        тесты; ядро проверяется напрямую, страницы — через клиент
 ```
 
@@ -145,7 +141,14 @@ tests/        тесты; ядро проверяется напрямую, ст
 разобранные главы с отметкой «закрыли / перенесли / ещё не разбирали».
 
 Вычисляемое в данных не хранится: номер встречи, пройденные главы, число встреч
-по книге, темп и каталог понятий выводятся из встреч каждый раз заново.
+по книге, темп и каталог тем выводятся из встреч каждый раз заново.
+
+Словарь понятий — отдельный файл `data/glossary.yaml`: короткие определения для
+страницы «Словарь» и подсказок у тем встреч. Длинные статьи остаются в
+репозитории конспектов.
+
+Анонсы, итоги и конспекты глав в данные переносит проектный скилл
+[`club-ingest`](.claude/skills/club-ingest/SKILL.md).
 
 Конспекты остаются в [Shvechkova/summary](https://github.com/Shvechkova/summary):
 сайт хранит адреса, а не тексты.

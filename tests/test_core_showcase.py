@@ -4,7 +4,7 @@ from datetime import date
 
 from app.core.models import MeetingImage, Outcome, OutcomeItem
 from app.core.view import ClubView
-from tests.factories import a_book, a_club, a_meeting, some_data
+from tests.factories import a_book, a_club, a_meeting, a_term, some_data
 
 TODAY = date(2026, 10, 26)
 POSTER = MeetingImage(src="meetings/poster.jpg", alt="Афиша")
@@ -68,13 +68,13 @@ def test_recent_topics_are_limited_to_eight():
     assert len(view([meeting]).recent_topics(TODAY)) == 8
 
 
-def test_a_recent_topic_knows_its_notes():
-    club = a_club(topic_notes={"ADR": "https://example.org/adr"})
+def test_a_recent_topic_knows_its_glossary_term():
+    adr = a_term("adr", "ADR")
     meeting = a_meeting("m1", "2026-10-07", title="Встреча", topics=("ADR",))
 
-    (topic,) = view([meeting], club=club).recent_topics(TODAY)
+    (topic,) = ClubView(some_data(meetings=[meeting], glossary=[adr])).recent_topics(TODAY)
 
-    assert topic.notes_url == "https://example.org/adr"
+    assert topic.term == adr
 
 
 def test_no_topics_means_an_empty_selection():

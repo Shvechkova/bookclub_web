@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty %}
+{% block title %}Словарь · {{ club.name }}{% endblock %}
+{% block main %}
+<h1>Словарь</h1>
+<p class="lead">Понятия, о которых говорим на встречах, — коротко, в пару фраз. Подробнее — в статьях и конспектах глав.</p>
+{% if not index %}
+{{ empty("Словарь наполняется понятиями со встреч клуба: здесь появятся короткие определения и ссылки на конспекты глав.") }}
+{% else %}
+{# Указатель — только по буквам, на которые есть понятия: пустая буква
+   ведёт в никуда и читается как поломка. #}
+<nav class="letters" aria-label="Буквы словаря">
+  {% for group in index %}<a href="#letter-{{ loop.index }}">{{ group.letter }}</a>{% endfor %}
+</nav>
+{% for group in index %}
+<section class="letter" id="letter-{{ loop.index }}">
+  <h2 class="letter-title">{{ group.letter }}</h2>
+  {% for term in group.terms %}
+  {# Якорь — id понятия: на него ведут плашки тем, связи и ссылки извне. #}
+  <article class="entry" id="{{ term.id }}">
+    <h3 class="entry-name">{{ term.name }}</h3>
+    {% if term.aliases %}<p class="entry-aliases">{{ term.aliases | join(" · ") }}</p>{% endif %}
+    <p class="entry-summary">{{ term.summary }}</p>
+    {% if term.article %}<p class="entry-more"><span class="entry-label">Подробно:</span> <a href="{{ term.article }}"{{ term.article | new_tab }}>статья</a></p>{% endif %}
+    {% set chapters = view.term_chapters(term) %}
+    {% if chapters %}
+    <p class="entry-more"><span class="entry-label">В конспектах:</span> {% for item in chapters %}{% if item.url %}<a href="{{ item.url }}"{{ item.url | new_tab }}>{{ item.label }}</a>{% else %}{{ item.label }}{% endif %}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+    {% endif %}
+    {% set related = view.related_of(term) %}
+    {% if related %}
+    <p class="entry-more"><span class="entry-label">Связано:</span> {% for item in related %}<a href="#{{ item.id }}">{{ item.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% endfor %}
+{% endif %}
+{% endblock %}

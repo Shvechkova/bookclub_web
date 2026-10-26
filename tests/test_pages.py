@@ -1,5 +1,6 @@
 """Страницы сайта: навигация, «Сейчас», лента истории, страница встречи."""
 
+import re
 from datetime import date
 
 from fastapi.testclient import TestClient
@@ -7,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.core.models import BookStatus, Outcome, Quote
 from app.core.view import ClubView
 from app.web.app import create_app
-from tests.factories import a_book, a_club, a_meeting, a_space, some_data
+from tests.factories import a_book, a_club, a_meeting, a_space, a_term, some_data
 
 TODAY = date(2026, 9, 21)
 
@@ -33,10 +34,11 @@ def test_every_page_carries_the_same_three_sections():
         meetings=[a_meeting("m1", "2026-09-09", book="b1", closed=(1,))],
     )
 
-    for path in ("/", "/history", "/about", "/meetings/m1", "/books/b1"):
+    for path in ("/", "/history", "/glossary", "/about", "/meetings/m1", "/books/b1"):
         html = page(path, **setup)
         assert 'href="/"' in html
         assert 'href="/history"' in html
+        assert 'href="/glossary"' in html
         assert 'href="/shelf"' not in html
         assert 'href="/about"' in html
         assert "https://t.me/kabanya" in html
@@ -231,27 +233,30 @@ def test_a_past_meeting_shows_its_outcome_and_quote():
     assert "глава 16" in html
 
 
-def test_meeting_topics_link_to_their_notes_and_nowhere_else():
-    html = page(
-        "/meetings/m1",
-        club=a_club(topic_notes={"Саги": "https://notes/saga"}),
-        meetings=[a_meeting("m1", "2026-09-09", title="Встреча", topics=("Саги", "Кворум"))],
+def test_meeting_topics_link_to_the_glossary_and_nowhere_else():
+    view = ClubView(
+        some_data(
+            meetings=[a_meeting("m1", "2026-09-09", title="Встреча", topics=("Саги", "Кворум"))],
+            glossary=[a_term("saga", "Сага", aliases=("Саги",), summary="Цепочка шагов.")],
+        )
     )
+    html = TestClient(create_app(view=view, today=lambda: TODAY)).get("/meetings/m1").text
 
     topics = html[html.index('<p class="topics">'):]
     topics = topics[: topics.index("</p>")]
-    assert '<a href="https://notes/saga"' in topics
-    assert ">Саги</a>" in topics
+    assert '<a href="/glossary#saga" aria-describedby="topic-tip-1">Саги</a>' in topics
+    assert 'id="topic-tip-1">Цепочка шагов.</span>' in topics
     assert "Кворум" in topics and ">Кворум</a>" not in topics
     assert "/shelf" not in html
 
 
-def test_the_site_has_three_sections_and_the_feed_is_called_shelf():
+def test_the_site_has_four_sections_and_the_feed_is_called_shelf():
     html = page("/history")
 
     nav = html[html.index('<nav class="sections"'):]
     nav = nav[: nav.index("</nav>")]
-    assert nav.count("<a ") == 3
+    assert nav.count("<a ") == 4
+    assert re.findall(r">([^<]+)</a>", nav) == ["Сейчас", "Полка", "Словарь", "О клубе"]
     assert '<a href="/history" aria-current="page">Полка</a>' in nav
     assert "История" not in nav
     assert "<h1>Полка</h1>" in html
