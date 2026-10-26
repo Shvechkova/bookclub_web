@@ -1,23 +1,33 @@
 {% extends "base.html" %}
 {% from "_macros.html" import empty %}
-{% block title %}Словарь · {{ club.name }}{% endblock %}
 {% block main %}
 <h1>Словарь</h1>
 <p class="lead">Понятия, о которых говорим на встречах, — коротко, в пару фраз. Подробнее — в статьях и конспектах глав.</p>
 {% if not index %}
 {{ empty("Словарь наполняется понятиями со встреч клуба: здесь появятся короткие определения и ссылки на конспекты глав.") }}
 {% else %}
+{# Поиск — в браузере: у статической выгрузки нет сервера. Без скриптов
+   форма скрыта стилями, и словарь читается целиком, как раньше. #}
+<form class="glossary-search" role="search" action="">
+  <label for="glossary-q" class="glossary-search-label">Поиск по словарю</label>
+  <input id="glossary-q" class="glossary-search-field" name="q" type="search" autocomplete="off" spellcheck="false" aria-keyshortcuts="/" aria-describedby="glossary-found" placeholder="закон Конвея, DDD, микросервисы…">
+  <p class="glossary-found" id="glossary-found" aria-live="polite"></p>
+  <p class="glossary-nothing" hidden>Ничего не нашлось. Попробуйте английское название или одно слово вместо фразы.</p>
+</form>
 {# Указатель — только по буквам, на которые есть понятия: пустая буква
    ведёт в никуда и читается как поломка. #}
 <nav class="letters" aria-label="Буквы словаря">
   {% for group in index %}<a href="#letter-{{ loop.index }}">{{ group.letter }}</a>{% endfor %}
 </nav>
+<div class="glossary-list">
 {% for group in index %}
 <section class="letter" id="letter-{{ loop.index }}">
   <h2 class="letter-title">{{ group.letter }}</h2>
   {% for term in group.terms %}
   {# Якорь — id понятия: на него ведут плашки тем, связи и ссылки извне. #}
-  <article class="entry" id="{{ term.id }}">
+  {# Текст для поиска — уже нормализованный: скрипт сравнивает строки, а не
+     разбирает разметку. `data-names` — название и синонимы через «|». #}
+  <article class="entry" id="{{ term.id }}" data-search="{{ term | search_text }}" data-names="{{ term | search_names }}">
     <h3 class="entry-name">{{ term.name }}</h3>
     {% if term.aliases %}<p class="entry-aliases">{{ term.aliases | join(" · ") }}</p>{% endif %}
     <p class="entry-summary">{{ term.summary }}</p>
@@ -34,5 +44,7 @@
   {% endfor %}
 </section>
 {% endfor %}
+</div>
+<script src="{{ url('/static/glossary-search.js') }}" defer></script>
 {% endif %}
 {% endblock %}

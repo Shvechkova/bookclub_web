@@ -260,7 +260,7 @@ def test_the_site_has_four_sections_and_the_feed_is_called_shelf():
     assert '<a href="/history" aria-current="page">Полка</a>' in nav
     assert "История" not in nav
     assert "<h1>Полка</h1>" in html
-    assert "<title>Полка ·" in html
+    assert "<title>Полка:" in html
 
 
 def test_the_concept_catalogue_section_is_gone():

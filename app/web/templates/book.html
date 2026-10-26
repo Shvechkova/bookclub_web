@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% from "_macros.html" import cover, empty, book_status %}
-{% block title %}{{ book.title }} · {{ club.name }}{% endblock %}
 {% block main %}
 <div class="book-head">
   <div class="book-cover">{{ cover(book, link=false, lazy=false) }}</div>

@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 from datetime import date
 from pathlib import Path
@@ -130,12 +131,26 @@ def test_export_writes_a_sitemap_and_robots(tmp_path):
     sitemap = (tmp_path / "sitemap.xml").read_text(encoding="utf-8")
     robots = (tmp_path / "robots.txt").read_text(encoding="utf-8")
 
+    # Адреса — со слешем: так их отдаёт статика, без переадресации.
     assert "<loc>https://example.org/bookclub_web/</loc>" in sitemap
-    assert "<loc>https://example.org/bookclub_web/about</loc>" in sitemap
-    assert "<loc>https://example.org/bookclub_web/glossary</loc>" in sitemap
-    assert "<loc>https://example.org/bookclub_web/meetings/m1</loc>" in sitemap
-    assert "<loc>https://example.org/bookclub_web/books/closed-one</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/about/</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/glossary/</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/meetings/m1/</loc>" in sitemap
+    assert "<loc>https://example.org/bookclub_web/books/closed-one/</loc>" in sitemap
+    assert "404" not in sitemap
+    assert sitemap.count("<loc>") == 9
     assert "Sitemap: https://example.org/bookclub_web/sitemap.xml" in robots
+
+
+def test_the_sitemap_matches_the_canonical_addresses(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, origin="https://example.org")
+    sitemap = set(re.findall(r"<loc>([^<]+)</loc>", (tmp_path / "sitemap.xml").read_text(encoding="utf-8")))
+
+    canonical = set()
+    for page in tmp_path.rglob("index.html"):
+        canonical |= set(re.findall(r'rel="canonical" href="([^"]+)"', page.read_text(encoding="utf-8")))
+
+    assert sitemap == canonical
 
 
 def test_export_without_a_site_address_writes_no_sitemap(tmp_path):
@@ -167,3 +182,85 @@ def test_every_link_into_the_glossary_finds_its_term(tmp_path):
 
     assert wanted, "ни одна страница не ведёт в словарь"
     assert wanted <= anchors, wanted - anchors
+
+
+# --- поиск и пересылка по всей выгрузке --------------------------------------
+
+
+def exported_pages(root: Path) -> dict[str, str]:
+    """Страницы сайта без 404: она не страница клуба и закрыта от индекса."""
+    return {
+        str(page.relative_to(root)): page.read_text(encoding="utf-8")
+        for page in root.rglob("index.html")
+    }
+
+
+def test_no_two_pages_share_a_title_or_a_description(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, origin="https://example.org")
+    pages = exported_pages(tmp_path)
+
+    titles = {name: re.search(r"<title>([^<]*)</title>", html).group(1) for name, html in pages.items()}
+    descriptions = {
+        name: re.search(r'<meta name="description" content="([^"]*)"', html).group(1)
+        for name, html in pages.items()
+    }
+    assert len(set(titles.values())) == len(pages), titles
+    assert len(set(descriptions.values())) == len(pages), descriptions
+
+
+def test_every_linked_data_block_is_valid_json(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, origin="https://example.org")
+    pages = exported_pages(tmp_path)
+
+    kinds = set()
+    for name, html in pages.items():
+        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
+        assert blocks, name
+        for block in blocks:
+            data = json.loads(block)
+            assert data["@context"] == "https://schema.org", name
+            kinds.add(data["@type"])
+    assert {"Organization", "WebSite", "Event", "Book", "DefinedTermSet", "BreadcrumbList"} <= kinds
+
+
+def test_every_page_has_one_main_heading(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY)
+
+    for name, html in exported_pages(tmp_path).items():
+        assert len(re.findall(r"<h1[ >]", html)) == 1, name
+
+
+def test_every_image_has_an_alt_and_a_size(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY)
+
+    for name, html in exported_pages(tmp_path).items():
+        for image in re.findall(r"<img [^>]*>", html):
+            assert " alt=" in image, (name, image)
+            assert " width=" in image and " height=" in image, (name, image)
+
+
+def test_export_writes_a_not_found_page(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, base="/bookclub_web", origin="https://example.org")
+    html = (tmp_path / "404.html").read_text(encoding="utf-8")
+
+    assert '<meta name="robots" content="noindex">' in html
+    assert 'href="/bookclub_web/"' in html
+    assert 'rel="canonical"' not in html
+    assert broken_links(tmp_path, base="/bookclub_web") == []
+
+
+def test_only_the_not_found_page_is_closed_from_indexing(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, origin="https://example.org")
+
+    for name, html in exported_pages(tmp_path).items():
+        assert 'name="robots"' not in html, name
+
+
+def test_export_writes_the_icons_and_the_manifest(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, base="/bookclub_web")
+
+    assert (tmp_path / "favicon.ico").read_bytes() == (tmp_path / "static" / "favicon.ico").read_bytes()
+    manifest = json.loads((tmp_path / "manifest.webmanifest").read_text(encoding="utf-8"))
+    assert manifest["start_url"] == "/bookclub_web/"
+    for icon in manifest["icons"]:
+        assert (tmp_path / icon["src"].removeprefix("/bookclub_web/")).exists(), icon

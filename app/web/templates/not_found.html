@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{# Страница на любой неизвестный адрес — и на сервере, и на статике (`404.html`).
+   Ссылки абсолютные с папкой сайта: страница открывается с любой глубины. #}
+{% block main %}
+<section class="not-found">
+  <p class="label">Ошибка 404</p>
+  <h1>Такой страницы нет</h1>
+  <p>Возможно, адрес набран с опечаткой или встречу переименовали.</p>
+  <p class="how-actions">
+    <a class="button button--magenta" href="{{ url('/') }}">На главную</a>
+    <a class="button button--outline" href="{{ url('/history') }}">Все книги и встречи</a>
+  </p>
+</section>
+{% endblock %}

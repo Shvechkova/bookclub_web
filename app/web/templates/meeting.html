@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% from "_macros.html" import meeting_image, topic as topic_link %}
-{% block title %}Встреча #{{ number }} · {{ club.name }}{% endblock %}
-{% block og_image %}{% if image %}{{ absolute('/static/' ~ image.src) }}{% else %}{{ super() }}{% endif %}{% endblock %}
 {% block main %}
 {# Картинка встречи — сразу под заголовком, до глав и итогов: на широком
    экране рядом с ним, как обложка на странице книги. #}

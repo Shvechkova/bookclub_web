@@ -22,7 +22,7 @@ def glossary(terms=(), books=(), meetings=(), path="/glossary", base="") -> str:
 
 
 def entry(html: str, term_id: str) -> str:
-    found = re.search(rf'<article class="entry" id="{term_id}">.*?</article>', html, re.S)
+    found = re.search(rf'<article class="entry" id="{term_id}"[^>]*>.*?</article>', html, re.S)
     assert found, f"карточки {term_id} нет"
     return found.group(0)
 
@@ -43,7 +43,7 @@ def test_the_page_has_a_heading_a_lead_and_the_glossary_section_is_current():
 
     assert "<h1>Словарь</h1>" in html
     assert '<p class="lead">' in html
-    assert "<title>Словарь ·" in html
+    assert "<title>Словарь:" in html
     assert '<a href="/glossary" aria-current="page">Словарь</a>' in html
 
 

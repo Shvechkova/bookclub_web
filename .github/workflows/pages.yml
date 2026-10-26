@@ -45,8 +45,13 @@ jobs:
         # которому страницу открывают.
         #
         # SITE_URL нужен канону, карточкам пересылки и карте сайта.
+        #
+        # Коды подтверждения прав в Яндекс.Вебмастере и Google Search Console —
+        # переменные репозитория с теми же именами. Не заданы — тегов нет.
         env:
           DOMAIN: ${{ vars.SITE_DOMAIN }}
+          YANDEX_VERIFICATION: ${{ vars.YANDEX_VERIFICATION }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
           REPO: ${{ github.event.repository.name }}
           OWNER: ${{ github.repository_owner }}
         run: |

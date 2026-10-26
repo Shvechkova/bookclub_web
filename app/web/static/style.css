@@ -956,3 +956,65 @@ img { max-width: 100%; height: auto; }
 }
 .term:hover .term-tip,
 .term:focus-within .term-tip { display: block; }
+
+/* --- поиск по словарю ---------------------------------------------------- */
+
+/* Поиск работает скриптом: без класса `js` поля нет, и словарь читается
+   целиком. Скрытое скриптом прячется наверняка — у плашек букв свой
+   `display`, и атрибут `hidden` сам его не перебьёт. */
+.glossary-search { display: none; }
+.js .glossary-search { display: block; margin: 20px 0 0; max-width: none; }
+.glossary-list [hidden], .letters [hidden], .glossary-search [hidden] { display: none !important; }
+
+.glossary-search-label {
+  display: block;
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.glossary-search-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--cyan);
+  border-radius: 0;
+  background: var(--ink-soft);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 16px; /* меньше 16 — iOS приближает страницу при фокусе */
+  -webkit-appearance: none;
+  appearance: none;
+}
+.glossary-search-field::placeholder { color: var(--muted); opacity: 1; }
+.glossary-search-field:focus,
+.glossary-search-field:focus-visible {
+  outline: none;
+  border-color: var(--magenta);
+  box-shadow: 4px 4px 0 var(--magenta);
+}
+.glossary-search-field::-webkit-search-cancel-button { filter: invert(1); cursor: pointer; }
+
+.glossary-found {
+  margin: 8px 0 0;
+  min-height: 1.4em;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+.glossary-found:empty { min-height: 0; margin: 0; }
+.glossary-nothing {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-left: 6px solid var(--magenta);
+  background: var(--ink-soft);
+  color: var(--paper);
+}
+
+/* Совпадение — голубой маркер, как выделение в зине, без скруглений. */
+.entry mark { background: var(--cyan); color: var(--ink); padding: 0 1px; }

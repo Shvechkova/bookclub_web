@@ -87,6 +87,30 @@ MSYS_NO_PATHCONV=1 SITE_BASE=/bookclub_web SITE_URL=https://shvechkova.github.io
 заголовков запроса, врёт за прокси и на статике, а неверный канонический адрес
 уводит поисковик вернее, чем его отсутствие.
 
+Кроме страниц, выгрузка кладёт `404.html` (GitHub Pages отдаёт его на любой
+неизвестный адрес; закрыт от индекса), `manifest.webmanifest` и `favicon.ico` в
+корень. Канонические адреса и карта сайта — со слешем на конце (`/history/`):
+так статика отвечает без переадресации.
+
+### Подтверждение прав в Яндекс.Вебмастере и Google Search Console
+
+Коды подтверждения задаются переменными окружения; пустая — тега нет:
+
+| Переменная | Мета-тег |
+|---|---|
+| `YANDEX_VERIFICATION` | `<meta name="yandex-verification" content="…">` |
+| `GOOGLE_SITE_VERIFICATION` | `<meta name="google-site-verification" content="…">` |
+
+Значение — только код из атрибута `content`, который выдаёт Вебмастер или
+Search Console при выборе способа «Мета-тег». При выкатке берутся одноимённые
+переменные репозитория (**Settings → Secrets and variables → Actions →
+Variables**); после их добавления перезапустите выкатку (**Actions → Сайт
+клуба на GitHub Pages → Run workflow**) и только потом жмите «Проверить».
+Затем добавьте в Вебмастере и Search Console карту сайта
+`https://<домен>/sitemap.xml`. Без своего домена `robots.txt` лежит не в корне
+`shvechkova.github.io`, и поисковики его не читают — карту в этом случае
+добавляют только вручную.
+
 ## Выкатка на GitHub Pages
 
 `.github/workflows/pages.yml` собирает и публикует сайт при каждом push в `main`:

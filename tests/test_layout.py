@@ -723,3 +723,37 @@ def test_the_warmup_button_stands_beside_the_text_on_a_wide_screen(site):
             assert page.locator(".warmup").bounding_box()["height"] <= 160
         finally:
             browser.close()
+
+
+# --- поиск по словарю ---------------------------------------------------------
+
+
+def test_without_scripts_the_glossary_search_is_hidden_and_every_term_shows(site):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, NARROW, scripts=False)
+        try:
+            page.goto(site + "/glossary", wait_until="load")
+            assert page.locator(".glossary-search").is_hidden(), "поле без скриптов не работает"
+            for term_id in ("consistent-hashing", "isolation-levels", "adr"):
+                assert page.locator("#" + term_id).is_visible(), f"{term_id} скрыто"
+        finally:
+            browser.close()
+
+
+@pytest.mark.parametrize("viewport", [NARROW, WIDE], ids=["360", "1280"])
+def test_the_glossary_search_fits_the_screen_with_a_query(site, viewport):
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, viewport)
+        try:
+            page.goto(site + "/glossary", wait_until="load")
+            field = page.locator("#glossary-q")
+            field.fill("согласованное хеширование виртуальными узлами")
+            playwright_api.expect(page.locator("#adr")).to_be_hidden()
+            assert page.locator("#consistent-hashing").is_visible()
+            box = field.bounding_box()
+            assert box["x"] >= 0 and box["x"] + box["width"] <= viewport["width"]
+            scroll_width = page.evaluate("document.documentElement.scrollWidth")
+            client_width = page.evaluate("document.documentElement.clientWidth")
+            assert scroll_width <= client_width, "поле поиска раздвинуло страницу"
+        finally:
+            browser.close()

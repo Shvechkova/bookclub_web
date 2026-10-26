@@ -7,6 +7,10 @@
 лучше явная ошибка при старте, чем страница, где половина блоков молча пуста.
 """
 
+import os
+
+from app.web import seo
 from app.web.app import create_app
 
-app = create_app()
+# Коды подтверждения прав в поисковиках — те же переменные, что у выгрузки.
+app = create_app(verification=seo.verification_from_env(os.environ))
