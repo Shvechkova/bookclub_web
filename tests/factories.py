@@ -105,21 +105,18 @@ def a_meeting(
     carried: tuple[int, ...] = (),
     planned: tuple[int, ...] = (),
     fmt: str | None = None,
+    parts: dict[int, str] | None = None,
     **overrides,
 ) -> Meeting:
-    discussed = (
-        tuple(
-            DiscussedChapter(number=number, outcome=ChapterOutcome.CLOSED)
-            for number in closed
+    parts = parts or {}
+    discussed = tuple(
+        DiscussedChapter(number=number, outcome=outcome, part=parts.get(number))
+        for outcome, numbers in (
+            (ChapterOutcome.CLOSED, closed),
+            (ChapterOutcome.CARRIED, carried),
+            (ChapterOutcome.PLANNED, planned),
         )
-        + tuple(
-            DiscussedChapter(number=number, outcome=ChapterOutcome.CARRIED)
-            for number in carried
-        )
-        + tuple(
-            DiscussedChapter(number=number, outcome=ChapterOutcome.PLANNED)
-            for number in planned
-        )
+        for number in numbers
     )
     values = dict(
         id=meeting_id,

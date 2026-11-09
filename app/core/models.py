@@ -79,6 +79,9 @@ class DiscussedChapter:
 
     number: int
     outcome: ChapterOutcome
+    # Какая часть главы взята, словами: «до раздела „Масштабируемость“». Только
+    # подпись для читателя: на исход и на пройденные главы не влияет.
+    part: str | None = None
 
 
 @dataclass(frozen=True)
@@ -231,6 +234,13 @@ class Meeting:
     @property
     def has_book_part(self) -> bool:
         return self.book_id is not None
+
+    def part_of(self, number: int) -> str | None:
+        """Пометка о взятой части главы на этой встрече, если она записана."""
+        for chapter in self.chapters:
+            if chapter.number == number:
+                return chapter.part
+        return None
 
     def closed_numbers(self) -> tuple[int, ...]:
         return tuple(c.number for c in self.chapters if c.outcome is ChapterOutcome.CLOSED)

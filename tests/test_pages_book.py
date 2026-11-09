@@ -158,3 +158,31 @@ def test_an_unknown_book_is_not_found():
     response = TestClient(create_app(view=view, today=lambda: TODAY)).get("/books/нет")
 
     assert response.status_code == 404
+
+
+# --- глава, поделённая на две встречи ----------------------------------------
+
+
+def test_a_chapter_split_between_two_meetings_shows_the_part_of_each():
+    html = page(
+        "/books/b1",
+        books=[a_book("b1", chapters=2)],
+        meetings=[
+            a_meeting("m1", "2026-01-07", book="b1", carried=(2,), parts={2: "до середины"}),
+            a_meeting("m2", "2026-01-21", book="b1", closed=(2,), parts={2: "с середины"}),
+        ],
+    )
+    row = chapter_row(html, 2)
+
+    assert row.index("/meetings/m1") < row.index("до середины") < row.index("/meetings/m2")
+    assert row.index("/meetings/m2") < row.index("с середины")
+
+
+def test_a_chapter_without_a_note_shows_its_meeting_as_before():
+    html = page(
+        "/books/b1",
+        books=[a_book("b1", chapters=2)],
+        meetings=[a_meeting("m1", "2026-01-07", book="b1", closed=(1,))],
+    )
+
+    assert 'class="part"' not in chapter_row(html, 1)

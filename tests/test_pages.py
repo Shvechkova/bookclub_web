@@ -242,11 +242,14 @@ def test_meeting_topics_link_to_the_glossary_and_nowhere_else():
     )
     html = TestClient(create_app(view=view, today=lambda: TODAY)).get("/meetings/m1").text
 
-    topics = html[html.index('<p class="topics">'):]
-    topics = topics[: topics.index("</p>")]
-    assert '<a href="/glossary#saga" aria-describedby="topic-tip-1">Саги</a>' in topics
+    topics = html[html.index('<ul class="plates topics">'):]
+    topics = topics[: topics.index("</ul>")]
+    assert topics.count("<li>") == 2, "темы не плашками"
+    assert 'href="/glossary#saga" aria-describedby="topic-tip-1">Саги</a>' in topics
+    assert '<a class="plate' in topics
     assert 'id="topic-tip-1">Цепочка шагов.</span>' in topics
-    assert "Кворум" in topics and ">Кворум</a>" not in topics
+    assert '<span class="plate plate--magenta">Кворум</span>' in topics
+    assert ">Кворум</a>" not in topics
     assert "/shelf" not in html
 
 

@@ -20,6 +20,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.view import (
     ClubView,
     chapter_phrase,
+    chapter_phrase_taken,
     google_calendar_url,
     is_past,
     meeting_image,
@@ -114,6 +115,7 @@ def create_app(
         club=club,
         view=club_view,
         chapter_phrase=chapter_phrase,
+        chapter_phrase_taken=chapter_phrase_taken,
         verification=verification or {},
         metrika_id=metrika_id,
     )

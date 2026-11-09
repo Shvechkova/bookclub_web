@@ -817,3 +817,32 @@ def test_the_column_grows_on_a_wide_monitor(site):
                 assert low <= column <= high, f"колонка {column} при окне {width}"
             finally:
                 browser.close()
+
+
+@pytest.mark.parametrize("viewport", [NARROW, WIDE], ids=["360", "1280"])
+def test_the_meeting_recap_fits_the_screen(site, viewport):
+    """Карточки тезисов и споров не раздвигают страницу; на узком экране
+    тезисы стоят друг под другом, на широком — в ряд."""
+    with playwright_api.sync_playwright() as playwright:
+        browser, page = _open_home(playwright, viewport)
+        try:
+            page.goto(site + "/meetings/m1", wait_until="load")
+            scroll_width = page.evaluate("document.documentElement.scrollWidth")
+            client_width = page.evaluate("document.documentElement.clientWidth")
+            assert scroll_width <= client_width, "итоги раздвинули страницу"
+
+            cards = page.locator(".thesis")
+            boxes = [cards.nth(i).bounding_box() for i in range(cards.count())]
+            assert len(boxes) == 3
+            for box in boxes:
+                assert box["x"] >= 0 and box["x"] + box["width"] <= viewport["width"] + 1
+            lefts = {round(box["x"]) for box in boxes}
+            if viewport is NARROW:
+                assert len(lefts) == 1, "на узком экране тезисы не в одну колонку"
+            else:
+                assert len(lefts) == 3, "на широком экране тезисы не в ряд"
+
+            debate = page.locator(".debate").first.bounding_box()
+            assert debate["x"] + debate["width"] <= viewport["width"] + 1
+        finally:
+            browser.close()

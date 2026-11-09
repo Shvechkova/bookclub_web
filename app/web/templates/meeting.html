@@ -22,14 +22,22 @@
 {% if chapters %}
 <section class="chapters-of-meeting">
   <h2>{% if is_past %}Разобрали{% else %}Разбираем{% endif %}</h2>
+  {# Одна глава — строкой: список из одного пункта читается как обрывок плана.
+     Пометка о части и конспект стоят одинаково в строке и в списке. #}
+  {% macro chapter_tail(chapter) %}{% if chapter.part %} <span class="part">— {{ chapter.part }}</span>{% endif %}{% if chapter.notes_url %} <a class="notes" href="{{ chapter.notes_url }}"{{ chapter.notes_url | new_tab }}>конспект</a>{% endif %}{% endmacro %}
+  {% if chapters | length == 1 %}
+  {% set chapter = chapters[0] %}
+  <p class="meeting-chapter">Глава {{ chapter.number }}. {{ chapter.title }}{{ chapter_tail(chapter) }}</p>
+  {% else %}
   <ol class="meeting-chapters">
     {% for chapter in chapters %}
-    <li><span class="num">{{ "%02d" | format(chapter.number) }}</span> {{ chapter.title }}</li>
+    <li><span class="num">{{ "%02d" | format(chapter.number) }}</span> {{ chapter.title }}{{ chapter_tail(chapter) }}</li>
     {% endfor %}
   </ol>
+  {% endif %}
 </section>
 {% endif %}
-{% if meeting.announce %}
+{% if meeting.announce and not is_past %}
 <ul class="announce">{% for item in meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
 {% endif %}
 {% if is_past %}
@@ -37,15 +45,18 @@
   {% set outcome = meeting.outcome %}
   <section class="outcome">
     <h2>Итоги</h2>
-    {% if outcome.agreed or outcome.argued or outcome.taken %}
-    <ol>
-      {% if outcome.agreed %}<li>{{ outcome.agreed }}</li>{% endif %}
-      {% if outcome.argued %}<li>{{ outcome.argued }}</li>{% endif %}
-      {% if outcome.taken %}<li>{{ outcome.taken }}</li>{% endif %}
-    </ol>
+    {# Тезисы подписаны словами: цвет карточки сам по себе не читается ни
+       экранным чтецом, ни на чёрно-белой печати. #}
+    {% set theses = [("agreed", "Согласились", outcome.agreed), ("argued", "Спорили", outcome.argued), ("taken", "Забираем", outcome.taken)] | selectattr(2) | list %}
+    {% if theses %}
+    <div class="theses">
+      {% for kind, label, text in theses %}
+      <div class="thesis thesis--{{ kind }}"><p class="thesis-label">{{ label }}</p><p>{{ text }}</p></div>
+      {% endfor %}
+    </div>
     {% endif %}
     {% if outcome.quote %}
-    <blockquote class="quote">
+    <blockquote class="quote quote--evening">
       {{ outcome.quote.text }}
       {% if outcome.quote.chapter %}<span class="source">{{ chapter_phrase([outcome.quote.chapter]) }}</span>{% endif %}
     </blockquote>
@@ -53,21 +64,40 @@
     {# Полная форма — в порядке поста в канале. Незаписанная часть не оставляет
        заголовка: пустой раздел «Главные споры» читается как «спорить было не о чем». #}
     {% if outcome.lead %}<p class="recap-lead">{{ outcome.lead }}</p>{% endif %}
-    {% for title, items in (("По главам", outcome.by_chapter), ("Главные споры", outcome.debates)) if items %}
-    <h3 class="recap-heading">{{ title }}</h3>
-    <ul class="recap-items">
-      {% for item in items %}
+    {# Глав несколько — пункты разложены по ним и несут номера. Глава одна
+       или книги нет — номер у каждого пункта был бы одним и тем же. #}
+    {% set by_chapters = chapters | length > 1 %}
+    {% if outcome.by_chapter %}
+    <h3 class="recap-heading">{{ "По главам" if by_chapters else "О чём говорили" }}</h3>
+    {# Одна глава — пункты считаются по порядку счётчиком; несколько — на том
+       же месте стоит номер главы. #}
+    <ul class="recap-items{% if not by_chapters %} recap-items--counted{% endif %}">
+      {% for item in outcome.by_chapter %}
       <li>
-        {% if item.chapters or item.heading %}<p class="recap-item-head">{% if item.chapters %}<span class="num" title="{{ chapter_phrase(item.chapters) }}">{{ item.chapters | chapter_numbers }}</span>{% endif %}{% if item.heading %}<strong>{{ item.heading }}</strong>{% endif %}</p>{% endif %}
+        {% set numbered = by_chapters and item.chapters %}
+        {% if numbered or item.heading %}<p class="recap-item-head">{% if numbered %}<span class="num" title="{{ chapter_phrase(item.chapters) }}">{{ item.chapters | chapter_numbers }}</span>{% endif %}{% if item.heading %}<strong>{{ item.heading }}</strong>{% endif %}</p>{% endif %}
         <p>{{ item.text }}</p>
       </li>
       {% endfor %}
     </ul>
-    {% endfor %}
+    {% endif %}
+    {% if outcome.debates %}
+    <h3 class="recap-heading recap-heading--magenta">Главные споры</h3>
+    <ul class="debate-grid">
+      {% for item in outcome.debates %}
+      <li class="debate">
+        {% if item.heading %}<p class="debate-head">{{ item.heading }}</p>{% endif %}
+        <p>{{ item.text }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
     {% if outcome.aside %}<p class="recap-aside">{{ outcome.aside }}</p>{% endif %}
     {% if outcome.verdict %}
-    <h3 class="recap-heading">Общий итог</h3>
-    <p class="recap-verdict">{{ outcome.verdict }}</p>
+    <div class="verdict-frame">
+      <h3 class="recap-heading">Общий итог</h3>
+      <p class="recap-verdict">{{ outcome.verdict }}</p>
+    </div>
     {% endif %}
   </section>
   {% else %}
@@ -75,7 +105,12 @@
   {% endif %}
 {% endif %}
 {% if meeting.topics %}
-<p class="topics">Темы: {% for topic in meeting.topics %}{{ topic_link(topic, view.term_for(topic), "topic-tip-" ~ loop.index) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+<div class="meeting-topics">
+  <h3 class="recap-heading">Темы</h3>
+  <ul class="plates topics">
+    {% for topic in meeting.topics %}<li>{{ topic_link(topic, view.term_for(topic), "topic-tip-" ~ loop.index, "plate" if loop.index is odd else "plate plate--magenta") }}</li>{% endfor %}
+  </ul>
+</div>
 {% endif %}
 {% if not is_past %}
 {% if club.terms %}
@@ -88,5 +123,13 @@
 
 {% if meeting.links %}
 <ul class="links">{% for link in meeting.links %}<li><a href="{{ link.url }}"{{ link.url | new_tab }}>{{ link.title }}</a></li>{% endfor %}</ul>
+{% endif %}
+{# После встречи анонс уже прочитан: он остаётся на странице для поиска и
+   для тех, кому интересно, с чего начинали, но не заслоняет итоги. #}
+{% if meeting.announce and is_past %}
+<details class="announce-later">
+<summary>Анонс встречи</summary>
+<ul class="announce">{% for item in meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
+</details>
 {% endif %}
 {% endblock %}

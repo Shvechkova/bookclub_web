@@ -445,3 +445,46 @@ def test_the_example_and_the_club_describe_the_warmup_game():
         assert warmup.name == "Тыжархитектор"
         assert warmup.url == "https://shvechkova.github.io/tyzharchitector/"
         assert warmup.lead
+
+
+# --- пометка о части главы ---------------------------------------------------
+
+
+def test_a_meeting_chapter_keeps_the_note_about_the_part_taken(tmp_path):
+    chapters = [{"number": 2, "outcome": "carried", "part": "до раздела «Бюджеты»"}]
+    meeting = _with_meeting(tmp_path, chapters=chapters).meeting("m-2026-06-03")
+
+    assert [(c.number, c.outcome, c.part) for c in meeting.chapters] == [
+        (2, ChapterOutcome.CARRIED, "до раздела «Бюджеты»")
+    ]
+
+
+def test_a_meeting_chapter_without_a_note_has_none():
+    meeting = example().meeting("m-2026-06-03")
+
+    assert [c.part for c in meeting.chapters] == [None, None]
+
+
+@pytest.mark.parametrize("part", ["", "   ", 3, ["до раздела"]])
+def test_a_note_about_the_part_that_is_not_a_text_is_rejected(tmp_path, part):
+    with pytest.raises(DataError) as error:
+        _with_meeting(tmp_path, chapters=[{"number": 2, "part": part}])
+
+    assert "m-2026-06-03" in str(error.value)
+    assert "part" in str(error.value)
+    assert "глав" in str(error.value) and "2" in str(error.value)
+
+
+def test_the_example_shows_a_chapter_split_between_two_meetings():
+    data = example()
+    notes = [
+        (meeting.id, chapter.outcome, chapter.part)
+        for meeting in data.meetings
+        for chapter in meeting.chapters
+        if chapter.part
+    ]
+
+    assert [outcome for _, outcome, _ in notes] == [
+        ChapterOutcome.CARRIED,
+        ChapterOutcome.CLOSED,
+    ]

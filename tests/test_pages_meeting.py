@@ -323,3 +323,238 @@ def _calendar_link(html: str) -> str:
     assert marker in html, "на странице нет ссылки в календарь"
     start = html.index(marker) + len('href="')
     return unescape(html[start : html.index('"', start)])
+
+
+# --- одна глава за встречу и часть главы -------------------------------------
+
+
+def chapters_block(html: str) -> str:
+    found = re.search(r'<section class="chapters-of-meeting">.*?</section>', html, re.S)
+    assert found, "блока глав встречи нет"
+    return found.group(0)
+
+
+def one_chapter_outcome():
+    return Outcome(
+        by_chapter=(
+            OutcomeItem(heading="Про издание", text="Переписали заметно."),
+            OutcomeItem(heading="Смола", text="Продукт дороже программы.", chapters=(1,)),
+        ),
+        debates=(OutcomeItem(heading="Блок-схемы", text="Нужны ли они сегодня."),),
+    )
+
+
+def single(**overrides):
+    values = dict(book="brooks", closed=(1,), outcome=one_chapter_outcome())
+    values.update(overrides)
+    return a_meeting("m0", "2026-09-09", **values)
+
+
+def test_a_meeting_about_one_chapter_names_it_in_a_line_not_a_list():
+    block = chapters_block(page("/meetings/m0", books=[brooks()], meetings=[single()]))
+
+    assert "Глава 1. Смоляная яма" in " ".join(unescape(block).split())
+    assert "<ol" not in block
+
+
+def test_a_meeting_about_several_chapters_still_lists_them():
+    block = chapters_block(page("/meetings/m1", books=[brooks()], meetings=[upcoming()]))
+
+    assert block.count("<li>") == 3
+    assert "Глава 1." not in block
+
+
+def test_a_meeting_about_one_chapter_says_what_was_discussed_without_numbers():
+    html = page("/meetings/m0", books=[brooks()], meetings=[single()])
+
+    assert "О чём говорили" in html
+    assert "По главам" not in html
+    assert "Продукт дороже программы." in html
+    assert 'class="recap-item-head"><span class="num"' not in html
+
+
+def test_a_meeting_about_several_chapters_keeps_the_numbers_of_the_items():
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(full_outcome())])
+
+    assert "По главам" in html
+    assert "О чём говорили" not in html
+    assert 'class="recap-item-head"><span class="num"' in html
+
+
+def test_a_meeting_without_a_book_says_what_was_discussed():
+    meeting = a_meeting(
+        "m0",
+        "2026-09-09",
+        title="Вечер докладов",
+        outcome=Outcome(by_chapter=(OutcomeItem(heading="Доклад", text="Про очереди."),)),
+    )
+    html = page("/meetings/m0", meetings=[meeting])
+
+    assert "О чём говорили" in html
+    assert "По главам" not in html
+
+
+def test_a_chapter_of_a_meeting_links_to_its_notes():
+    book = a_book(
+        "brooks",
+        chapters_override=(
+            Chapter(number=1, title="Смоляная яма", notes_url="https://notes/1"),
+            Chapter(number=2, title="Закон Брукса"),
+        ),
+    )
+    one = chapters_block(page("/meetings/m0", books=[book], meetings=[single()]))
+    several = chapters_block(
+        page(
+            "/meetings/m1",
+            books=[book],
+            meetings=[a_meeting("m1", "2026-09-23", book="brooks", planned=(1, 2))],
+        )
+    )
+
+    for block in (one, several):
+        assert block.count("https://notes/1") == 1
+        assert block.count(">конспект<") == 1
+
+
+def test_the_note_about_the_part_follows_the_chapter_title():
+    one = chapters_block(
+        page(
+            "/meetings/m0",
+            books=[brooks()],
+            meetings=[single(closed=(), carried=(1,), parts={1: "до раздела «Продукт»"})],
+        )
+    )
+    several = chapters_block(
+        page(
+            "/meetings/m1",
+            books=[brooks()],
+            meetings=[upcoming(parts={2: "с раздела «Закон»"})],
+        )
+    )
+
+    assert unescape(one).index("Смоляная яма") < unescape(one).index("до раздела «Продукт»")
+    assert unescape(several).index("Закон Брукса") < unescape(several).index("с раздела «Закон»")
+    assert several.count('class="part"') == 1
+
+
+def test_a_chapter_without_a_note_leaves_no_place_for_it():
+    html = page("/meetings/m0", books=[brooks()], meetings=[single()])
+
+    assert 'class="part"' not in html
+
+
+# --- живая страница итогов ---------------------------------------------------
+
+ANNOUNCE = ("Первый пункт анонса.", "Второй пункт анонса.")
+
+
+def announce_block(html: str) -> str | None:
+    found = re.search(r'<details class="announce-later">.*?</details>', html, re.S)
+    return found.group(0) if found else None
+
+
+def thesis_labels(html: str) -> list[str]:
+    return re.findall(r'<p class="thesis-label">([^<]*)</p>', html)
+
+
+def test_a_past_meeting_puts_its_announce_folded_after_the_outcome():
+    meeting = a_meeting(
+        "m0", "2026-09-09", book="brooks", closed=(1, 2, 3),
+        outcome=full_outcome(), announce=ANNOUNCE,
+    )
+    html = page("/meetings/m0", books=[brooks()], meetings=[meeting])
+    block = announce_block(html)
+
+    assert block is not None, "свёрнутого анонса нет"
+    assert "<summary>Анонс встречи</summary>" in block
+    for item in ANNOUNCE:
+        assert item in block
+        assert html.count(item) == 1
+    assert html.index("Итоги</h2>") < html.index('<details class="announce-later">')
+
+
+def test_a_past_meeting_without_an_outcome_still_folds_its_announce():
+    meeting = a_meeting("m0", "2026-09-09", book="brooks", closed=(1,), announce=ANNOUNCE)
+    html = page("/meetings/m0", books=[brooks()], meetings=[meeting])
+
+    block = announce_block(html)
+    assert block is not None
+    assert all(item in block for item in ANNOUNCE)
+    assert html.index("Итоги этой встречи ещё не записаны.") < html.index(block)
+
+
+def test_an_upcoming_meeting_keeps_its_announce_open():
+    html = page("/meetings/m1", books=[brooks()], meetings=[upcoming(announce=ANNOUNCE)])
+
+    assert announce_block(html) is None
+    assert "Анонс встречи" not in html
+    assert '<ul class="announce">' in html
+    assert all(item in html for item in ANNOUNCE)
+
+
+def test_the_theses_are_cards_signed_in_order():
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(full_outcome())])
+
+    assert thesis_labels(html) == ["Согласились", "Спорили", "Забираем"]
+    assert html.count('<div class="thesis thesis--') == 3
+
+
+def test_an_unwritten_thesis_leaves_no_empty_card():
+    outcome = Outcome(argued="Спорили про блок-схемы.")
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(outcome)])
+
+    assert thesis_labels(html) == ["Спорили"]
+    assert html.count('<div class="thesis thesis--') == 1
+
+
+def test_an_outcome_without_theses_has_no_cards():
+    outcome = Outcome(verdict="Книга старая, а проблемы те же.")
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(outcome)])
+
+    assert '<div class="theses">' not in html
+
+
+def test_the_talk_of_a_one_chapter_meeting_is_counted_in_order():
+    html = page("/meetings/m0", books=[brooks()], meetings=[single()])
+
+    assert '<ul class="recap-items recap-items--counted">' in html
+
+
+def test_the_talk_of_a_several_chapters_meeting_carries_chapter_numbers_instead():
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(full_outcome())])
+
+    assert "recap-items--counted" not in html
+    assert '<span class="num" title="глава 2">02</span>' in html
+
+
+def test_every_debate_stands_as_its_own_card():
+    outcome = full_outcome(
+        debates=(
+            OutcomeItem(heading="Блок-схемы", text="Нужны ли они сегодня."),
+            OutcomeItem(heading="Мой код", text="Своего кода нет."),
+        )
+    )
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(outcome)])
+
+    grid = re.search(r'<ul class="debate-grid">.*?</ul>', html, re.S)
+    assert grid, "сетки споров нет"
+    assert grid.group(0).count('<li class="debate">') == 2
+
+
+def test_the_verdict_stands_in_a_frame():
+    html = page(
+        "/meetings/m0",
+        books=[brooks()],
+        meetings=[recapped(full_outcome(verdict="Книга старая, а проблемы те же."))],
+    )
+
+    frame = re.search(r'<div class="verdict-frame">.*?</div>', html, re.S)
+    assert frame, "рамки общего итога нет"
+    assert "Общий итог" in frame.group(0)
+    assert "Книга старая, а проблемы те же." in frame.group(0)
+
+
+def test_the_quote_of_the_evening_is_set_apart_from_the_text():
+    html = page("/meetings/m0", books=[brooks()], meetings=[recapped(full_outcome())])
+
+    assert '<blockquote class="quote quote--evening">' in html

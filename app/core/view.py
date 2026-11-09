@@ -159,6 +159,26 @@ class ChapterView:
     is_started: bool
 
 
+@dataclass(frozen=True)
+class MeetingChapter:
+    """Глава книги так, как она взята на встрече: с пометкой о части, если есть."""
+
+    chapter: Chapter
+    part: str | None = None
+
+    @property
+    def number(self) -> int:
+        return self.chapter.number
+
+    @property
+    def title(self) -> str:
+        return self.chapter.title
+
+    @property
+    def notes_url(self) -> str | None:
+        return self.chapter.notes_url
+
+
 class ClubView:
     """Read-модель клуба: данные плюс всё, что из них выводится."""
 
@@ -439,14 +459,17 @@ class ClubView:
 
     # --- календарь -----------------------------------------------------------
 
-    def chapters_of_meeting(self, meeting: Meeting) -> tuple[Chapter, ...]:
-        """Главы встречи с названиями, по порядку номеров."""
+    def chapters_of_meeting(self, meeting: Meeting) -> tuple[MeetingChapter, ...]:
+        """Главы встречи с названиями и пометками о части, по порядку номеров."""
         book = self._data.book(meeting.book_id) if meeting.book_id else None
         if book is None:
             return ()
         numbers = sorted({item.number for item in meeting.chapters})
-        found = (book.chapter(number) for number in numbers)
-        return tuple(chapter for chapter in found if chapter is not None)
+        return tuple(
+            MeetingChapter(chapter=chapter, part=meeting.part_of(number))
+            for number in numbers
+            if (chapter := book.chapter(number)) is not None
+        )
 
     def calendar_event(self, meeting: Meeting) -> CalendarEvent:
         """Данные события: название, начало, конец по длительности клуба, адрес."""
@@ -635,6 +658,12 @@ def chapter_phrase(numbers: list[int] | tuple[int, ...]) -> str:
     if numbers[-1] - numbers[0] + 1 == len(numbers):
         return f"главы {numbers[0]}–{numbers[-1]}"
     return "главы " + ", ".join(str(number) for number in numbers)
+
+
+def chapter_phrase_taken(numbers: list[int] | tuple[int, ...]) -> str:
+    """То же в винительном падеже, после «берём»: «главу 4», «главы 8–9»."""
+    phrase = chapter_phrase(numbers)
+    return "главу" + phrase[len("глава"):] if phrase.startswith("глава ") else phrase
 
 
 def google_calendar_url(event: CalendarEvent, details: str = "") -> str:

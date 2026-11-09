@@ -445,22 +445,129 @@ a.cover, a.cover:hover { color: var(--paper); text-decoration: none; }
 .meeting-chapters { padding-left: 0; list-style: none; counter-reset: none; }
 .meeting-chapters li { padding: 6px 0; border-bottom: 1px solid var(--ink-line); max-width: none; }
 .meeting-chapters .num { margin-right: 10px; font-family: var(--mono); font-size: 13px; }
+.meeting-chapter { max-width: none; }
+.meeting-chapter .notes, .meeting-chapters .notes { margin-left: 8px; font-size: 14px; }
+/* Пометка о части главы: тише названия, чтобы не спорить с ним. */
+.part { color: var(--muted); }
+.chapter .part { margin-left: 4px; font-size: 13px; }
 
-/* Полные итоги: тот же ритм, что у глав встречи, — пункт под чертой,
-   номер главы моноширинной плашкой. */
+/* Итоги в приёмах афиш: заголовки разделов — плашки моноширинным капсом,
+   тезисы — цветные карточки, споры — карточки с полосой, общий итог в рамке. */
 .recap-heading {
-  font-size: clamp(17px, 3.2vw, 20px);
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  margin: 28px 0 8px;
+  display: inline-block;
+  margin: 36px 0 14px;
+  padding: 4px 10px;
+  background: var(--cyan);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
-.recap-lead { margin-top: 24px; }
-.recap-items { padding-left: 0; list-style: none; margin: 0; }
-.recap-items li { padding: 8px 0; border-bottom: 1px solid var(--ink-line); }
+.recap-heading--magenta { background: var(--magenta); color: var(--paper); }
+
+.theses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.thesis { padding: 16px 18px; background: var(--ink-soft); border-top: 4px solid var(--cyan); }
+.thesis--argued { border-top-color: var(--magenta); }
+.thesis--taken { border-top-color: var(--paper); }
+.thesis p { margin: 0; max-width: none; }
+.thesis .thesis-label {
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.thesis--argued .thesis-label { color: var(--magenta); }
+.thesis--taken .thesis-label { color: var(--paper); }
+
+.quote--evening {
+  margin: 28px 0 0;
+  padding: 18px 22px;
+  background: none;
+  border-left: 6px solid var(--magenta);
+  font-family: var(--hand);
+  font-size: clamp(30px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.1;
+  max-width: none;
+}
+.quote--evening .source { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.recap-lead { margin-top: 28px; font-size: 18px; }
+.recap-items { padding-left: 0; list-style: none; margin: 0; counter-reset: talk; }
+.recap-items li { padding: 12px 0; border-bottom: 1px solid var(--ink-line); }
 .recap-items p { margin: 0; }
 .recap-items .recap-item-head { margin-bottom: 4px; }
+.recap-item-head strong { color: var(--cyan); }
 .recap-item-head .num { margin-right: 10px; font-family: var(--mono); font-size: 13px; }
+/* Порядковый номер пункта — только у встречи по одной главе: у встречи по
+   нескольким главам на этом месте номер главы. */
+.recap-items--counted li { position: relative; padding-left: 46px; }
+.recap-items--counted li::before {
+  counter-increment: talk;
+  content: counter(talk, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--magenta);
+}
+
+.debate-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+.debate {
+  max-width: none;
+  padding: 14px 16px;
+  background: var(--ink-soft);
+  border-left: 4px solid var(--magenta);
+}
+.debate:nth-child(even) { border-left-color: var(--cyan); }
+.debate p { margin: 0; font-size: 15px; }
+.debate .debate-head { margin-bottom: 6px; font-size: 17px; font-weight: 800; line-height: 1.25; overflow-wrap: break-word; }
+
 .recap-aside { color: var(--muted); margin-top: 20px; }
+
+.verdict-frame {
+  position: relative;
+  margin: 40px 0 0;
+  padding: 26px 22px 20px;
+  border: 3px solid var(--paper);
+}
+.verdict-frame .recap-heading { position: absolute; top: -14px; left: 16px; margin: 0; background: var(--magenta); color: var(--paper); }
+.recap-verdict { margin: 0; font-size: 18px; font-weight: 600; max-width: none; }
+
+.meeting-topics { margin-top: 12px; }
+.meeting-topics .plates { margin: 0; }
+
+.announce-later { margin: 36px 0 0; border-top: 1px solid var(--ink-line); padding-top: 14px; }
+.announce-later summary {
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.announce-later summary:hover { color: var(--cyan); }
+.announce-later .announce { margin-top: 12px; }
 
 /* Афиша или карточка итогов: в рамке, как обложка книги. На широком экране
    стоит справа от заголовка встречи, на узком — под ним и не шире 480 точек:

@@ -35,7 +35,7 @@
     <span class="chapter-title">{{ item.chapter.title }}</span>
     {% if not item.is_taken %}<span class="not-taken">не взята</span>{% endif %}
     {% if item.is_started %}<span class="started">перенесена</span>{% endif %}
-    {% for meeting in item.meetings %}<a class="meeting" href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% endfor %}
+    {% for meeting in item.meetings %}<a class="meeting" href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% set part = meeting.part_of(item.chapter.number) %}{% if part %}<span class="part">{{ part }}</span>{% endif %}{% endfor %}
     {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}"{{ item.chapter.notes_url | new_tab }}>конспект</a>{% endif %}
   </li>
   {% endfor %}

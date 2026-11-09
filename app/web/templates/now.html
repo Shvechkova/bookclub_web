@@ -163,8 +163,8 @@
       {# Ведём планом: ближайшие главы важнее служебной строки о том, что
          чтение ещё не начиналось. #}
       {% if upcoming and upcoming_chapters %}
-      <p class="next-chapters">{{ upcoming.meeting.date | day_month }} берём {{ chapter_phrase(upcoming_chapters | map(attribute="number") | list) }}:
-        {% for chapter in upcoming_chapters %}{{ chapter.title }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+      <p class="next-chapters">{{ upcoming.meeting.date | day_month }} берём {{ chapter_phrase_taken(upcoming_chapters | map(attribute="number") | list) }}:
+        {% for chapter in upcoming_chapters %}{{ chapter.title }}{% if chapter.part %} <span class="part">— {{ chapter.part }}</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</p>
       {% endif %}
       {% if progress and progress.done %}
       <p class="progress">Пройдено {{ progress.done }} из {{ progress.taken | chapters_of }}</p>

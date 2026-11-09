@@ -471,3 +471,56 @@ def test_how_to_come_without_an_upcoming_meeting_has_no_meeting_button():
     assert "Ближайшая встреча —" not in how
     assert "Вступить в чат s4m.space" in how
     assert "Приходи в среду" not in how
+
+
+# --- часть главы в плане ближайшей встречи -----------------------------------
+
+
+def next_chapters(html: str) -> str:
+    found = re.search(r'<p class="next-chapters">.*?</p>', html, re.S)
+    assert found, "строки о главах ближайшей встречи нет"
+    return " ".join(found.group(0).split())
+
+
+def reading_two_chapters():
+    return a_book(
+        "b1",
+        status=BookStatus.READING,
+        chapters_override=(
+            Chapter(number=1, title="Компромиссы"),
+            Chapter(number=2, title="Требования"),
+        ),
+    )
+
+
+def test_the_plan_of_the_next_meeting_says_which_part_of_the_chapter_is_taken():
+    meeting = a_meeting(
+        "m1", "2026-09-23", book="b1", planned=(2,), parts={2: "с раздела «Надёжность»"}
+    )
+    line = next_chapters(page("/", books=[reading_two_chapters()], meetings=[meeting]))
+
+    assert "Требования" in line
+    assert line.index("Требования") < line.index("с раздела «Надёжность»")
+
+
+def test_the_plan_of_the_next_meeting_without_a_note_stays_as_it_was():
+    meeting = a_meeting("m1", "2026-09-23", book="b1", planned=(1, 2))
+    line = next_chapters(page("/", books=[reading_two_chapters()], meetings=[meeting]))
+
+    assert "Компромиссы · Требования</p>" in line
+    assert 'class="part"' not in line
+
+
+def test_the_plan_of_the_next_meeting_takes_one_chapter_in_the_accusative():
+    meeting = a_meeting("m1", "2026-09-23", book="b1", planned=(2,))
+    line = next_chapters(page("/", books=[reading_two_chapters()], meetings=[meeting]))
+
+    assert "берём главу 2:" in line
+    assert "берём глава" not in line
+
+
+def test_the_plan_of_the_next_meeting_takes_several_chapters_as_before():
+    meeting = a_meeting("m1", "2026-09-23", book="b1", planned=(1, 2))
+    line = next_chapters(page("/", books=[reading_two_chapters()], meetings=[meeting]))
+
+    assert "берём главы 1–2:" in line

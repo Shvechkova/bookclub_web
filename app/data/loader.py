@@ -443,7 +443,16 @@ def _discussed(raw: Any, where: str) -> DiscussedChapter:
             f"{where}: у главы {raw.get('number')!r} неизвестный исход "
             f"{raw.get('outcome')!r}, известны: {known}"
         ) from None
-    return DiscussedChapter(number=int(_required(raw, "number", where)), outcome=outcome)
+    number = int(_required(raw, "number", where))
+    part = raw.get("part")
+    if "part" in raw and (not isinstance(part, str) or not part.strip()):
+        raise DataError(
+            f"{where}: у главы {number} поле part — строка о том, какая часть главы "
+            f"взята, например «до раздела „Масштабируемость“», а не {part!r}"
+        )
+    return DiscussedChapter(
+        number=number, outcome=outcome, part=part.strip() if part else None
+    )
 
 
 def _format(raw: Any) -> MeetingFormat | None:

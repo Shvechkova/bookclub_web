@@ -185,20 +185,21 @@ meetings:
         src: meetings/m-2026-10-07-recap.jpg
         alt: "Карточка итогов: оценки врут, документация нужна, серебряной пули нет"
 
-  # Главу не дожали: третью перенесли на следующую встречу.
+  # Главу поделили на две встречи: на первой перенесли, на второй закрыли.
+  # `part` говорит словами, какая часть главы взята.
   - id: m-2026-06-17
     date: 2026-06-17
     host: Артём
     book: closed-example
     chapters:
-      - { number: 3, outcome: carried }
+      - { number: 3, outcome: carried, part: до раздела «Развязка» }
 
   - id: m-2026-07-01
     date: 2026-07-01
     host: Лена
     book: closed-example
     chapters:
-      - { number: 3, outcome: closed }
+      - { number: 3, outcome: closed, part: с раздела «Развязка» }
     outcome:
       agreed: Дожали третью главу и на этом книгу закрыли.
       argued: Спорили, стоило ли вообще её дочитывать.

@@ -138,5 +138,5 @@ def test_a_topic_matches_its_term_by_alias_regardless_of_case():
         path="/meetings/m1",
     )
 
-    assert '<a href="/glossary#adr" aria-describedby="topic-tip-1">adr</a>' in html
+    assert 'href="/glossary#adr" aria-describedby="topic-tip-1">adr</a>' in html
     assert 'role="tooltip" id="topic-tip-1">Коротко.</span>' in html
