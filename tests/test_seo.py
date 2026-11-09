@@ -565,6 +565,17 @@ def test_an_unknown_address_answers_with_the_not_found_page():
     assert "application/ld+json" not in html
 
 
+def test_the_not_found_page_has_the_boar_and_the_hand_line():
+    html = site().get("/no-such-page").text
+
+    boar = re.search(r'<img class="not-found-boar"[^>]*>', html)
+    assert boar and 'src="/static/logo-mark.png"' in boar.group(0)
+    assert 'alt=""' in boar.group(0)
+    hand = html.index("Эту главу мы не читали")
+    assert hand < html.index("Такой страницы нет")
+    assert "На главную" in html and "Все книги и встречи" in html
+
+
 def test_an_unknown_meeting_answers_with_the_same_page():
     response = site().get("/meetings/nope")
 

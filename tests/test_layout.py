@@ -210,6 +210,25 @@ def test_no_horizontal_scrolling_on_a_narrow_screen(site):
             browser.close()
 
 
+@pytest.mark.parametrize("viewport", [NARROW, {"width": 1280, "height": 900}], ids=["360", "1280"])
+def test_the_not_found_boar_is_visible_without_horizontal_scrolling(site, viewport):
+    with playwright_api.sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page(viewport=viewport)
+        page.route("https://fonts.**", lambda route: route.abort())
+        try:
+            page.goto(site + "/no-such-page", wait_until="load")
+            boar = page.locator(".not-found-boar")
+            assert boar.is_visible(), "кабана на 404 не видно"
+            box = boar.bounding_box()
+            assert box["x"] >= 0 and box["x"] + box["width"] <= viewport["width"] + 1
+            scroll_width = page.evaluate("document.documentElement.scrollWidth")
+            client_width = page.evaluate("document.documentElement.clientWidth")
+            assert scroll_width <= client_width, "кабан раздвинул страницу"
+        finally:
+            browser.close()
+
+
 def test_the_main_heading_stays_inside_the_screen(site):
     with playwright_api.sync_playwright() as playwright:
         browser = playwright.chromium.launch()
