@@ -739,6 +739,7 @@ terms:
       - { book: fundamental-software-architecture, chapter: 17 }
       - { book: learning-domain-driver-design, chapter: 14 }
       - { book: building-microservices, chapter: 1 }
+      - { book: kleppmann-ddia-2, chapter: 1 }
     related: [bounded-context, service-granularity, saga, subdomain, deep-module]
 
   - id: service-granularity
@@ -1497,7 +1498,8 @@ terms:
     chapters:
       - { book: learning-domain-driver-design, chapter: 8 }
       - { book: learning-domain-driver-design, chapter: 16 }
-    related: [cqrs, data-mesh]
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [cqrs, data-mesh, etl, data-warehouse, system-of-record]
 
   - id: data-mesh
     name: Сеть данных
@@ -2054,6 +2056,7 @@ terms:
       даты рождения. Данные, которых нет, нельзя украсть и нельзя затребовать.
     chapters:
       - { book: building-microservices, chapter: 11 }
+      - { book: kleppmann-ddia-2, chapter: 1 }
     related: [least-privilege]
 
   - id: resilience
@@ -2537,3 +2540,97 @@ terms:
     chapters:
       - { book: brooks-mythical-man-month, chapter: 19 }
     related: [iterative-development]
+
+  # --- конспекты: «Высоконагруженные приложения», 2-е издание ---------------
+
+  - id: data-intensive-application
+    name: Data-intensive приложение
+    aliases: [Data-intensive, Data-intensive application, Compute-intensive]
+    summary: >
+      Приложение, где одна из главных трудностей — управление данными: объём,
+      изменения, согласованность при сбоях и конкурентном доступе, высокая
+      доступность. В compute-intensive системах трудность другая: распараллелить
+      большое вычисление.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [hpc, oltp-olap]
+
+  - id: etl
+    name: ETL
+    aliases: [ELT, Extract-Transform-Load]
+    summary: >
+      Извлечь данные из операционных систем, привести к удобной схеме и
+      очистить, загрузить в хранилище. Если преобразование идёт уже внутри
+      хранилища, это ELT.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [data-warehouse, data-lake, oltp-olap]
+
+  - id: data-warehouse
+    name: Хранилище данных
+    aliases: [Data Warehouse, DWH]
+    summary: >
+      Отдельная база для аналитики: копия данных из операционных систем только
+      для чтения, приведённая к удобной схеме. Её выносят отдельно, чтобы
+      тяжёлые запросы не тормозили пользователей и чтобы собрать данные,
+      разбросанные по десяткам систем.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [etl, data-lake, oltp-olap]
+
+  - id: data-lake
+    name: Озеро данных
+    aliases: [Data Lake]
+    summary: >
+      Централизованный репозиторий файлов любого формата без навязанной схемы.
+      Данные лежат сырыми, каждый потребитель преобразует их под себя. Гибче и
+      дешевле хранилища и может быть промежуточной остановкой перед ним.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [data-warehouse, etl]
+
+  - id: system-of-record
+    name: Система записи и производные данные
+    aliases: [System of Record, Source of truth, Система записи, Производные данные, Derived data]
+    summary: >
+      Система записи хранит каноническую версию данных: новое пишется сюда
+      первым, и при расхождении права она. Производные данные — результат
+      преобразования: кэш, индексы, материализованные представления. Они
+      избыточны по определению, и их можно пересоздать из источника.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [data-warehouse]
+
+  - id: cloud-native
+    name: Cloud native
+    aliases: [Облачно-нативная архитектура, Cloud-native]
+    summary: >
+      Архитектура, спроектированная под облачные сервисы: высокоуровневые
+      сервисы строят поверх низкоуровневых облачных, например объектных
+      хранилищ. Хранение и вычисления при этом разделены, данные ходят по сети.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [vendor-lock-in]
+
+  - id: vendor-lock-in
+    name: Vendor lock-in
+    aliases: [Привязка к поставщику, Привязка к вендору]
+    summary: >
+      Зависимость от облачного провайдера: если сервис закрывается, дорожает
+      или меняется, остаётся только мигрировать, а без стандартных API это
+      трудно.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [cloud-native]
+
+  - id: hpc
+    name: HPC
+    aliases: [High-performance computing, Высокопроизводительные вычисления, Суперкомпьютер]
+    summary: >
+      Суперкомпьютеры для научных вычислений: погода, климат, молекулярная
+      динамика. Узлы стоят рядом и доверяют друг другу, а при отказе всё
+      останавливают и перезапускают с контрольной точки. Облачный сервис,
+      наоборот, останавливаться не должен.
+    chapters:
+      - { book: kleppmann-ddia-2, chapter: 1 }
+    related: [data-intensive-application]
