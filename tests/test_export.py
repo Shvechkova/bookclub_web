@@ -249,6 +249,13 @@ def test_export_writes_a_not_found_page(tmp_path):
     assert broken_links(tmp_path, base="/bookclub_web") == []
 
 
+def test_export_puts_the_metrika_counter_on_the_not_found_page(tmp_path):
+    export_site(a_site(), tmp_path, today=TODAY, metrika_id="114153922")
+
+    assert "mc.yandex.ru/metrika/tag.js?id=114153922" in (tmp_path / "404.html").read_text(encoding="utf-8")
+    assert "mc.yandex.ru/metrika/tag.js?id=114153922" in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
 def test_only_the_not_found_page_is_closed_from_indexing(tmp_path):
     export_site(a_site(), tmp_path, today=TODAY, origin="https://example.org")
 

@@ -19,7 +19,7 @@ ORIGIN = "https://example.org"
 
 
 def site(*, origin=ORIGIN, base="", club=None, meetings=None, books=None,
-         glossary=(), verification=None) -> TestClient:
+         glossary=(), verification=None, metrika_id=None) -> TestClient:
     books = books or [
         a_book(
             "b1",
@@ -39,7 +39,7 @@ def site(*, origin=ORIGIN, base="", club=None, meetings=None, books=None,
     )
     app = create_app(
         view=view, today=lambda: TODAY, base=base, origin=origin,
-        verification=verification,
+        verification=verification, metrika_id=metrika_id,
     )
     return TestClient(app)
 
@@ -598,6 +598,44 @@ def test_without_codes_there_are_no_verification_tags():
     html = page("/")
 
     assert "verification" not in html
+
+
+# --- счётчик Яндекс.Метрики --------------------------------------------------
+
+
+def test_the_metrika_id_is_read_from_the_environment():
+    assert seo.metrika_id_from_env({"YANDEX_METRIKA_ID": "114153922"}) == "114153922"
+    assert seo.metrika_id_from_env({"YANDEX_METRIKA_ID": " 114153922 "}) == "114153922"
+
+
+def test_an_empty_or_odd_metrika_id_is_ignored():
+    for value in ("", "   ", 'abc"', "123 456", "12a"):
+        assert seo.metrika_id_from_env({"YANDEX_METRIKA_ID": value}) is None, value
+    assert seo.metrika_id_from_env({}) is None
+
+
+def assert_has_metrika(html: str) -> None:
+    assert "https://mc.yandex.ru/metrika/tag.js?id=114153922" in html
+    assert "ym(114153922, 'init'" in html
+    noscript = re.search(r"<noscript>(.*?)</noscript>", html, re.S)
+    assert noscript and "https://mc.yandex.ru/watch/114153922" in noscript.group(1)
+
+
+def test_the_metrika_counter_is_on_every_page():
+    for path in ("/", "/about"):
+        assert_has_metrika(page(path, metrika_id="114153922"))
+
+
+def test_the_metrika_counter_is_on_the_not_found_page():
+    response = site(metrika_id="114153922").get("/no-such-page")
+
+    assert response.status_code == 404
+    assert_has_metrika(response.text)
+
+
+def test_without_a_metrika_id_there_is_no_counter():
+    assert "mc.yandex.ru" not in page("/")
+    assert "mc.yandex.ru" not in site().get("/no-such-page").text
 
 
 # --- адрес сайта не задан ----------------------------------------------------

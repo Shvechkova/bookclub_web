@@ -48,9 +48,13 @@ jobs:
         #
         # Коды подтверждения прав в Яндекс.Вебмастере и Google Search Console —
         # переменные репозитория с теми же именами. Не заданы — тегов нет.
+        #
+        # Номер счётчика Яндекс.Метрики — переменная YANDEX_METRIKA_ID. Не
+        # задана — счётчика на страницах нет.
         env:
           DOMAIN: ${{ vars.SITE_DOMAIN }}
           YANDEX_VERIFICATION: ${{ vars.YANDEX_VERIFICATION }}
+          YANDEX_METRIKA_ID: ${{ vars.YANDEX_METRIKA_ID }}
           GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
           REPO: ${{ github.event.repository.name }}
           OWNER: ${{ github.repository_owner }}

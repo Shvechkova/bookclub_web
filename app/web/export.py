@@ -39,6 +39,7 @@ def export_site(
     base: str = "",
     origin: str = "",
     verification: dict[str, str] | None = None,
+    metrika_id: str | None = None,
 ) -> list[Path]:
     """Раскладывает сайт в папку. Возвращает список записанных файлов.
 
@@ -55,7 +56,8 @@ def export_site(
     day = today or Day.today()
     client = TestClient(
         create_app(
-            view=view, today=lambda: day, base=base, origin=origin, verification=verification
+            view=view, today=lambda: day, base=base, origin=origin,
+            verification=verification, metrika_id=metrika_id,
         )
     )
 
@@ -145,6 +147,7 @@ def main(argv: list[str]) -> int:
         base=base,
         origin=origin,
         verification=seo.verification_from_env(os.environ),
+        metrika_id=seo.metrika_id_from_env(os.environ),
     )
     print(f"выгружено файлов: {len(written)} в {Path(out).resolve()}")
     return 0

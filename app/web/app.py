@@ -58,6 +58,7 @@ def create_app(
     base: str = "",
     origin: str = "",
     verification: dict[str, str] | None = None,
+    metrika_id: str | None = None,
 ) -> FastAPI:
     """Собирает приложение сайта клуба.
 
@@ -73,6 +74,10 @@ def create_app(
 
     `verification` — коды подтверждения прав в Яндексе и Google: имя мета-тега
     → значение, см. `seo.verification_from_env`.
+
+    `metrika_id` — номер счётчика Яндекс.Метрики, см. `seo.metrika_id_from_env`.
+    Не задан — счётчика на страницах нет: локальный запуск и тесты статистику
+    не портят.
     """
     folder = base.strip("/")
     prefix = f"/{folder}" if folder else ""
@@ -110,6 +115,7 @@ def create_app(
         view=club_view,
         chapter_phrase=chapter_phrase,
         verification=verification or {},
+        metrika_id=metrika_id,
     )
     templates.env.filters.update(
         day_month=humanize.day_month,

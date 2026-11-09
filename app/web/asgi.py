@@ -12,5 +12,8 @@ import os
 from app.web import seo
 from app.web.app import create_app
 
-# Коды подтверждения прав в поисковиках — те же переменные, что у выгрузки.
-app = create_app(verification=seo.verification_from_env(os.environ))
+# Коды подтверждения прав и счётчик Метрики — те же переменные, что у выгрузки.
+app = create_app(
+    verification=seo.verification_from_env(os.environ),
+    metrika_id=seo.metrika_id_from_env(os.environ),
+)

@@ -477,3 +477,13 @@ def verification_from_env(environ: Mapping[str, str]) -> dict[str, str]:
         for name, tag in VERIFICATION_ENV.items()
         if environ.get(name, "").strip()
     }
+
+
+def metrika_id_from_env(environ: Mapping[str, str]) -> str | None:
+    """Номер счётчика Яндекс.Метрики из `YANDEX_METRIKA_ID`.
+
+    Номер подставляется внутрь скрипта и в адрес, поэтому берётся только из
+    цифр; всё прочее — как будто переменной нет, и счётчика на страницах нет.
+    """
+    value = environ.get("YANDEX_METRIKA_ID", "").strip()
+    return value if value.isascii() and value.isdigit() else None
