@@ -149,7 +149,7 @@
     <p class="warmup-name" id="warmup-name">{{ club.warmup.name }}</p>
     <p class="warmup-lead">{{ club.warmup.lead }}</p>
   </div>
-  <a class="button button--magenta warmup-play" href="{{ club.warmup.url }}"{{ club.warmup.url | new_tab }}>Играть</a>
+  <a class="button button--magenta warmup-play" href="{{ club.warmup.url }}" data-goal="warmup"{{ club.warmup.url | new_tab }}>Играть</a>
 </aside>
 {% endif %}
 

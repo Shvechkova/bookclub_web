@@ -21,7 +21,7 @@
   {% endif %}
 {% endif %}
 
-{% if book.notes_url %}<p class="notes"><a href="{{ book.notes_url }}"{{ book.notes_url | new_tab }}>Конспект книги</a></p>{% endif %}
+{% if book.notes_url %}<p class="notes"><a href="{{ book.notes_url }}" data-goal="notes"{{ book.notes_url | new_tab }}>Конспект книги</a></p>{% endif %}
 {% if book.close_note %}<p class="close-note">{{ book.close_note }}</p>{% endif %}
 {% if book.takeaways %}
 <ul class="takeaways">{% for item in book.takeaways %}<li>{{ item }}</li>{% endfor %}</ul>
@@ -36,7 +36,7 @@
     {% if not item.is_taken %}<span class="not-taken">не взята</span>{% endif %}
     {% if item.is_started %}<span class="started">перенесена</span>{% endif %}
     {% for meeting in item.meetings %}<a class="meeting" href="{{ url('/meetings/' ~ meeting.id) }}">#{{ view.number_of(meeting.id) }}</a>{% set part = meeting.part_of(item.chapter.number) %}{% if part %}<span class="part">{{ part }}</span>{% endif %}{% endfor %}
-    {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}"{{ item.chapter.notes_url | new_tab }}>конспект</a>{% endif %}
+    {% if item.chapter.notes_url %}<a class="notes" href="{{ item.chapter.notes_url }}" data-goal="notes"{{ item.chapter.notes_url | new_tab }}>конспект</a>{% endif %}
   </li>
   {% endfor %}
 </ol>

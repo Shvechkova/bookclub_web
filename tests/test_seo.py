@@ -8,7 +8,7 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
-from app.core.models import BookStatus, MeetingImage, Outcome
+from app.core.models import BookStatus, Chapter, MeetingImage, Outcome, Warmup
 from app.core.view import ClubView
 from app.web import seo
 from app.web.app import STATIC, create_app
@@ -660,3 +660,74 @@ def test_without_a_site_address_the_absolute_markup_is_skipped():
     assert "application/ld+json" not in html
     assert meta(html, "description")
 
+
+# --- цели счётчика -----------------------------------------------------------
+
+
+def goal_of(html: str, href_start: str) -> str | None:
+    """Цель у первой ссылки, адрес которой начинается с `href_start`."""
+    found = re.search(rf'<a [^>]*href="{re.escape(href_start)}[^"]*"[^>]*>', html)
+    assert found, f"ссылки {href_start} нет"
+    goal = re.search(r'data-goal="([^"]+)"', found.group(0))
+    return goal.group(1) if goal else None
+
+
+def test_with_a_counter_clicks_on_marked_links_reach_goals():
+    html = page("/", metrika_id="114153922")
+
+    assert "reachGoal" in html
+    assert "[data-goal]" in html
+    assert "ym(114153922, 'reachGoal'" in html
+
+
+def test_without_a_counter_there_is_no_goal_code():
+    assert "reachGoal" not in page("/")
+    assert "reachGoal" not in site().get("/no-such-page").text
+
+
+def test_the_club_chat_is_marked_as_the_chat_goal():
+    for path in ("/", "/about"):
+        html = page(path, metrika_id="114153922")
+        chats = re.findall(r'<a [^>]*href="https://t.me/kabanya"[^>]*>', html)
+        assert chats, path
+        assert all('data-goal="chat"' in anchor for anchor in chats), path
+
+
+def test_the_calendar_link_is_marked_as_the_calendar_goal():
+    meeting = a_meeting("m2", "2026-09-30", book="b1", planned=(2,))
+    html = page("/meetings/m2", metrika_id="114153922", meetings=[meeting])
+
+    assert goal_of(html, "https://calendar.google.com") == "calendar"
+
+
+def test_notes_links_are_marked_as_the_notes_goal():
+    book = a_book(
+        "b1",
+        status=BookStatus.READING,
+        notes_url="https://notes/book",
+        chapters_override=(Chapter(number=1, title="Начало", notes_url="https://notes/1"),),
+    )
+    meeting = a_meeting("m1", "2026-09-09", book="b1", closed=(1,))
+    book_page = page("/books/b1", books=[book], meetings=[meeting])
+    meeting_page = page("/meetings/m1", books=[book], meetings=[meeting])
+
+    assert goal_of(book_page, "https://notes/book") == "notes"
+    assert goal_of(book_page, "https://notes/1") == "notes"
+    assert goal_of(meeting_page, "https://notes/1") == "notes"
+
+
+def test_the_warmup_button_is_marked_as_the_warmup_goal():
+    club = a_club(
+        space=a_space(),
+        telegram="https://t.me/kabanya",
+        warmup=Warmup(name="Тыжархитектор", lead="Тренажёр.", url="https://example.github.io/game/"),
+    )
+    html = page("/", club=club)
+
+    assert goal_of(html, "https://example.github.io/game/") == "warmup"
+
+
+def test_other_links_carry_no_goal():
+    html = page("/about", metrika_id="114153922")
+
+    assert goal_of(html, "https://s4m.space/") is None

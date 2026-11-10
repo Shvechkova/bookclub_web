@@ -24,7 +24,7 @@
   <h2>{% if is_past %}Разобрали{% else %}Разбираем{% endif %}</h2>
   {# Одна глава — строкой: список из одного пункта читается как обрывок плана.
      Пометка о части и конспект стоят одинаково в строке и в списке. #}
-  {% macro chapter_tail(chapter) %}{% if chapter.part %} <span class="part">— {{ chapter.part }}</span>{% endif %}{% if chapter.notes_url %} <a class="notes" href="{{ chapter.notes_url }}"{{ chapter.notes_url | new_tab }}>конспект</a>{% endif %}{% endmacro %}
+  {% macro chapter_tail(chapter) %}{% if chapter.part %} <span class="part">— {{ chapter.part }}</span>{% endif %}{% if chapter.notes_url %} <a class="notes" href="{{ chapter.notes_url }}" data-goal="notes"{{ chapter.notes_url | new_tab }}>конспект</a>{% endif %}{% endmacro %}
   {% if chapters | length == 1 %}
   {% set chapter = chapters[0] %}
   <p class="meeting-chapter">Глава {{ chapter.number }}. {{ chapter.title }}{{ chapter_tail(chapter) }}</p>
@@ -117,7 +117,7 @@
 <ul class="terms">{% for term in club.terms %}<li>{{ term }}</li>{% endfor %}</ul>
 {% endif %}
 {% if calendar_url %}
-<p class="calendar"><a href="{{ calendar_url }}">В календарь</a></p>
+<p class="calendar"><a href="{{ calendar_url }}" data-goal="calendar">В календарь</a></p>
 {% endif %}
 {% endif %}
 

@@ -64,7 +64,7 @@
     {% if club.space and club.space.thread %}<a class="button button--cyan" href="{{ club.space.thread }}"{{ club.space.thread | new_tab }}>Ветка книжного клуба</a>{% endif %}
     {% if club.space and club.space.channel %}<a class="button button--outline" href="{{ club.space.channel }}"{{ club.space.channel | new_tab }}>Канал {{ club.space.name }}</a>{% endif %}
     {% if club.space and club.space.site %}<a class="button button--outline" href="{{ club.space.site }}"{{ club.space.site | new_tab }}>Сайт {{ club.space.name }}</a>{% endif %}
-    {% if club.telegram %}<span class="about-club-chat"><a class="button button--outline" href="{{ club.telegram }}"{{ club.telegram | new_tab }}>Чат читальни</a> <span class="about-club-chat-note">— после первого посещения</span></span>{% endif %}
+    {% if club.telegram %}<span class="about-club-chat"><a class="button button--outline" href="{{ club.telegram }}" data-goal="chat"{{ club.telegram | new_tab }}>Чат читальни</a> <span class="about-club-chat-note">— после первого посещения</span></span>{% endif %}
   </p>
   {% endif %}
 </section>

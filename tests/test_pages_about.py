@@ -114,7 +114,9 @@ def test_the_club_chat_is_offered_after_the_first_visit():
     html = page(**ABOUT, telegram="https://t.me/kabanya")
 
     chat = html[html.index('class="about-club-chat"'):]
-    assert 'href="https://t.me/kabanya" target="_blank" rel="noopener">Чат читальни</a>' in chat
+    link = re.search(r'<a [^>]*href="https://t.me/kabanya"[^>]*>Чат читальни</a>', chat)
+    assert link, "кнопки чата читальни нет"
+    assert 'target="_blank" rel="noopener"' in link.group(0)
     assert "после первого посещения" in chat
     assert html.index(a_space().site) < html.index("https://t.me/kabanya"), (
         "чат читальни — последним, после всех ссылок площадки"
