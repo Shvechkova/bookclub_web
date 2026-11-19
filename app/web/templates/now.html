@@ -46,8 +46,10 @@
     <p class="sticker"><span class="sticker-lead">Начинаем новую книгу</span><span class="sticker-number">встреча #{{ upcoming.number }}</span></p>
     {% endif %}
     <h2 class="next-title">{{ view.title_of(upcoming.meeting) }}</h2>
+    {# На «Сейчас» — только начало анонса: целиком он на странице встречи,
+       куда ведёт «Подробности встречи». #}
     {% if upcoming.meeting.announce %}
-    <ul class="announce">{% for item in upcoming.meeting.announce %}<li>{{ item }}</li>{% endfor %}</ul>
+    <ul class="announce">{% for item in upcoming.meeting.announce[:1] %}<li>{{ item }}</li>{% endfor %}</ul>
     {% endif %}
     {% if upcoming.meeting.format %}
     <p class="format">Второй час: {{ upcoming.meeting.format.name }}{% if upcoming.meeting.format.note %} — {{ upcoming.meeting.format.note }}{% endif %}</p>

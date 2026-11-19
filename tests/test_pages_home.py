@@ -123,6 +123,37 @@ def test_without_a_poster_the_next_meeting_has_no_room_for_one():
     assert "/static/meetings/" not in html
 
 
+# --- анонс ближайшей встречи -------------------------------------------------
+
+ANNOUNCE_ITEMS = (
+    "Первый пункт анонса.",
+    "Второй пункт анонса.",
+    "Третий пункт анонса.",
+)
+
+
+def test_now_shows_only_the_first_announcement_item():
+    setup = dict(
+        books=[a_book("b1")],
+        meetings=[
+            a_meeting(
+                "m1", "2026-09-23", book="b1", planned=(1,), announce=ANNOUNCE_ITEMS
+            )
+        ],
+    )
+
+    next_block = re.search(
+        r'<section class="next">.*?</section>', page("/", **setup), re.S
+    ).group(0)
+    assert ANNOUNCE_ITEMS[0] in next_block
+    for item in ANNOUNCE_ITEMS[1:]:
+        assert item not in next_block, "на «Сейчас» анонс пойдёт целиком"
+
+    meeting_page = page("/meetings/m1", **setup)
+    positions = [meeting_page.index(item) for item in ANNOUNCE_ITEMS]
+    assert positions == sorted(positions), "на странице встречи анонс идёт не по порядку"
+
+
 # --- обложки в «Истории» ------------------------------------------------------
 
 
